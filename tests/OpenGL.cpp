@@ -9,8 +9,7 @@
 #include "../src/Window/Window.hpp"
 #include "../src/Graphics/Common.hpp"
 #include "../src/Util/Common.hpp"
-
-#include "../src/Math/Vector.hpp"
+#include "../src/System/Logger.hpp"
 
 
 int main()
@@ -18,19 +17,26 @@ int main()
 	using namespace DevaFramework;
 	using namespace gl;
 	using namespace glbinding;
+
 	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
 	Window::setCurrentWindow(wnd);
 
+	Logger::log("Created Window");
+
 	glbinding::Binding::initialize();
+
+	Logger::log("Initialized glBinding");
 
 	std::string vshader = readTextFile("shaders/Empty.vertex.glsl");
 	std::string fshader = readTextFile("shaders/Empty.fragment.glsl");
 
 	GLuint progid = loadShaderSet(vshader, fshader);
 
+	Logger::log("Loaded shaders");
+
 	const float triangle_coords_colors[] =
 	{ -1.f, -1.f, 0.f, 1.f,
-	  -1.f,  1.f, 0.f, 1.f,
+	   0.f,  1.f, 0.f, 1.f,
 	   1.f, -1.f, 0.f, 1.f,
  	   1.f,  0.f, 0.f, 1.f,
 	   0.f,  1.f, 0.f, 1.f,
@@ -43,41 +49,13 @@ int main()
 	glBindBuffer(gl::GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), &triangle_coords_colors[0], GL_STATIC_DRAW);
 
+	Logger::log("Loaded buffer");
+
 	GLuint mvp_unif = glGetUniformLocation(progid, "MVP");
-
-	float ds = 0.01f, dr = 0.05f;
-	float scale = 1.0f, rotate = 0;
-	glm::mat4 mvp = glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-	glm::mat4 mRot;
-	glm::mat4 mScale;
-	mRot = glm::rotate(glm::mat4(), rotate, glm::vec3(0, 0, 0));
-	mScale = glm::scale(glm::mat4(), glm::vec3(scale, scale, 1));
-
-	glm::mat4 model = glm::scale(glm::mat4(), glm::vec3(300.f, 300.f, 1.f));
-
-	glm::mat4 view = glm::translate(glm::vec3(0.f, 0.f, 0.f));
-	
-	glm::mat4 proj = glm::ortho(-400.f, 400.f, -300.f, 300.f);
-
-
-
-
-
 
 	while (!wnd.shouldClose())
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		if (scale >= 1.0f || scale <= 0.2f) ds = -ds;
-		scale += ds;
-		if (rotate + dr == 360) rotate = -dr;
-		rotate += dr;
-
-		mRot = glm::rotate(glm::mat4(), rotate, glm::vec3(0, 0, 1));
-		mScale = glm::scale(glm::mat4(), glm::vec3(scale, scale, 1));
-		mvp = proj * view * model;
-
-		glUniformMatrix4fv(mvp_unif, 1, GL_FALSE, &mvp[0][0]);
 		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0,
@@ -99,4 +77,5 @@ int main()
 
 		wnd.update();
 	}
+	Logger::log("Terminating");
 }

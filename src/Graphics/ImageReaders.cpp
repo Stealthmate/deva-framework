@@ -1,7 +1,8 @@
 #include "ImageReaders.hpp"
 
 #include <fstream>
-
+#include "../src/System/Logger.hpp"
+#include <iostream>
 using namespace DevaFramework;
 
 #include <libpng/png.h>
@@ -56,7 +57,7 @@ RawImage DevaFramework::readPNG(const std::string &filename)
 
 
     png_bytep* rowPtrs = NULL;
-    char* data = NULL;
+    unsigned char* data = NULL;
 
     png_set_read_fn(pngPtr,(png_voidp)&source, readData);
 
@@ -78,7 +79,7 @@ RawImage DevaFramework::readPNG(const std::string &filename)
 
     rowPtrs = new png_bytep[imgHeight];
 
-    data = new char[imgWidth * imgHeight * bitdepth * channels / 8];
+    data = new unsigned char[imgWidth * imgHeight * bitdepth * channels / 8];
 
     const unsigned int stride = imgWidth * bitdepth * channels / 8;
 

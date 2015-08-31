@@ -6,9 +6,6 @@
 namespace DevaFramework
 {
 
-
-
-
 }
 
 #endif  //DEVA_FRAMEWORK_SYSTEM_CONFIG_H

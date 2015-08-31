@@ -27,7 +27,7 @@ private:
 
 public:
 
-    static DEVA_API void log(const std::string &msg, LogLevel l);
+    static DEVA_API void log(const std::string &msg, LogLevel l = LogLevel::MESSAGE);
 };
 
 }

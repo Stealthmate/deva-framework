@@ -31,17 +31,20 @@ Logger::func_LogCallback Logger::log_func = [](const std::string &msg, Logger::L
 	{
 	case MESSAGE :
 	{
-		std::cout << msg << std::endl;
+		std::cout << "[Deva Framework]: Message: " << msg << std::endl;
 	}break;
 	case WARNING :
+	{
+		std::cerr << "[Deva Framework]: Warning: " << msg << std::endl;
+	}break;
 	case ERROR :
 	{
-		std::cerr << msg << std::endl;
+		std::cerr << "[Deva Framework]: Error: " << msg << std::endl;
 	}break;
 	case FATAL_ERROR :
 	{
-		std::cerr << msg << std::endl;
-		std::cout << msg << std::endl;
+		std::cerr << "[Deva Framework]: Fatal Error: " << msg << std::endl;
+		std::cerr << "[Deva Framework]: Fatal Error: " << msg << std::endl;
 		exit(1);
 	}
 	}

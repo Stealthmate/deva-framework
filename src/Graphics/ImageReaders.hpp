@@ -16,7 +16,7 @@ struct RawImage
 
     unsigned short error = 0;
 
-    char* data = 0;
+    unsigned char* data = 0;
     unsigned int width = 0;
     unsigned int height = 0;
     unsigned char channels = 0;
