@@ -10,7 +10,8 @@
 #include "../src/Graphics/Common.hpp"
 #include "../src/Util/Common.hpp"
 #include "../src/System/Logger.hpp"
-
+#include "../src/Graphics/Shader.hpp"
+#include "../src/Graphics/ShaderProgram.hpp"
 
 int main()
 {
@@ -30,7 +31,18 @@ int main()
 	std::string vshader = readTextFile("shaders/Empty.vertex.glsl");
 	std::string fshader = readTextFile("shaders/Empty.fragment.glsl");
 
-	GLuint progid = loadShaderSet(vshader, fshader);
+	Shader vs = Shader(GL_VERTEX_SHADER, vshader);
+	Shader fs = Shader(GL_FRAGMENT_SHADER, fshader);
+
+	Logger::log(vs.compile());
+	Logger::log(fs.compile());
+
+	ShaderProgram prog = ShaderProgram();
+	prog.attachShader(vs).attachShader(fs);
+
+	Logger::log(prog.link());
+
+	GLuint progid = prog.getHandle();
 
 	Logger::log("Loaded shaders");
 

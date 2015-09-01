@@ -2,7 +2,6 @@
 
 #include "ImageReaders.hpp"
 #include "../System/Logger.hpp"
-#include <glbinding/gl/gl.h>
 
 using namespace DevaFramework;
 
