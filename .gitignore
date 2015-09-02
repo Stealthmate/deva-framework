@@ -1,7 +1,9 @@
 Win64/**
-bin/**
-!*.glsl
+bin/*.exe
+bin/*.pdb
+bin/*.dll
 !CMakeLists.txt
+!*.glsl
 !glbinding.dll
 !glfw3.dll
 !glew32.dll
