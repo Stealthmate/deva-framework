@@ -13,14 +13,12 @@ Shader::Shader(GLenum shaderType, const std::string &source)
 	setSource(source);
 }
 
-Shader& Shader::operator=(const Shader &shader)
+Shader::Shader(Shader &&shader)
 {
-	if (&shader == this) return *this;
-
-	if (this->handle != SHADER_HANDLE_NULL) glDeleteShader(this->handle);
 	this->handle = shader.handle;
+	shader.handle = SHADER_HANDLE_NULL;
 	setSource(shader.source);
-	return *this;
+	shader.source = "";
 }
 
 Shader& Shader::operator=(Shader &&shader)

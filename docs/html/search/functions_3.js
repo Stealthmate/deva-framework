@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['loadimagefromfile',['loadImageFromFile',['../struct_deva_framework_1_1_image.html#abcd9d2bede67aea15ac6ce450c2fa66e',1,'DevaFramework::Image']]]
+  ['detachshader',['detachShader',['../class_deva_framework_1_1_shader_program.html#a66ca950388046cbe30ed4682af40e69d',1,'DevaFramework::ShaderProgram']]]
 ];

@@ -29,6 +29,7 @@ private:
 
 
 
+
 public:
 
 	static DEVA_SYSTEM_API const Logger log;
@@ -36,7 +37,13 @@ public:
 	static DEVA_SYSTEM_API const Logger err;
 	static DEVA_SYSTEM_API const Logger assert;
 
-	DEVA_SYSTEM_API Logger(LogLevel level, func_LogCallback f);
+	static DEVA_SYSTEM_API const std::string endl;
+
+	static DEVA_SYSTEM_API void println(const std::string &msg, const Logger& out = log);
+
+	DEVA_SYSTEM_API Logger(func_LogCallback f, LogLevel level, const std::string &stamp);
+
+	std::string stamp;
 
 	template<typename T>
 	const Logger& operator<<(const T &msg) const

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['position',['position',['../struct_deva_framework_1_1_vertex_buffer_object.html#ac872e843a4128e8166595f17b80e0319',1,'DevaFramework::VertexBufferObject']]],
-  ['ptr_5fsize',['PTR_SIZE',['../class_deva_framework_1_1_pool_allocator.html#ade89c30765b988731d5b7c1bbd90124d',1,'DevaFramework::PoolAllocator']]]
+  ['offset',['offset',['../struct_deva_framework_1_1_vertex_buffer_object_1_1_vertex_array_object.html#afc8a4982414dec9cb912e9b405777c80',1,'DevaFramework::VertexBufferObject::VertexArrayObject']]]
 ];

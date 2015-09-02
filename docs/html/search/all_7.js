@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['nvaluespervertex',['nValuesPerVertex',['../struct_deva_framework_1_1_vertex_buffer_object_1_1_vertex_array_object.html#aaa5d4be0065634e99e0c4b71250edf17',1,'DevaFramework::VertexBufferObject::VertexArrayObject']]],
-  ['nvertices',['nVertices',['../struct_deva_framework_1_1_vertex_buffer_object.html#a7401e4d7c12ae71159e5e27a3e832507',1,'DevaFramework::VertexBufferObject']]]
+  ['magnitude',['magnitude',['../class_deva_framework_1_1_base_vector.html#a0a598424094f6508347bd26864420fbf',1,'DevaFramework::BaseVector']]],
+  ['move',['move',['../class_deva_framework_1_1_window.html#aefc4074e69567370c8e000e13743a3bf',1,'DevaFramework::Window']]]
 ];

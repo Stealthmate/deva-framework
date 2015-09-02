@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['rawimage',['RawImage',['../struct_deva_framework_1_1_raw_image.html',1,'DevaFramework']]],
-  ['readpng',['readPNG',['../namespace_deva_framework.html#a5e026ffa034edda7fb770f29b75f211a',1,'DevaFramework']]],
-  ['resize',['resize',['../class_deva_framework_1_1_window.html#a019da94c67ed9abb164f3b20f2d83927',1,'DevaFramework::Window']]]
+  ['poolallocator',['PoolAllocator',['../class_deva_framework_1_1_pool_allocator.html',1,'DevaFramework']]],
+  ['position',['position',['../struct_deva_framework_1_1_vertex_buffer_object.html#a6bcbda56f30afef65b09de84c5f68649',1,'DevaFramework::VertexBufferObject']]],
+  ['ptr_5fsize',['PTR_SIZE',['../class_deva_framework_1_1_pool_allocator.html#ade89c30765b988731d5b7c1bbd90124d',1,'DevaFramework::PoolAllocator']]]
 ];

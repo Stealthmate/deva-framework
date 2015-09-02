@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['update',['update',['../class_deva_framework_1_1_window.html#a59515fc5a56e86d5a46d771595daac55',1,'DevaFramework::Window']]]
+  ['normal',['normal',['../class_deva_framework_1_1_base_vector.html#abf2763941c7bbf93b5e8934391ada53a',1,'DevaFramework::BaseVector']]]
 ];

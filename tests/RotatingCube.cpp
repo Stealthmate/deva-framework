@@ -2,9 +2,7 @@
 
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
-
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
+#include <iostream>
 
 #include "../src/Window/Window.hpp"
 #include "../src/Graphics/Common.hpp"
@@ -26,18 +24,18 @@ int main()
 	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
 	Window::setCurrentWindow(wnd);
 
-	Logger::log << "Created Window";
+	Logger::println("Created Window");
 
 	glbinding::Binding::initialize();
 
-	Logger::log << "Initialized glBinding";
+	Logger::println("Initialized glBinding");
 
 	std::string vshader = readTextFile("shaders/Empty.vertex.glsl");
 	std::string fshader = readTextFile("shaders/Empty.fragment.glsl");
 
 	GLuint progid = loadShaderSet(vshader, fshader);
 
-	Logger::log << "Loaded shaders";
+	Logger::println("Loaded Shaders");
 
 	GLfloat coords[] =
 	{
@@ -112,7 +110,6 @@ int main()
 		vec4{+0.0f, +0.0f, +1.0f, +0.0f},
 		vec4{+0.0f, +0.0f, +0.0f, +1.0f}
 	};
-
 	GLfloat Near_plane = 0.1f;
 	GLfloat Far_plane = 1000.f;
 	GLfloat frustum_length = Far_plane - Near_plane;
@@ -133,7 +130,7 @@ int main()
 
 
 	GLuint mvpunif = glGetUniformLocation(progid, "MVP");
-	glUniformMatrix4fv(mvpunif, sizeof(mvp), GL_FALSE, (const GLfloat*)mvp);
+	glUniformMatrix4fv(mvpunif, sizeof(mvp), GL_FALSE, mvp);
 	float dAngle = 1.0f;
 	while (!wnd.shouldClose())
 	{
@@ -144,12 +141,12 @@ int main()
 		angle += dAngle;
 
 		mvp = rotate(angle*M_PI/180.f, vec3{0, 1, 0});
-		glUniformMatrix4fv(mvpunif, 1, GL_FALSE, (const GLfloat*)mvp);
+		glUniformMatrix4fv(mvpunif, 1, GL_FALSE, mvp);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
 
 		wnd.update();
 	}
-	Logger::log << "Terminating";
+	Logger::println("Terminating");
 }

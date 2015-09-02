@@ -88,27 +88,63 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Shader.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef DEVA_RENDER_SHADER_H</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define DEVA_RENDER_SHADER_H</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef DEVA_FRAMEWORK_GRAPHICS_SHADER_H</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define DEVA_FRAMEWORK_GRAPHICS_SHADER_H</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespace_deva.html">Deva</a></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;{</div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
-<div class="line"><a name="l00007"></a><span class="lineno"><a class="line" href="struct_deva_1_1_shader.html">    7</a></span>&#160;<span class="keyword">struct </span><a class="code" href="struct_deva_1_1_shader.html">Shader</a></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;{</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> id;</div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="struct_deva_1_1_shader_1_1_uniform.html">   10</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="struct_deva_1_1_shader_1_1_uniform.html">Uniform</a></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    {</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        std::string name;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    };</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;};</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;}</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#endif // DEVA_RENDER_SHADER_H</span></div>
-<div class="ttc" id="struct_deva_1_1_shader_1_1_uniform_html"><div class="ttname"><a href="struct_deva_1_1_shader_1_1_uniform.html">Deva::Shader::Uniform</a></div><div class="ttdef"><b>Definition:</b> Shader.hpp:10</div></div>
-<div class="ttc" id="namespace_deva_html"><div class="ttname"><a href="namespace_deva.html">Deva</a></div><div class="ttdef"><b>Definition:</b> Shader.hpp:4</div></div>
-<div class="ttc" id="struct_deva_1_1_shader_html"><div class="ttname"><a href="struct_deva_1_1_shader.html">Deva::Shader</a></div><div class="ttdef"><b>Definition:</b> Shader.hpp:7</div></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;Config.hpp&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;glTypes.hpp&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespace_deva_framework.html">DevaFramework</a></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;{</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    USE_GL;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="class_deva_framework_1_1_shader.html">   17</a></span>&#160;    <span class="keyword">class </span><a class="code" href="class_deva_framework_1_1_shader.html">Shader</a></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    {</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> GLuint SHADER_HANDLE_NULL = 999999;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        GLuint handle;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        std::string source;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        GLenum shaderType;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        </div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="class_deva_framework_1_1_shader.html#acd5de3145fbd175c53d27bfc9c3e09f0">   28</a></span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> std::string <a class="code" href="class_deva_framework_1_1_shader.html#acd5de3145fbd175c53d27bfc9c3e09f0">COMPILE_STATUS_OK</a>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        DEVA_GRAPHICS_API <a class="code" href="class_deva_framework_1_1_shader.html#afebc4725c5f80da90ffb9345c4df5cc8">Shader</a>(GLenum shaderType, <span class="keyword">const</span> std::string &amp;source = <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        DEVA_GRAPHICS_API <a class="code" href="class_deva_framework_1_1_shader.html#afebc4725c5f80da90ffb9345c4df5cc8">Shader</a>(<span class="keyword">const</span> <a class="code" href="class_deva_framework_1_1_shader.html">Shader</a> &amp;shader) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        DEVA_GRAPHICS_API <a class="code" href="class_deva_framework_1_1_shader.html#afebc4725c5f80da90ffb9345c4df5cc8">Shader</a>(<a class="code" href="class_deva_framework_1_1_shader.html">Shader</a> &amp;&amp;shader);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        DEVA_GRAPHICS_API <a class="code" href="class_deva_framework_1_1_shader.html">Shader</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="class_deva_framework_1_1_shader.html">Shader</a> &amp;shader) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        DEVA_GRAPHICS_API <a class="code" href="class_deva_framework_1_1_shader.html">Shader</a>&amp; operator=(<a class="code" href="class_deva_framework_1_1_shader.html">Shader</a> &amp;&amp;shader);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="class_deva_framework_1_1_shader.html#a664473bed2c2ab8de1b2963191cd53fa">   55</a></span>&#160;        DEVA_GRAPHICS_API <span class="keyword">inline</span> GLuint <a class="code" href="class_deva_framework_1_1_shader.html#a664473bed2c2ab8de1b2963191cd53fa">getHandle</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            <span class="keywordflow">return</span> this-&gt;handle;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        DEVA_GRAPHICS_API <span class="keywordtype">void</span> <a class="code" href="class_deva_framework_1_1_shader.html#ad0f1f49beb817f77cd93357aab7f296f">setSource</a>(<span class="keyword">const</span> std::string &amp;source);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        DEVA_GRAPHICS_API std::string <a class="code" href="class_deva_framework_1_1_shader.html#a166ec873e96c82d04fb1fbdb58902733">compile</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        DEVA_GRAPHICS_API ~<a class="code" href="class_deva_framework_1_1_shader.html">Shader</a>();</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    };</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;}</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#endif //DEVA_FRAMEWORK_GRAPHICS_SHADER_H</span></div>
+<div class="ttc" id="class_deva_framework_1_1_shader_html_acd5de3145fbd175c53d27bfc9c3e09f0"><div class="ttname"><a href="class_deva_framework_1_1_shader.html#acd5de3145fbd175c53d27bfc9c3e09f0">DevaFramework::Shader::COMPILE_STATUS_OK</a></div><div class="ttdeci">static const std::string COMPILE_STATUS_OK</div><div class="ttdoc">A std::string constant representing successful shader compilation. </div><div class="ttdef"><b>Definition:</b> Shader.hpp:28</div></div>
+<div class="ttc" id="class_deva_framework_1_1_shader_html"><div class="ttname"><a href="class_deva_framework_1_1_shader.html">DevaFramework::Shader</a></div><div class="ttdoc">A wrapper class for an OpenGL Shader. </div><div class="ttdef"><b>Definition:</b> Shader.hpp:17</div></div>
+<div class="ttc" id="class_deva_framework_1_1_shader_html_ad0f1f49beb817f77cd93357aab7f296f"><div class="ttname"><a href="class_deva_framework_1_1_shader.html#ad0f1f49beb817f77cd93357aab7f296f">DevaFramework::Shader::setSource</a></div><div class="ttdeci">DEVA_GRAPHICS_API void setSource(const std::string &amp;source)</div><div class="ttdoc">(Re)sets the shader source code. </div><div class="ttdef"><b>Definition:</b> Shader.cpp:36</div></div>
+<div class="ttc" id="class_deva_framework_1_1_shader_html_a166ec873e96c82d04fb1fbdb58902733"><div class="ttname"><a href="class_deva_framework_1_1_shader.html#a166ec873e96c82d04fb1fbdb58902733">DevaFramework::Shader::compile</a></div><div class="ttdeci">DEVA_GRAPHICS_API std::string compile() const </div><div class="ttdef"><b>Definition:</b> Shader.cpp:43</div></div>
+<div class="ttc" id="namespace_deva_framework_html"><div class="ttname"><a href="namespace_deva_framework.html">DevaFramework</a></div><div class="ttdoc">Encloses the whole Deva Framework and the functionality it provides. </div><div class="ttdef"><b>Definition:</b> Config.hpp:30</div></div>
+<div class="ttc" id="class_deva_framework_1_1_shader_html_a664473bed2c2ab8de1b2963191cd53fa"><div class="ttname"><a href="class_deva_framework_1_1_shader.html#a664473bed2c2ab8de1b2963191cd53fa">DevaFramework::Shader::getHandle</a></div><div class="ttdeci">DEVA_GRAPHICS_API GLuint getHandle() const </div><div class="ttdef"><b>Definition:</b> Shader.hpp:55</div></div>
+<div class="ttc" id="class_deva_framework_1_1_shader_html_afebc4725c5f80da90ffb9345c4df5cc8"><div class="ttname"><a href="class_deva_framework_1_1_shader.html#afebc4725c5f80da90ffb9345c4df5cc8">DevaFramework::Shader::Shader</a></div><div class="ttdeci">DEVA_GRAPHICS_API Shader(GLenum shaderType, const std::string &amp;source=&quot;&quot;)</div><div class="ttdef"><b>Definition:</b> Shader.cpp:10</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

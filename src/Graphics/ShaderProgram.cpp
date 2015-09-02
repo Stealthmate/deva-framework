@@ -12,9 +12,9 @@ const std::string ShaderProgram::LINK_STATUS_OK = "SHADERPROGRAM_LINK_SUCCESS";
 ShaderProgram::ShaderProgram(const std::vector<Shader> &shaders)
 {
 	this->handle = glCreateProgram();
-	for (auto i : shaders)
+	for (int i = 0;i <= shaders.size() - 1;i++)
 	{
-		attachShader(i);
+		attachShader(shaders[i]);
 	}
 }
 
@@ -29,9 +29,9 @@ ShaderProgram& ShaderProgram::attachShader(const Shader &shader)
 	return *this;
 }
 
-ShaderProgram& ShaderProgram::detachShader(const Shader &shader)
+ShaderProgram& ShaderProgram::detachShader(GLuint shaderHandle)
 {
-	auto i = std::find(this->shaders.begin(), this->shaders.end(), shader.getHandle());
+	auto i = std::find(this->shaders.begin(), this->shaders.end(), shaderHandle);
 	if (i != this->shaders.end())
 	{
 		glAttachShader(this->handle, *i);
@@ -41,7 +41,7 @@ ShaderProgram& ShaderProgram::detachShader(const Shader &shader)
 	return *this;
 }
 
-std::string ShaderProgram::link() const
+std::string ShaderProgram::link()
 {
 	glLinkProgram(this->handle);
 	GLint status;
@@ -56,6 +56,8 @@ std::string ShaderProgram::link() const
 		delete[] log;
 		return result;
 	}
+	
+	for (auto i : shaders) detachShader(i);
 
 	return LINK_STATUS_OK;
 }

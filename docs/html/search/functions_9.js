@@ -1,4 +1,11 @@
 var searchData=
 [
-  ['window',['Window',['../class_deva_framework_1_1_window.html#abb30d7016db02630363b00872b68b67d',1,'DevaFramework::Window']]]
+  ['operator_20const_20t_20_2aconst',['operator const T *const',['../class_deva_framework_1_1_base_matrix.html#adce2260ee02a2bade282bd639f91088a',1,'DevaFramework::BaseMatrix']]],
+  ['operator_28_29',['operator()',['../class_deva_framework_1_1_base_matrix.html#a91256ff932a4e902fbbece2c8d95bb50',1,'DevaFramework::BaseMatrix::operator()(unsigned int vec_n, unsigned int vec_pos)'],['../class_deva_framework_1_1_base_matrix.html#ad42c8f7b38d889c353b2c260b1378419',1,'DevaFramework::BaseMatrix::operator()(unsigned int vec_n, unsigned int vec_pos) const ']]],
+  ['operator_2a',['operator*',['../class_deva_framework_1_1_base_matrix.html#a069827af37023b5f7c9d73c7ad27a01a',1,'DevaFramework::BaseMatrix::operator*()'],['../class_deva_framework_1_1_base_vector.html#ac844deb1dd8de1120b82dd86c7d95909',1,'DevaFramework::BaseVector::operator*()']]],
+  ['operator_2b',['operator+',['../class_deva_framework_1_1_base_vector.html#add996c7dc6d79b2750313121bfb97eaf',1,'DevaFramework::BaseVector']]],
+  ['operator_2d',['operator-',['../class_deva_framework_1_1_base_vector.html#a6ece11000d06628bcc1a5e0da780336c',1,'DevaFramework::BaseVector']]],
+  ['operator_2f',['operator/',['../class_deva_framework_1_1_base_vector.html#a2c659815689ac9171ac1d7026c965407',1,'DevaFramework::BaseVector']]],
+  ['operator_3d',['operator=',['../struct_deva_framework_1_1_image.html#a645773587ffefda3891bfc7f6cc541bb',1,'DevaFramework::Image::operator=(const Image &amp;img)'],['../struct_deva_framework_1_1_image.html#ac8178731a1ba5ed3aeef426dcc16a244',1,'DevaFramework::Image::operator=(Image &amp;&amp;img)'],['../class_deva_framework_1_1_shader.html#ad0a18b91d216fd48b6cf518e98688393',1,'DevaFramework::Shader::operator=()'],['../class_deva_framework_1_1_shader_program.html#a209bd0dc41de2d6470a9e402a645c366',1,'DevaFramework::ShaderProgram::operator=()'],['../class_deva_framework_1_1_window.html#af9ba44202e5e962d2a3aabe04a2de5c4',1,'DevaFramework::Window::operator=()']]],
+  ['operator_5b_5d',['operator[]',['../class_deva_framework_1_1_base_vector.html#af7deaa39fc8d4cfdd730053fceba7e63',1,'DevaFramework::BaseVector::operator[](int i)'],['../class_deva_framework_1_1_base_vector.html#a32ae6efec4432a4c12159acf4901f3ce',1,'DevaFramework::BaseVector::operator[](int i) const ']]]
 ];

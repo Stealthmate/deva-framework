@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['image',['Image',['../struct_deva_framework_1_1_image.html#a58edd1c45b4faeb5f789b0d036d02313',1,'DevaFramework::Image::Image()'],['../struct_deva_framework_1_1_image.html#aa44ed77d00d96d2c878b050835f828c4',1,'DevaFramework::Image::Image(const Image &amp;img)'],['../struct_deva_framework_1_1_image.html#ac14290feecc714c50693701fc36d1d2d',1,'DevaFramework::Image::Image(Image &amp;&amp;img)']]]
+  ['close',['close',['../class_deva_framework_1_1_window.html#a35055c04498121d39741bfcd5082705b',1,'DevaFramework::Window']]],
+  ['compile',['compile',['../class_deva_framework_1_1_shader.html#a166ec873e96c82d04fb1fbdb58902733',1,'DevaFramework::Shader']]],
+  ['createwindow',['createWindow',['../class_deva_framework_1_1_window.html#a613437c5b5772fcda09d2b045e5d48b3',1,'DevaFramework::Window']]]
 ];

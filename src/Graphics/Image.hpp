@@ -1,5 +1,5 @@
-#ifndef DEVA_FRAMEWORK_GRAPHICS_IMAGES_IMAGE_H
-#define DEVA_FRAMEWORK_GRAPHICS_IMAGES_IMAGE_H
+#ifndef DEVA_FRAMEWORK_GRAPHICS_IMAGE_H
+#define DEVA_FRAMEWORK_GRAPHICS_IMAGE_H
 
 #include "Config.hpp"
 
@@ -11,7 +11,7 @@ struct Image
 {
     /** Create an Image object from a file, treating it as a specified format
         @param filename The name of the file, the image is stored in
-        @param format The format of the image (Supported formats specified in ImageFormat)asd
+        @param format The format of the image (Supported formats specified in ImageFormat)
     */
     static DEVA_GRAPHICS_API Image loadImageFromFile(const std::string &filename, ImageFormat format);
 
@@ -43,4 +43,4 @@ public:
 
 }
 
-#endif // DEVA_FRAMEWORK_GRAPHICS_IMAGES_IMAGE_H
+#endif // DEVA_FRAMEWORK_GRAPHICS_IMAGE_H

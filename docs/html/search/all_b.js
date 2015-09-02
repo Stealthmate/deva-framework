@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['setcurrentwindow',['setCurrentWindow',['../class_deva_framework_1_1_window.html#a1b97ec14d0c83b7df84f1661450f1002',1,'DevaFramework::Window']]],
-  ['shader',['Shader',['../struct_deva_1_1_shader.html',1,'Deva']]],
-  ['spacing',['spacing',['../struct_deva_framework_1_1_vertex_buffer_object_1_1_vertex_array_object.html#a83696ab1c57d4363f9cd4c409b08c67d',1,'DevaFramework::VertexBufferObject::VertexArrayObject']]]
+  ['rawimage',['RawImage',['../struct_deva_framework_1_1_raw_image.html',1,'DevaFramework']]],
+  ['readpng',['readPNG',['../namespace_deva_framework.html#a5e026ffa034edda7fb770f29b75f211a',1,'DevaFramework']]],
+  ['resize',['resize',['../class_deva_framework_1_1_window.html#a019da94c67ed9abb164f3b20f2d83927',1,'DevaFramework::Window']]],
+  ['rotate',['rotate',['../namespace_deva_framework.html#ae1875b4427af1615d17785f4f2c40adf',1,'DevaFramework']]]
 ];
