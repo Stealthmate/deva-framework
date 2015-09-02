@@ -1,6 +1,6 @@
 Win64/**
 bin/*.pdb
-bin/*.lik
+bin/*.ilk
 bin/*.exp
 bin/*.dll
 bin/*.lib
