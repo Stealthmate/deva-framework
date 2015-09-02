@@ -25,9 +25,9 @@ namespace DevaFramework
 	public:
 
 		///Set the context, routing all draw calls to the specified window
-		static DEVA_API void setCurrentWindow(const Window &wnd);
+		static DEVA_WINDOW_API void setCurrentWindow(const Window &wnd);
 		///Create a Window with the given parameters
-		static DEVA_API Window& createWindow(
+		static DEVA_WINDOW_API Window& createWindow(
 			unsigned int width, 
 			unsigned int height, 
 			const std::string& title, 
@@ -77,31 +77,31 @@ namespace DevaFramework
 	public:
 
 		///Transfers ownership of the window from wnd
-		DEVA_API Window(Window &&wnd);
+		DEVA_WINDOW_API Window(Window &&wnd);
 		///Destroys the current window and transfers ownership from wnd
-		DEVA_API Window& operator=(Window &&wnd);
+		DEVA_WINDOW_API Window& operator=(Window &&wnd);
 
-		DEVA_API unsigned int getWidth();
-		DEVA_API unsigned int getHeight();
-		DEVA_API std::string getTitle();
-		DEVA_API bool shouldClose();
+		DEVA_WINDOW_API unsigned int getWidth();
+		DEVA_WINDOW_API unsigned int getHeight();
+		DEVA_WINDOW_API std::string getTitle();
+		DEVA_WINDOW_API bool shouldClose();
 
-		DEVA_API void setTitle(const std::string &title);
-		DEVA_API void setShouldClose(bool flag);
-		DEVA_API void setCloseCallback(F_WindowCloseCallback close_callback);
+		DEVA_WINDOW_API void setTitle(const std::string &title);
+		DEVA_WINDOW_API void setShouldClose(bool flag);
+		DEVA_WINDOW_API void setCloseCallback(F_WindowCloseCallback close_callback);
 
 		///Resizes the window to the specified dimensions
-		DEVA_API void resize(unsigned int width, unsigned int height);
+		DEVA_WINDOW_API void resize(unsigned int width, unsigned int height);
 		///Moves the top left corner of the window to the specified position
-		DEVA_API void move(unsigned int x, unsigned int y);
+		DEVA_WINDOW_API void move(unsigned int x, unsigned int y);
 
 		///Swaps the buffers and updates the event queue
-		DEVA_API void update();
+		DEVA_WINDOW_API void update();
 		///Marks the window closed and destroys it, releasing any resources associated with it in the process
-		DEVA_API void close();
+		DEVA_WINDOW_API void close();
 
 		///Calls close() if the window is still open
-		DEVA_API ~Window();
+		DEVA_WINDOW_API ~Window();
 	};
 
 }

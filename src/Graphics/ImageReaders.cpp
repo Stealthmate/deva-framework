@@ -30,7 +30,7 @@ RawImage DevaFramework::readPNG(const std::string &filename)
     int is_png = 0;
     source.read((char*)png_signature, 8);
 
-    is_png = !(bool)png_sig_cmp(png_signature, 0, 8);
+    is_png = png_sig_cmp(png_signature, 0, 8) != 0;
 
     if(!is_png)
     {

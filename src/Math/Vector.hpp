@@ -1,53 +1,25 @@
 #ifndef DEVA_FRAMEWORK_MATH_VECTOR_H
 #define DEVA_FRAMEWORK_MATH_VECTOR_H
 
-#include "Config.hpp"
+#include "BaseVector.hpp"
 
 namespace DevaFramework
 {
-	struct Vector
-	{
-		float x, y;
+	typedef BaseVector<float, 2> vec2;
+	typedef BaseVector<float, 3> vec3;
+	typedef BaseVector<float, 4> vec4;
 
-		DEVA_API Vector();
-		DEVA_API Vector(float x, float  y);
+	typedef BaseVector<double, 2> dvec2;
+	typedef BaseVector<double, 3> dvec3;
+	typedef BaseVector<double, 4> dvec4;
 
-		DEVA_API Vector(Vector const &vec) = default;
-		DEVA_API Vector& operator=(Vector const &vec) = default;
+	typedef BaseVector<unsigned int, 2> uvec2;
+	typedef BaseVector<unsigned int, 3> uvec3;
+	typedef BaseVector<unsigned int, 4> uvec4;
 
-		///Arithmetic operators. All of these perform calculations on all 4 values of the Vector.
-		DEVA_API Vector& operator*=(Vector const &p);
-		DEVA_API Vector& operator*=(const float &p);
-		DEVA_API Vector& operator/=(Vector const &p);
-		DEVA_API Vector& operator/=(const float p);
-		DEVA_API Vector& operator+=(Vector const &p);
-		DEVA_API Vector& operator+=(const float p);
-		DEVA_API Vector& operator-=(Vector const &p);
-		DEVA_API Vector& operator-=(const float p);
-
-		DEVA_API Vector const operator*(Vector const &p) const;
-		DEVA_API Vector const operator*(const float p) const;
-		DEVA_API Vector const operator/(Vector const &p) const;
-		DEVA_API Vector const operator/(const float p) const;
-		DEVA_API Vector const operator+(Vector const &p) const;
-		DEVA_API Vector const operator+(const float p) const;
-		DEVA_API Vector const operator-(Vector const &p) const;
-		DEVA_API Vector const operator-(const float p) const;
-
-		///Returns a Vector with all 4 coordinates inverted.
-		DEVA_API Vector const operator-() const;
-
-		///Returns \c TRUE if all the coordinates of <B>@e p</B> are equal 
-		///to the coordinates of <B>this</B>, and \c FALSE otherwise.
-		DEVA_API bool operator==(Vector const &p) const;
-		///Returns \c TRUE if either of the coordinates of <B>@e p</B> is <B>NOT</B> equal 
-		///to the coordinates of <B>this</B>, and false otherwise.
-		DEVA_API bool operator!=(Vector const &p) const;
-
-		///Returns a string representation
-		DEVA_API std::string str() const;
-
-	};
+	typedef BaseVector<int, 2> ivec2;
+	typedef BaseVector<int, 3> ivec3;
+	typedef BaseVector<int, 4> ivec4;
 }
 
 #endif //DEVA_FRAMEWORK_MATH_VECTOR_H

@@ -17,7 +17,7 @@ list(APPEND TEST_LIST Images)
 
 add_executable(RotatingCube ${CURDIR}/RotatingCube.cpp)
 add_dependencies(RotatingCube deva-Window deva-Graphics deva-Util)
-target_link_libraries(RotatingCube deva-Window deva-Graphics deva-Util deva-Math ${DEVA_FRAMEWORK_SYSTEM_DEP_OGL})
+target_link_libraries(RotatingCube deva-Window deva-Graphics deva-Util deva-Math deva-System ${DEVA_FRAMEWORK_SYSTEM_DEP_OGL})
 list(APPEND TEST_LIST RotatingCube)
 
 file(GLOB_RECURSE SRCS bin/shaders/*.glsl)

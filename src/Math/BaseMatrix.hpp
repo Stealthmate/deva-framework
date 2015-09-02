@@ -56,6 +56,11 @@ namespace DevaFramework
 				return data[vec_n * vector_length + vec_pos];
 			}
 
+			const T& operator()(unsigned int vec_n, unsigned int vec_pos) const
+			{
+				return data[vec_n * vector_length + vec_pos];
+			}
+
 			T getValue(unsigned int vec_n, unsigned int vec_pos) const
 			{
 				return data[vec_n * vector_length + vec_pos];

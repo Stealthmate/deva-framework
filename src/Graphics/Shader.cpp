@@ -2,7 +2,7 @@
 #include "glFunctions.hpp"
 
 USE_GL;
-
+#include "../src/System/Logger.hpp"
 using namespace DevaFramework;
 
 const std::string Shader::COMPILE_STATUS_OK = "SHADER_COMPILE_SUCCESS";
@@ -20,6 +20,7 @@ Shader& Shader::operator=(const Shader &shader)
 	if (this->handle != SHADER_HANDLE_NULL) glDeleteShader(this->handle);
 	this->handle = shader.handle;
 	setSource(shader.source);
+	return *this;
 }
 
 Shader& Shader::operator=(Shader &&shader)

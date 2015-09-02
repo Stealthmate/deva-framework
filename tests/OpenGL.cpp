@@ -22,11 +22,11 @@ int main()
 	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
 	Window::setCurrentWindow(wnd);
 
-	Logger::log("Created Window");
+	Logger::log << "Created Window";
 
 	glbinding::Binding::initialize();
 
-	Logger::log("Initialized glBinding");
+	Logger::log << "Initialized glBinding";
 
 	std::string vshader = readTextFile("shaders/Empty.vertex.glsl");
 	std::string fshader = readTextFile("shaders/Empty.fragment.glsl");
@@ -34,17 +34,17 @@ int main()
 	Shader vs = Shader(GL_VERTEX_SHADER, vshader);
 	Shader fs = Shader(GL_FRAGMENT_SHADER, fshader);
 
-	Logger::log(vs.compile());
-	Logger::log(fs.compile());
+	Logger::log << vs.compile();
+	Logger::log << fs.compile();
 
 	ShaderProgram prog = ShaderProgram();
 	prog.attachShader(vs).attachShader(fs);
 
-	Logger::log(prog.link());
+	Logger::log << prog.link();
 
 	GLuint progid = prog.getHandle();
 
-	Logger::log("Loaded shaders");
+	Logger::log << "Loaded shaders";
 
 	const float triangle_coords_colors[] =
 	{ -1.f, -1.f, 0.f, 1.f, //XYZW
@@ -61,7 +61,7 @@ int main()
 	glBindBuffer(gl::GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), &triangle_coords_colors[0], GL_STATIC_DRAW);
 
-	Logger::log("Loaded buffer");
+	Logger::log << "Loaded buffer";
 
 	GLuint mvp_unif = glGetUniformLocation(progid, "MVP");
 
@@ -89,5 +89,5 @@ int main()
 
 		wnd.update();
 	}
-	Logger::log("Terminating");
+	Logger::log << "Terminating";
 }

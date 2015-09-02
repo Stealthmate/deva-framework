@@ -20,7 +20,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 
 	if (raw.error)
 	{
-		Logger::log("Could not load image.");
+		Logger::err << "Could not load image.";
 		return Image();
 	}
 
@@ -36,7 +36,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 	else if (raw.bitdepth == 8)
 	{
 		unsigned char* new_data = new unsigned char[raw.width*raw.height*DEVA_IMAGE_BITS_PER_PIXEL];
-		Logger::log(strm((int)raw.channels));
+		Logger::warn << (int)raw.channels;
 		for (int i = 0;i <= raw.height - 1;i++)
 		{
 			for (int j = 0;j <= raw.width - 1;j++)
@@ -54,6 +54,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 
 		return img;
 	}
+	else return Image();
 }
 
 Image::Image()

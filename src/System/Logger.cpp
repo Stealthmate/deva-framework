@@ -23,9 +23,40 @@ std::string timestamp()
     return std::string("[") + time.substr(11, 8) + time_ms + "] ";*/
 	return "";
 }
-//
 
-Logger::func_LogCallback Logger::log_func = [](const std::string &msg, Logger::LogLevel l)
+void default_log_func (const std::string &msg, Logger::LogLevel l)
+{
+	switch (l)
+	{
+	case Logger::LogLevel::MESSAGE:
+	{
+		std::cout << "[Deva Framework]: Message: " << msg << std::endl;
+	}break;
+	case Logger::LogLevel::WARNING:
+	{
+		std::cerr << "[Deva Framework]: Warning: " << msg << std::endl;
+	}break;
+	case Logger::LogLevel::ERROR:
+	{
+		std::cerr << "[Deva Framework]: Error: " << msg << std::endl;
+	}break;
+	case Logger::LogLevel::FATAL_ERROR:
+	{
+		std::cerr << "[Deva Framework]: Fatal Error: " << msg << std::endl;
+		std::cerr << "[Deva Framework]: Fatal Error: " << msg << std::endl;
+		exit(1);
+	}
+	}
+}
+
+DEVA_SYSTEM_API const Logger Logger::log = Logger(Logger::LogLevel::MESSAGE, default_log_func);
+DEVA_SYSTEM_API const Logger Logger::warn = Logger(Logger::LogLevel::WARNING, default_log_func);
+DEVA_SYSTEM_API const Logger Logger::err = Logger(Logger::LogLevel::ERROR, default_log_func);
+DEVA_SYSTEM_API const Logger Logger::assert = Logger(Logger::LogLevel::FATAL_ERROR, default_log_func);
+
+Logger::Logger(LogLevel level, func_LogCallback f) : level(level), log_func(f) {}
+
+/*Logger::func_LogCallback Logger::log_func = [](const std::string &msg, Logger::LogLevel l)
 {
 	switch (l)
 	{
@@ -48,9 +79,10 @@ Logger::func_LogCallback Logger::log_func = [](const std::string &msg, Logger::L
 		exit(1);
 	}
 	}
-};
+};*/
 
-void Logger::log(const std::string &msg, LogLevel l)
+/*const Logger& Logger::operator<<(const std::string &msg) const
 {
-	log_func(msg, l);
-}
+	log_func(msg, level);
+	return *this;
+}*/

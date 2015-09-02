@@ -7,7 +7,7 @@
 
 namespace DevaFramework
 {
-	DEVA_API std::string readTextFile(const char* filepath);
+	DEVA_UTIL_API std::string readTextFile(const char* filepath);
 }
 
 #endif //define DEVA_FRAMEWORK_UTIL_COMMON_H

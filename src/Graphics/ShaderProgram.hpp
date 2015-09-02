@@ -26,24 +26,24 @@ namespace DevaFramework
 
 	public:
 
-		DEVA_API ShaderProgram(const std::vector<Shader> &shaders = std::vector<Shader>());
-		DEVA_API ShaderProgram(const ShaderProgram &shaderprog) = default;
-		DEVA_API ShaderProgram(ShaderProgram &&shaderprogram) = default;
-		DEVA_API ShaderProgram& operator=(const ShaderProgram &shaderprog);
-		DEVA_API ShaderProgram& operator=(ShaderProgram &&shaderprog);
+		DEVA_GRAPHICS_API ShaderProgram(const std::vector<Shader> &shaders = std::vector<Shader>());
+		DEVA_GRAPHICS_API ShaderProgram(const ShaderProgram &shaderprog) = default;
+		DEVA_GRAPHICS_API ShaderProgram(ShaderProgram &&shaderprogram) = default;
+		DEVA_GRAPHICS_API ShaderProgram& operator=(const ShaderProgram &shaderprog);
+		DEVA_GRAPHICS_API ShaderProgram& operator=(ShaderProgram &&shaderprog);
 
-		DEVA_API inline GLuint getHandle() const
+		DEVA_GRAPHICS_API inline GLuint getHandle() const
 		{
 			return this->handle;
 		}
 
-		DEVA_API ShaderProgram& attachShader(const Shader &shader);
-		DEVA_API ShaderProgram& detachShader(const Shader &shader);
+		DEVA_GRAPHICS_API ShaderProgram& attachShader(const Shader &shader);
+		DEVA_GRAPHICS_API ShaderProgram& detachShader(const Shader &shader);
 	
 	public:
-		DEVA_API std::string link() const;
+		DEVA_GRAPHICS_API std::string link() const;
 
-		DEVA_API ~ShaderProgram();
+		DEVA_GRAPHICS_API ~ShaderProgram();
 
 	};
 }

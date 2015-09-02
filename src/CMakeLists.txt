@@ -1,5 +1,4 @@
 option(BUILD_SHARED_LIBS "Build the shared library" ON)
-add_definitions(-DDEVA_BUILD)
 set(LIBTYPE STATIC)
 if(BUILD_SHARED_LIBS)
 add_definitions(-DDEVA_BUILD_SHARED)

@@ -23,11 +23,27 @@ public:
 
 private:
 
-	static func_LogCallback log_func;
+	func_LogCallback log_func;
+
+	LogLevel level;
+
+
 
 public:
 
-    static DEVA_API void log(const std::string &msg, LogLevel l = LogLevel::MESSAGE);
+	static DEVA_SYSTEM_API const Logger log;
+	static DEVA_SYSTEM_API const Logger warn;
+	static DEVA_SYSTEM_API const Logger err;
+	static DEVA_SYSTEM_API const Logger assert;
+
+	DEVA_SYSTEM_API Logger(LogLevel level, func_LogCallback f);
+
+	template<typename T>
+	const Logger& operator<<(const T &msg) const
+	{
+		log_func(strm(msg), this->level);
+		return *this;
+	}
 };
 
 }

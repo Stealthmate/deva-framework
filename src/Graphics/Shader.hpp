@@ -23,22 +23,22 @@ namespace DevaFramework
 		
 		static std::string const COMPILE_STATUS_OK;
 
-		DEVA_API Shader(GLenum shaderType, const std::string &source = "");
-		DEVA_API Shader(const Shader &shader) = default;
-		DEVA_API Shader(Shader &&shader) = default;
-		DEVA_API Shader& operator=(const Shader &shader);
-		DEVA_API Shader& operator=(Shader &&shader);
+		DEVA_GRAPHICS_API Shader(GLenum shaderType, const std::string &source = "");
+		DEVA_GRAPHICS_API Shader(const Shader &shader) = default;
+		DEVA_GRAPHICS_API Shader(Shader &&shader) = default;
+		DEVA_GRAPHICS_API Shader& operator=(const Shader &shader);
+		DEVA_GRAPHICS_API Shader& operator=(Shader &&shader);
 
-		DEVA_API inline GLuint getHandle() const
+		DEVA_GRAPHICS_API inline GLuint getHandle() const
 		{
 			return this->handle;
 		}
 
-		DEVA_API void setSource(const std::string &source);
+		DEVA_GRAPHICS_API void setSource(const std::string &source);
 
-		DEVA_API std::string compile() const;
+		DEVA_GRAPHICS_API std::string compile() const;
 
-		DEVA_API ~Shader();
+		DEVA_GRAPHICS_API ~Shader();
 
 	};
 

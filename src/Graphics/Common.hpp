@@ -10,7 +10,7 @@
 namespace DevaFramework
 {
 
-	DEVA_API gl::GLuint loadShaderSet(std::string VertexShaderCode, std::string FragmentShaderCode);
+	DEVA_GRAPHICS_API gl::GLuint loadShaderSet(std::string VertexShaderCode, std::string FragmentShaderCode);
 
 
 }

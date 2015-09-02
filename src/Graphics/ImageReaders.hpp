@@ -25,8 +25,8 @@ struct RawImage
 };
 
 ///Returns a RawImage, read from a PNG file
-DEVA_API RawImage readPNG(const std::string &filename);
-DEVA_API RawImage readBMP(const std::string &filename);
+DEVA_GRAPHICS_API RawImage readPNG(const std::string &filename);
+DEVA_GRAPHICS_API RawImage readBMP(const std::string &filename);
 
 }
 

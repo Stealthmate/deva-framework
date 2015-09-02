@@ -12,7 +12,8 @@
 #include "../src/System/Logger.hpp"
 #include "../src/Graphics/Image.hpp"
 #include "../src/Math/Matrix.hpp"
-#include "../src/Math/Matrix_Vector.hpp"
+#include "../src/Math/Vector.hpp"
+#include "../src/Math/MatrixFactory.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -25,39 +26,39 @@ int main()
 	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
 	Window::setCurrentWindow(wnd);
 
-	Logger::log("Created Window");
+	Logger::log << "Created Window";
 
 	glbinding::Binding::initialize();
 
-	Logger::log("Initialized glBinding");
+	Logger::log << "Initialized glBinding";
 
 	std::string vshader = readTextFile("shaders/Empty.vertex.glsl");
 	std::string fshader = readTextFile("shaders/Empty.fragment.glsl");
 
 	GLuint progid = loadShaderSet(vshader, fshader);
 
-	Logger::log("Loaded shaders");
+	Logger::log << "Loaded shaders";
 
 	GLfloat coords[] =
 	{
 		-0.5f, -0.5f, +0.0f, +1.0f,//x
 		+0.0f, +1.0f, +0.0f, +1.0f,//r
 		+0.5f, -0.5f, +0.0f, +1.0f,//x
-		+1.0f, +0.0f, +0.0f, +1.0f,//r
+		+0.0f, +1.0f, +0.0f, +1.0f,//r
 		+0.5f, +0.5f, +0.0f, +1.0f,//x
-		+0.0f, +0.0f, +1.0f, +1.0f,//r
+		+0.0f, +1.0f, +0.0f, +1.0f,//r
 		-0.5f, +0.5f, +0.0f, +1.0f,//x
 		+0.0f, +1.0f, +0.0f, +1.0f,//r
 		-0.5f, -0.5f, +0.5f, +1.0f,//x
-		+1.0f, +0.0f, +0.0f, +1.0f,//r
+		+0.0f, +0.0f, +1.0f, +1.0f,//r
 		+0.5f, -0.5f, +0.5f, +1.0f,//x
 		+0.0f, +0.0f, +1.0f, +1.0f,//r
 		+0.5f, +0.5f, +0.5f, +1.0f,//x
-		+0.0f, +1.0f, +0.0f, +1.0f,//r
+		+0.0f, +0.0f, +1.0f, +1.0f,//r
 		-0.5f, +0.5f, +0.5f, +1.0f,//x
-		+1.0f, +0.0f, +0.0f, +1.0f,//r
+		+0.0f, +0.0f, +1.0f, +1.0f,//r
 	};
-
+	glFrontFace(GL_CW);
 	GLushort indecies[] =
 	{
 		0,1,2,
@@ -138,14 +139,11 @@ int main()
 	{
 		if (angle > 359)
 		{
-			angle = 1.f;
+			angle = 1.0f;
 		}
 		angle += dAngle;
 
-		mvp(2, 0) = sin(angle*M_PI / 180.f);
-		mvp(0, 0) = cos(angle*M_PI / 180.f);
-		mvp(0, 2) = -sin(angle*M_PI / 180.f);
-		mvp(2, 2) = cos(angle*M_PI / 180.f);
+		mvp = rotate(angle*M_PI/180.f, vec3{0, 1, 0});
 		glUniformMatrix4fv(mvpunif, 1, GL_FALSE, (const GLfloat*)mvp);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -153,5 +151,5 @@ int main()
 
 		wnd.update();
 	}
-	Logger::log("Terminating");
+	Logger::log << "Terminating";
 }
