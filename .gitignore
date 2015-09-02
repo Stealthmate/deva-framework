@@ -1,6 +1,6 @@
 Win64/**
 bin/**
-!bin/shaders/**
+!bin/shaders/*.glsl
 !glbinding.dll
 !glfw3.dll
 !glew32.dll
