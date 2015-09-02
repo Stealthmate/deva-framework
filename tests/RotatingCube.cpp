@@ -104,31 +104,26 @@ int main()
 
 	float angle = 0;
 
-	GLfloat mvp[] =
+	mat4 mvp =
 	{
-		+1.0f, +0.0f, +0.0f, +0.0f,
-		+0.0f, +1.0f, +0.0f, +0.0f,
-		+0.0f, +0.0f, +1.0f, +0.0f,
-		+0.0f, +0.0f, +0.0f, +1.0f
+		vec4{+1.0f, +0.0f, +0.0f, +0.0f},
+		vec4{+0.0f, +1.0f, +0.0f, +0.0f},
+		vec4{+0.0f, +0.0f, +1.0f, +0.0f},
+		vec4{+0.0f, +0.0f, +0.0f, +1.0f}
 	};
 
-	vec4 v = {2, 2, 0, 1};
-	//Logger::log(v.to_str());
-	mat4 m = { vec4{2, 0, 0, 0}, vec4{0, 3, 0, 0}, vec4{0, 0, 1, 0}, vec4{0, 0, 0, 1} };
-	//Logger::log(m.to_str());
-	Logger::log((m*v).to_str());
 	GLfloat Near_plane = 0.1f;
 	GLfloat Far_plane = 1000.f;
 	GLfloat frustum_length = Far_plane - Near_plane;
 	GLfloat FoV = 70.f * M_PI / 180.f;
 	GLfloat aspect_ratio = 800.f / 600.f;
-	GLfloat y_scale = (1/tan(FoV)) * aspect_ratio;
+	GLfloat y_scale = (1 / tan(FoV)) * aspect_ratio;
 	GLfloat x_scale = y_scale / aspect_ratio;
-	GLfloat projection_matrix[] = 
+	GLfloat projection_matrix[] =
 	{
 		x_scale, 0, 0, 0,
 		0, y_scale, 0, 0,
-		0, 0, -(Far_plane + Near_plane)/frustum_length, -1,
+		0, 0, -(Far_plane + Near_plane) / frustum_length, -1,
 		0, 0, -(2 * Far_plane*Near_plane) / frustum_length, 0
 	};
 
@@ -137,7 +132,7 @@ int main()
 
 
 	GLuint mvpunif = glGetUniformLocation(progid, "MVP");
-	glUniformMatrix4fv(mvpunif, sizeof(mvp), GL_FALSE, mvp);
+	glUniformMatrix4fv(mvpunif, sizeof(mvp), GL_FALSE, (const GLfloat*)mvp);
 	float dAngle = 1.0f;
 	while (!wnd.shouldClose())
 	{
@@ -147,11 +142,11 @@ int main()
 		}
 		angle += dAngle;
 
-		mvp[8] =  sin(angle*M_PI / 180.f);
-		mvp[0] =  cos(angle*M_PI / 180.f);
-		mvp[2] = -sin(angle*M_PI / 180.f);
-		mvp[10] =  cos(angle*M_PI / 180.f);
-		glUniformMatrix4fv(mvpunif, 1, GL_FALSE, mvp);
+		mvp(2, 0) = sin(angle*M_PI / 180.f);
+		mvp(0, 0) = cos(angle*M_PI / 180.f);
+		mvp(0, 2) = -sin(angle*M_PI / 180.f);
+		mvp(2, 2) = cos(angle*M_PI / 180.f);
+		glUniformMatrix4fv(mvpunif, 1, GL_FALSE, (const GLfloat*)mvp);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);

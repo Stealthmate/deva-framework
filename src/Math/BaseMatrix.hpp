@@ -35,7 +35,7 @@ namespace DevaFramework
 					{
 						for (int j = 0;j <= vector_length - 1;j++)
 						{
-							data[i * vector_length + j] = val_i->operator()(0, j);
+							data[i * vector_length + j] = val_i->getValue(0, j);
 						}
 						val_i++;
 					}
@@ -51,9 +51,19 @@ namespace DevaFramework
 			}
 
 
-			T operator()(unsigned int vec_n, unsigned int vec_pos) const
+			T& operator()(unsigned int vec_n, unsigned int vec_pos)
 			{
 				return data[vec_n * vector_length + vec_pos];
+			}
+
+			T getValue(unsigned int vec_n, unsigned int vec_pos) const
+			{
+				return data[vec_n * vector_length + vec_pos];
+			}
+
+			explicit operator T*()
+			{
+				return &data[0];
 			}
 
 			template<unsigned int vec_len>
@@ -68,9 +78,7 @@ namespace DevaFramework
 					{
 						for (int j = 0;j <= n_vectors - 1;j++)
 						{
-							std::cout << "Logging result(" << i << " " << k << " = this(" << k << " " << j << ") * mat(" << i << " " << j << ")\n";
-							std::cout << result.data[i*vector_length + k] << " += " << this->operator()(k, j) << " * " << mat(i, j) << std::endl;
-							result.data[i * vector_length + k] += this->operator()(k, j) * mat(i, j);
+							result(i, k) += this->getValue(k, j) * mat.getValue(i, j);
 						}
 					}
 				}
