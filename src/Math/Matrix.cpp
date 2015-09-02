@@ -2,7 +2,7 @@
 #include "../System/Logger.hpp"
 
 #include "Point.hpp"
-
+/*
 using namespace DevaFramework;
 
 const double M_PI = 3.1415;
@@ -204,3 +204,4 @@ std::string Matrix::str() const
     }
     return output;
 }
+*/

@@ -1,48 +1,19 @@
-#ifndef MATRICES_H
-#define MATRICES_H
+#ifndef DEVA_FRAMEWORK_MATH_MATRIX_H
+#define DEVA_FRAMEWORK_MATH_MATRIX_H
 
-#include <string>
+#include "BaseMatrix.hpp"
 
 namespace DevaFramework
 {
-
-struct Point;
-
-struct Matrix
-{
-    ///Basic operation to matrix conversions
-    static Matrix getScaleMatrix(const Point &p);
-    static Matrix getRotationMatrix(float angle, char matrix);
-    static Matrix getTranslationMatrix(const Point &p);
-
-    ///The matrix
-    float m[4][4];
-
-    ///Constructor
-    Matrix();
-    Matrix(float a[4][4]);
-    Matrix(float i0j0, float i0j1, float i0j2, float i0j3,
-           float i1j0, float i1j1, float i1j2, float i1j3,
-           float i2j0, float i2j1, float i2j2, float i2j3,
-           float i3j0, float i3j1, float i3j2, float i3j3);
-
-    Matrix(const Matrix &mat);
-    Matrix(Matrix&& m);
-
-    Matrix& operator=(const Matrix &mat);
-    Matrix& operator=(Matrix &&mat);
-
-    Matrix operator*(const Matrix &mat) const;
-    Point operator*(const Point &p) const;
-
-    ///Easy access
-    float& operator()(int i, int j);
-
-    const float* operator()();
-
-    std::string str() const;
-};
-
+	typedef BaseMatrix<float, 2, 2> mat2;
+	typedef BaseMatrix<float, 2, 3> mat2x3;
+	typedef BaseMatrix<float, 2, 4> mat2x4;
+	typedef BaseMatrix<float, 3, 2> mat3x2;
+	typedef BaseMatrix<float, 3, 3> mat3;
+	typedef BaseMatrix<float, 3, 4> mat3x4;
+	typedef BaseMatrix<float, 2, 2> mat4x2;
+	typedef BaseMatrix<float, 2, 3> mat4x3;
+	typedef BaseMatrix<float, 2, 4> mat4;
 }
 
-#endif // MATRIX_H
+#endif //DEVA_FRAMEWORK_MATH_MATRIX_H

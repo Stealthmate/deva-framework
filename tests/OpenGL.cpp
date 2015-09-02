@@ -47,12 +47,12 @@ int main()
 	Logger::log("Loaded shaders");
 
 	const float triangle_coords_colors[] =
-	{ -1.f, -1.f, 0.f, 1.f,
-	   0.f,  1.f, 0.f, 1.f,
-	   1.f, -1.f, 0.f, 1.f,
- 	   1.f,  0.f, 0.f, 1.f,
-	   0.f,  1.f, 0.f, 1.f,
-	   0.f,  0.f, 1.f, 1.f };
+	{ -1.f, -1.f, 0.f, 1.f, //XYZW
+	   0.f,  1.f, 0.f, 1.f, //RGBA
+	   1.f, -1.f, 0.f, 1.f, //XYZW
+ 	   1.f,  0.f, 0.f, 1.f, //RGBA
+	   0.f,  1.f, 0.f, 1.f, //XYZW
+	   0.f,  0.f, 1.f, 1.f }; //RGBA
 
 	GLuint buffer = 0;
 

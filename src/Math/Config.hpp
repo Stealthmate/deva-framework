@@ -6,6 +6,7 @@
 namespace DevaFramework
 {
 	const float EPS = 1.0E-10f;
+	const double M_PI = 3.1415;
 }
 
 #endif //DEVA_FRAMEWORK_MATH_CONFIG_H

@@ -8,5 +8,6 @@ uniform mat4 MVP;
 void main()
 {
 	final_color = color_output;
+	//final_color = vec4(0.f, 0.f, 1.f, 1.f);
 }
 
