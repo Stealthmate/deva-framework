@@ -11,7 +11,7 @@ struct Image
 {
     /** Create an Image object from a file, treating it as a specified format
         @param filename The name of the file, the image is stored in
-        @param format The format of the image (Supported formats specified in ImageFormat)
+        @param format The format of the image (Supported formats specified in ImageFormat)asd
     */
     static DEVA_GRAPHICS_API Image loadImageFromFile(const std::string &filename, ImageFormat format);
 
