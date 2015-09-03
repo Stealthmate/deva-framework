@@ -4,9 +4,21 @@ in layout(location=0) vec4 coords;
 in layout(location=1) vec4 color;
 
 
-uniform mat4 PROJ_MAT;
+uniform mat4 PROJ_MAT  =
+{
+	vec4(1, 0, 0, 0),
+	vec4(0, 1, 0, 0),
+	vec4(0, 0, 1, 0),
+	vec4(0, 0, 0, 1)
+};
 
-uniform mat4 MVP;
+uniform mat4 MVP =
+{
+	vec4(1, 0, 0, 0),
+	vec4(0, 1, 0, 0),
+	vec4(0, 0, 1, 0),
+	vec4(0, 0, 0, 1)
+};
 
 const float deg = 45*3.14/180;
 uniform mat4 rotX = 

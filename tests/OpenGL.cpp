@@ -54,7 +54,7 @@ int main()
 	glBindBuffer(gl::GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), &triangle_coords_colors[0], GL_STATIC_DRAW);
 
-	Logger::log << "Loaded buffer";
+	Logger::println("Loaded buffer");
 
 	while (!wnd.shouldClose())
 	{
@@ -80,5 +80,5 @@ int main()
 
 		wnd.update();
 	}
-	Logger::log << "Terminating";
+	Logger::println("Terminating");
 }
