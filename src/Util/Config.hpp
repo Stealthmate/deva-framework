@@ -13,6 +13,8 @@
 	#else
 		#define DEVA_UTIL_API
 	#endif
+#else
+	#define DEVA_UTIL_API	
 #endif
 
 #endif // DEVA_FRAMEWORK_GRAPHICS_CONFIG_H

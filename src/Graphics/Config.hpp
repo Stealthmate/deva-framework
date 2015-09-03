@@ -14,6 +14,9 @@
 		#define DEVA_GRAPHICS_API
 	#endif
 #endif
+#else
+	#define DEVA_GRAPHICS_API	
+#endif
 
 namespace DevaFramework
 {
