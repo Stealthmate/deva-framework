@@ -27,7 +27,9 @@ set(DevaFramework_VERSION_MINOR 0)
 include_directories("include/")
 link_directories("lib/" "bin/lib")
 
+if(MSVC)
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251" )
+endif()
 
 #System dependencies
 if (WIN32)

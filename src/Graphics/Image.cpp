@@ -39,7 +39,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 		Logger::warn << (int)raw.channels;
 		for (int i = 0;i <= raw.height - 1;i++)
 		{
-			for (int j = 0;j <= raw.width - 1;j++)
+			for (auto j = 0;j < raw.width - 1;j++)
 			{
 				new_data[(4 * i*raw.width) + (4 * j) + 0] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 0];
 				new_data[(4 * i*raw.width) + (4 * j) + 1] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 1];
