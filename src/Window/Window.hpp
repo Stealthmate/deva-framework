@@ -11,7 +11,7 @@ namespace DevaFramework
 	void OnWindowShouldClose(Window_Handle hwnd);
 
 	/**
-	 @brief A Window to be used for displaying stuff on the screen.
+	 @brief A Window to be used for displaying stuff on the screen.asdasdasd
 	*/
 	class Window
 	{
