@@ -3,15 +3,11 @@
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
 
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-
 #include "../src/Window/Window.hpp"
 #include "../src/Graphics/Common.hpp"
 #include "../src/Util/Common.hpp"
 #include "../src/System/Logger.hpp"
 #include "../src/Graphics/Image.hpp"
-
 
 int main()
 {
@@ -42,41 +38,6 @@ int main()
 		1.f, 1.f, 0.f, 1.f ,
 	    -1.f, 1.f, 0.f, 1.f,
 	    -1.f, -1.f, 0.f, 1.f};
-
-	const char img_data[] = {
-		20, 0, 20,
-		0, 20, 20,
-		20, 0, 20,
-		20, 20, 0,
-		20, 0, 0,
-		0, 20, 0,
-		0, 0, 20,
-		20, 0, 20,
-		20, 20, 0,
-		20, 0, 20,
-		0, 20, 20,
-		20, 0, 20,
-		20, 20, 0,
-		20, 0, 0,
-	};
-	const unsigned char img_data_1[] = {
-		50, 0, 0,
-		50, 0, 0,
-		50, 0, 0,
-		50, 0, 0,
-		50, 0, 0,
-		50, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-	};
 
 	GLuint buffer = 0;
 

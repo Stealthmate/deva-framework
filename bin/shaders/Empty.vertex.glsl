@@ -16,6 +16,7 @@ uniform mat4 rotX =
 	vec4(0, sin(deg), cos(deg), 0),
 	vec4(0, 0, 0, 1)
 };
+
 out vec4 color_output;
 
 mat4 LookAtRH( vec3 eye, vec3 target, vec3 up )
@@ -54,36 +55,13 @@ mat4 LookAtRH( vec3 eye, vec3 target, vec3 up )
 
 void main()
 {
-	float pi = 3.14159265358979323846264;
-    float FoV = 1.f/tan((180.0f/2.f)*pi/180.f);
-    float aspect = 800.f/600.f;
-    float N = 0.1f;
-    float F = 3.0f;
-
 	vec3 eye = vec3(0.f, 0.f, -1.2f);
 	vec3 target = vec3(0.f, 0.f, 1.f);
 	vec3 up = vec3(0.f, 1.f, 0.f);
 	mat4 vm = LookAtRH(eye, target, up);
 
-
-    mat4 view = mat4(
-        vec4(+1.0f, +0.0f, +0.0f, +0.0f),
-		vec4(+0.0f, +1.0f, +0.0f, +0.0f),
-		vec4(+0.0f, +0.0f, +1.0f, +0.0f),
-		vec4(+0.0f, +0.0f, +0.0f, +1.0f));
-    
-	mat4 proj = mat4(
-        vec4(FoV/aspect,  0,            0,           0),
-		vec4(0,         FoV,            0,           0),
-		vec4(0,           0, (N+F)/(N-F), (2*N*F)/(N-F)),
-		vec4(0,           0,           -1,           0));
-
-
     gl_Position = PROJ_MAT * vm *  MVP * rotX *  coords;
 	color_output = color;
-    //color_output = (gl_Position + 1.0f)/2.0f;
-	//color_output.z = (color_output.z + 1.0f) / 2.0f;
-	//gl_Position = MVP * rotX * coords;
 }
 
 

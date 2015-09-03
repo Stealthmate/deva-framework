@@ -30,6 +30,7 @@ namespace DevaFramework
 		/**
 			@param shaders - A list of shader objects to include in the program. Can be omitted during construction.
 		*/
+
 		DEVA_GRAPHICS_API ShaderProgram(const std::vector<Shader> &shaders = std::vector<Shader>());
 
 		DEVA_GRAPHICS_API ShaderProgram(const ShaderProgram &shaderprog) = delete;
