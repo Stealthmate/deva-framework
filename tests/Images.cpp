@@ -15,21 +15,15 @@ int main()
 	using namespace gl;
 	using namespace glbinding;
 
-	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
+	Window &wnd = Window::createWindow(800, 600, "OpenGL Display Image");
 	Window::setCurrentWindow(wnd);
 
-	Logger::log << "Created Window";
-
 	glbinding::Binding::initialize();
-
-	Logger::log << "Initialized glBinding";
 
 	std::string vshader = readTextFile("shaders/Image.vertex.glsl");
 	std::string fshader = readTextFile("shaders/Image.fragment.glsl");
 
 	GLuint progid = loadShaderSet(vshader, fshader);
-
-	Logger::log << "Loaded shaders";
 
 	const float triangle_coords_colors[] =
 	{  -1.f, -1.f, 0.f, 1.f,
@@ -46,10 +40,8 @@ int main()
 	glBindBuffer(gl::GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), &triangle_coords_colors[0], GL_STATIC_DRAW);
 
-	Logger::log << "Loaded buffer";
-
 	GLuint mvp_unif = glGetUniformLocation(progid, "MVP");
-	Image img = Image::loadImageFromFile("SS10.png", ImageFormat::PNG);
+	Image img = Image::loadImageFromFile("SS1.png", ImageFormat::PNG);
 	GLuint tb;
 	glGenTextures(1, &tb);
 	glBindTexture(GL_TEXTURE_2D, tb);
@@ -88,5 +80,5 @@ int main()
 
 		wnd.update();
 	}
-	Logger::log << "Terminating";
+	Logger::println("Terminating");
 }

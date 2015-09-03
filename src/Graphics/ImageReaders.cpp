@@ -17,24 +17,22 @@ static void readData(png_structp pngPtr, png_bytep data, png_size_t length)
 RawImage DevaFramework::readPNG(const std::string &filename)
 {
     std::ifstream source(filename, std::ios::in | std::ios::binary);
-
     RawImage raw_data;
 
     if(!source.is_open())
     {
-        raw_data.error = RawImage::ERROR_CANNOT_OPEN_FILE;
+		Logger::println("Image does not exist.", Logger::err);
         return raw_data; /// No image
     }
 
     png_byte png_signature[8];
-    int is_png = 0;
+    int is_not_png = 0;
     source.read((char*)png_signature, 8);
 
-    is_png = png_sig_cmp(png_signature, 0, 8) != 0;
-
-    if(!is_png)
+    is_not_png = png_sig_cmp(png_signature, 0, 8);
+    if(is_not_png)
     {
-        raw_data.error = RawImage::ERROR_NOT_PNG;
+		Logger::println("Image is not PNG", Logger::err);
         return raw_data;
 
     }

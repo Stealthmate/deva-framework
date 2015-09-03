@@ -20,7 +20,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 
 	if (raw.error)
 	{
-		Logger::err << "Could not load image.";
+		Logger::err << Logger::err.stamp << "Could not load image. Error code: " << raw.error << Logger::endl;
 		return Image();
 	}
 
