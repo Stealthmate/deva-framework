@@ -2,7 +2,8 @@
 #Version 1.0
 
 project(DevaFramework)
-cmake_minimum_required(VERSION 2.8.12)
+#cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 2.8.7)
 
 set(BINDIR ../bin)
 set(LIBDIR ../bin/lib)

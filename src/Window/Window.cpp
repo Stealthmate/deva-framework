@@ -126,7 +126,7 @@ void Window::resize(unsigned int width, unsigned int height)
 	this->height = height;
 	glfwSetWindowSize(this->handle, this->width, this->height);
 }
-#include <iostream>
+
 void Window::update()
 {
 	if (!this->handle) return;
