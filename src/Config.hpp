@@ -34,8 +34,6 @@ typedef GLFWwindow* Window_Handle;
 
 typedef uint32_t ShaderID;
 typedef uint32_t TextureID;
-typedef short int Key;
-typedef short int MouseButton;
 }
 
 #endif // DEVA_FRAMEWORK_CONFIG_H

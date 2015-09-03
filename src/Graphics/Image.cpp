@@ -37,9 +37,9 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 	{
 		unsigned char* new_data = new unsigned char[raw.width*raw.height*DEVA_IMAGE_BITS_PER_PIXEL];
 		Logger::warn << (int)raw.channels;
-		for (int i = 0;i <= raw.height - 1;i++)
+		for (unsigned int i = 0;i <= raw.height - 1;i++)
 		{
-			for (auto j = 0;j < raw.width - 1;j++)
+			for (unsigned int j = 0;j < raw.width - 1;j++)
 			{
 				new_data[(4 * i*raw.width) + (4 * j) + 0] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 0];
 				new_data[(4 * i*raw.width) + (4 * j) + 1] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 1];
@@ -70,7 +70,7 @@ Image::Image(const Image &img) : width(img.width), height(img.height)
 
 	this->data = new unsigned char[image_size];
 
-	for (auto i = 0; i < image_size; i++) this->data[i] = img.data[i];
+	for (unsigned int i = 0; i < image_size; i++) this->data[i] = img.data[i];
 }
 
 Image::Image(Image &&img) : width(img.width), height(img.height)
@@ -89,7 +89,7 @@ Image& Image::operator=(const Image& img)
 
 	this->data = new unsigned char[image_size];
 
-	for (int i = 0; i < image_size; i++) this->data[i] = img.data[i];
+	for (unsigned int i = 0; i < image_size; i++) this->data[i] = img.data[i];
 
 	return *this;
 }

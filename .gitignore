@@ -14,3 +14,4 @@ bin/lib**
 !bin/glew32.dll
 !bin/libpng16.dll
 !lua.dll
+docs/**

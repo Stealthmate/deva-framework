@@ -27,6 +27,8 @@ set(DevaFramework_VERSION_MINOR 0)
 include_directories("include/")
 link_directories("lib/" "bin/lib")
 
+set(REQUIRED_COMPILER_VERSION_GCC "4.7")
+set(REQUIRED_COMPILER_VERSION_MSVC "19.0")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # using Clang
@@ -39,7 +41,10 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel C++
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251" )
+	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${REQUIRED_COMPILER_VERSION_MSVC})
+		message( SEND_ERROR "Compiler version is lower than required (${REQUIRED_COMPILER_VERSION_MSVC})! Build may fail!")
+	endif()
+	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251" )
 endif()
 
 #System dependencies
@@ -66,3 +71,6 @@ include(${CURDIR}/CMakeLists.txt)
 #Tests
 set(CURDIR tests)
 include(${CURDIR}/CMakeLists.txt)
+#Docs
+set(DOXYFILE_NAME "DevaFramework.doxy")
+add_custom_target(Docs COMMAND cd .. && doxygen DevaFramework.doxy)

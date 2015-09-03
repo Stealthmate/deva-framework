@@ -15,14 +15,21 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+using namespace DevaFramework;
+using namespace gl;
+using namespace glbinding;
+
+void OnKey(Window &win, Key k, InputAction ia, int modmask)
+{
+	if (k == Key::KEY_ESCAPE) win.close();
+}
+
 int main()
 {
-	using namespace DevaFramework;
-	using namespace gl;
-	using namespace glbinding;
 
 	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
 	Window::setCurrentWindow(wnd);
+	wnd.setOnKeyActionCallback(OnKey);
 
 	Logger::println("Created Window");
 

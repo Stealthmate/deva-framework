@@ -33,19 +33,6 @@ Window& Window::createWindow(
 	return opened_windows[opened_windows.size() - 1];
 }
 
-
-void DevaFramework::OnWindowShouldClose(Window_Handle hwnd)
-{
-	for (int i = 0;i <= opened_windows.size() - 1; i++)
-	{
-		if (opened_windows[i].handle == hwnd)
-		{
-			opened_windows[i].setShouldClose(true);
-			opened_windows[i].close_callback(opened_windows[i]);
-		}
-	}
-}
-
 void Window::setup()
 {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);//For some reason, core profile doesn't draw anything
@@ -54,7 +41,11 @@ void Window::setup()
 	this->handle = glfwCreateWindow(this->width, this->height, this->title.c_str(), nullptr, nullptr);
 	this->should_close = false;
 	glfwSetWindowCloseCallback(this->handle, OnWindowShouldClose);
-	this->close_callback = [](Window &wnd) { wnd.close(); };
+	this->close_callback = nullptr;
+	glfwSetKeyCallback(handle, OnKeyAction);
+	this->key_callback = nullptr;
+	glfwSetMouseButtonCallback(handle, OnMouseButtonAction);
+	this->mousebutton_callback = nullptr;
 }
 
 
@@ -78,7 +69,7 @@ Window::Window(Window && wnd)
 	wnd.handle = WINDOW_HANDLE_NULL;
 }
 
-Window & DevaFramework::Window::operator=(Window && wnd)
+Window& DevaFramework::Window::operator=(Window && wnd)
 {
 	this->width = wnd.width;
 	this->height = wnd.height;
@@ -109,10 +100,15 @@ std::string Window::getTitle() const
 bool Window::shouldClose()
 {
 	if (!this->handle) return true;
-	this->should_close = glfwWindowShouldClose(this->handle);
+	this->should_close = glfwWindowShouldClose(this->handle) != 0;
 	return this->should_close;
 }
 
+void Window::setTitle(const std::string &title)
+{
+	glfwSetWindowTitle(this->handle, title.c_str());
+	this->title = title;
+}
 
 void Window::setShouldClose(bool flag)
 {
@@ -120,11 +116,86 @@ void Window::setShouldClose(bool flag)
 	glfwSetWindowShouldClose(this->handle, this->should_close);
 }
 
+void DevaFramework::OnWindowShouldClose(Window_Handle hwnd)
+{
+	for (int i = 0;i <= opened_windows.size() - 1;i++)
+	{
+		if (opened_windows[i].handle == hwnd)
+		{
+			opened_windows[i].setShouldClose(true);
+			if (opened_windows[i].close_callback)
+				opened_windows[i].close_callback(opened_windows[i]);
+			break;
+		}
+	}
+}
+
+
+void Window::setCloseCallback(func_WindowCloseCallback close_callback)
+{
+	this->close_callback = close_callback;
+}
+
+bool Window::isKeyDown(Key k) const
+{
+	return glfwGetKey(this->handle, k) == InputAction::PRESS;
+}
+
+bool Window::isMouseButtonDown(MouseButton mb) const
+{
+	return glfwGetMouseButton(this->handle, mb) == InputAction::PRESS;
+}
+
+void DevaFramework::OnKeyAction(Window_Handle hwnd, int key, int scancode, int action, int modmask)
+{
+	for (int i = 0;i <= opened_windows.size() - 1;i++)
+	{
+		if (opened_windows[i].handle == hwnd)
+		{
+			if (opened_windows[i].key_callback) 
+				opened_windows[i].key_callback(
+					opened_windows[i], static_cast<Key>(key), static_cast<InputAction>(action), modmask);
+			break;
+		}
+	}
+}
+
+void Window::setOnKeyActionCallback(func_OnKeyAction cb)
+{
+	this->key_callback = cb;
+}
+
+void DevaFramework::OnMouseButtonAction(Window_Handle hwnd, int mousebutton, int action, int modmask)
+{
+	for (int i = 0;i <= opened_windows.size() - 1;i++)
+	{
+		if (opened_windows[i].handle == hwnd)
+		{
+			if (opened_windows[i].mousebutton_callback)
+				opened_windows[i].mousebutton_callback(
+					opened_windows[i], static_cast<MouseButton>(mousebutton), static_cast<InputAction>(action), modmask);
+			break;
+		}
+	}
+}
+
+void Window::setOnMouseButtonActionCallback(func_OnMouseButtonAction cb)
+{
+	this->mousebutton_callback = cb;
+}
+
 void Window::resize(unsigned int width, unsigned int height)
 {
 	this->width = width;
 	this->height = height;
 	glfwSetWindowSize(this->handle, this->width, this->height);
+}
+
+void Window::move(unsigned int topleft_X, unsigned int topleft_Y)
+{
+	glfwSetWindowPos(this->handle, topleft_X, topleft_Y);
+	this->Xpos = topleft_X;
+	this->Ypos = topleft_Y;
 }
 
 void Window::update()

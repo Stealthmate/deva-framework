@@ -7,20 +7,35 @@
 
 namespace DevaFramework
 {
-
-	void OnWindowShouldClose(Window_Handle hwnd);
+	void OnKeyAction(Window_Handle, int, int, int, int);
+	void OnMouseButtonAction(Window_Handle, int, int, int);
+	void OnWindowShouldClose(Window_Handle);
 
 	/**
 	 @brief A Window to be used for displaying stuff on the screen.
 	*/
 	class Window
 	{
+	public:
+
+		/**
+		A function which can be set as a callback for when the window should be closed.
+		@param wnd The Window that should be closed
+		*/
+		typedef void(*func_WindowCloseCallback)(Window& wnd);
+
+		typedef void (*func_OnKeyAction)(Window&, Key, InputAction, int modmask);
+		typedef void (*func_OnMouseButtonAction)(Window&, MouseButton, InputAction, int modmask);
+
+	private:
 		///Default Xpos
 		static const unsigned int DEFAULT_XPOS = 0;
 		///Default Ypos
 		static const unsigned int DEFAULT_YPOS = 0;
 
-		friend void OnWindowShouldClose(Window_Handle hwnd);
+		friend void OnWindowShouldClose(Window_Handle);
+		friend void OnMouseButtonAction(Window_Handle, int, int, int);
+		friend void OnKeyAction(Window_Handle, int, int, int, int);
 
 	public:
 
@@ -51,14 +66,10 @@ namespace DevaFramework
 		///True if the window has received a close event, false otherwise
 		bool should_close;
 
-		/**
-		A function which can be set as a callback for when the window should be closed.
-		@param wnd The Window that should be closed
-		*/
-		typedef void(*F_WindowCloseCallback)(Window &wnd);
-
 		///The function to be called when the window receives a close event
-		F_WindowCloseCallback close_callback;
+		func_WindowCloseCallback close_callback;
+		func_OnKeyAction key_callback;
+		func_OnMouseButtonAction mousebutton_callback;
 
 		///Constructs a window with the specified parameters
 		Window(
@@ -86,7 +97,12 @@ namespace DevaFramework
 
 		DEVA_WINDOW_API void setTitle(const std::string &title);
 		DEVA_WINDOW_API void setShouldClose(bool flag);
-		DEVA_WINDOW_API void setCloseCallback(F_WindowCloseCallback close_callback);
+		DEVA_WINDOW_API void setCloseCallback(func_WindowCloseCallback close_callback);
+
+		DEVA_WINDOW_API bool isKeyDown(Key k) const;
+		DEVA_WINDOW_API bool isMouseButtonDown(MouseButton mb) const;
+		DEVA_WINDOW_API void setOnKeyActionCallback(func_OnKeyAction cb);
+		DEVA_WINDOW_API void setOnMouseButtonActionCallback(func_OnMouseButtonAction cb);
 
 		///Resizes the window to the specified dimensions
 		DEVA_WINDOW_API void resize(unsigned int width, unsigned int height);

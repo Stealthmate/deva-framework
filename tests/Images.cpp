@@ -9,14 +9,21 @@
 #include "../src/System/Logger.hpp"
 #include "../src/Graphics/Image.hpp"
 
+
+using namespace DevaFramework;
+using namespace gl;
+using namespace glbinding;
+
+void OnKey(Window &win, Key k, InputAction ia, int modmask)
+{
+	if (k == Key::KEY_ESCAPE) win.close();
+}
+
 int main()
 {
-	using namespace DevaFramework;
-	using namespace gl;
-	using namespace glbinding;
-
 	Window &wnd = Window::createWindow(800, 600, "OpenGL Display Image");
 	Window::setCurrentWindow(wnd);
+	wnd.setOnKeyActionCallback(OnKey);
 
 	glbinding::Binding::initialize();
 
