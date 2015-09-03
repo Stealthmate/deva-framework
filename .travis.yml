@@ -1,7 +1,7 @@
 language: c++
 before_install:
 - sudo apt-get update
-- sudo apt-get -y install glfw
+- sudo apt-get -y install libglfw
 - sudo apt-get -y install glbindings
 - sudo apt-get -y install lua5.2
 - sudo apt-get -y install libpng16
