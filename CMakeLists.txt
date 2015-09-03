@@ -32,7 +32,7 @@ SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251" )
 if (WIN32)
 set(DEVA_FRAMEWORK_SYSTEM_DEP_OGL glbinding opengl32 glu32)
 else()
-set(DEVA_FRAMEWORK_SYSTEM_DEP_OGL GLU GLEW GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
+set(DEVA_FRAMEWORK_SYSTEM_DEP_OGL GLU glbinding GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
 endif()
 
 #Provided dependencies
