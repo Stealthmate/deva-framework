@@ -91,17 +91,22 @@ Window & DevaFramework::Window::operator=(Window && wnd)
 	return *this;
 }
 
-unsigned int Window::getWidth()
+unsigned int Window::getWidth() const
 {
 	return this->width;
 }
 
-unsigned int Window::getHeight()
+unsigned int Window::getHeight() const
 {
 	return this->height;
 }
 
-bool Window::shouldClose()
+std::string Window::getTitle() const
+{
+	return this->title;
+}
+
+bool Window::shouldClose() const
 {
 	if (!this->handle) return true;
 	this->should_close = glfwWindowShouldClose(this->handle);
