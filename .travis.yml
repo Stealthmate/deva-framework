@@ -1,6 +1,5 @@
 language: c++
 script: 
-	- mkdir Debug
-	- cd Debug
-	- cmake ..
-	
+- mkdir Debug
+- cd Debug
+- cmake ..
