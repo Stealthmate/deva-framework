@@ -51,6 +51,13 @@ public:
 		log_func(strm(msg), this->level);
 		return *this;
 	}
+
+	template<> 
+	const Logger& operator<<(const std::string &msg) const
+	{
+		log_func(msg, this->level);
+		return *this;
+	}
 };
 
 }
