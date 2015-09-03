@@ -3,4 +3,4 @@ script:
 - mkdir Debug
 - cd Debug
 - cmake ..
-- make
+- make V=1
