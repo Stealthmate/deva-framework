@@ -73,9 +73,7 @@ namespace DevaFramework
 
 		void setup();
 
-
 	public:
-
 		///Transfers ownership of the window from wnd
 		DEVA_WINDOW_API Window(Window &&wnd);
 		///Destroys the current window and transfers ownership from wnd

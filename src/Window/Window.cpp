@@ -91,6 +91,15 @@ Window & DevaFramework::Window::operator=(Window && wnd)
 	return *this;
 }
 
+unsigned int Window::getWidth()
+{
+	return this->width;
+}
+
+unsigned int Window::getHeight()
+{
+	return this->height;
+}
 
 bool Window::shouldClose()
 {
