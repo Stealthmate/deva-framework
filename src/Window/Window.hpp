@@ -24,7 +24,7 @@ namespace DevaFramework
 
 	public:
 
-		///Set the context, routing all draw calls to the specified window
+		///Set the context, routing all draw calls to the specified windowasdasd
 		static DEVA_WINDOW_API void setCurrentWindow(const Window &wnd);
 		///Create a Window with the given parameters
 		static DEVA_WINDOW_API Window& createWindow(
