@@ -44,12 +44,13 @@ endif()
 
 #System dependencies
 if (WIN32)
-set(DEVA_FRAMEWORK_SYSTEM_DEP_OGL glbinding opengl32 glu32)
+set(DEVA_FRAMEWORK_SYSTEM_DEP_OGL opengl32 glu32)
 else()
 set(DEVA_FRAMEWORK_SYSTEM_DEP_OGL GLU glbinding GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
 endif()
 
 #Provided dependencies
+set(DEVA_FRAMEWORK_PROV_DEP_GLBINDING glbinding)
 set(DEVA_FRAMEWORK_PROV_DEP_GLFW glfw3)
 set(DEVA_FRAMEWORK_PROV_DEP_LUA lua)
 set(DEVA_FRAMEWORK_PROV_DEP_PNG libpng16)
