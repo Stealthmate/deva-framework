@@ -11,7 +11,7 @@ namespace DevaFramework
 	void OnWindowShouldClose(Window_Handle hwnd);
 
 	/**
-	 @brief A Window to be used for displaying stuff on the screen.asdasdasd
+	 @brief A Window to be used for displaying stuff on the screen.
 	*/
 	class Window
 	{
@@ -24,7 +24,7 @@ namespace DevaFramework
 
 	public:
 
-		///Set the context, routing all draw calls to the specified windowasdasd
+		///Set the context, routing all draw calls to the specified window
 		static DEVA_WINDOW_API void setCurrentWindow(const Window &wnd);
 		///Create a Window with the given parameters
 		static DEVA_WINDOW_API Window& createWindow(
