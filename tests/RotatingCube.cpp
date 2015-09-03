@@ -42,19 +42,19 @@ int main()
 		-0.5f, -0.5f, +0.0f, +1.0f,//x
 		+0.0f, +1.0f, +0.0f, +1.0f,//r
 		+0.5f, -0.5f, +0.0f, +1.0f,//x
-		+0.0f, +1.0f, +0.0f, +1.0f,//r
+		+1.0f, +1.0f, +0.0f, +1.0f,//r
 		+0.5f, +0.5f, +0.0f, +1.0f,//x
-		+0.0f, +1.0f, +0.0f, +1.0f,//r
+		+0.0f, +1.0f, +1.0f, +1.0f,//r
 		-0.5f, +0.5f, +0.0f, +1.0f,//x
-		+0.0f, +1.0f, +0.0f, +1.0f,//r
+		+1.0f, +1.0f, +0.0f, +1.0f,//r
 		-0.5f, -0.5f, +0.5f, +1.0f,//x
-		+0.0f, +0.0f, +1.0f, +1.0f,//r
+		+0.0f, +1.0f, +1.0f, +1.0f,//r
 		+0.5f, -0.5f, +0.5f, +1.0f,//x
-		+0.0f, +0.0f, +1.0f, +1.0f,//r
+		+1.0f, +0.0f, +1.0f, +1.0f,//r
 		+0.5f, +0.5f, +0.5f, +1.0f,//x
-		+0.0f, +0.0f, +1.0f, +1.0f,//r
+		+0.0f, +1.0f, +1.0f, +1.0f,//r
 		-0.5f, +0.5f, +0.5f, +1.0f,//x
-		+0.0f, +0.0f, +1.0f, +1.0f,//r
+		+1.0f, +0.0f, +1.0f, +1.0f,//r
 	};
 	glFrontFace(GL_CW);
 	GLushort indecies[] =
@@ -147,6 +147,7 @@ int main()
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
 
 		wnd.update();
+		///TODO: IMplement OBJ file support
 	}
 	Logger::println("Terminating");
 }

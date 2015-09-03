@@ -82,7 +82,7 @@ namespace DevaFramework
 		DEVA_WINDOW_API unsigned int getWidth() const;
 		DEVA_WINDOW_API unsigned int getHeight() const;
 		DEVA_WINDOW_API std::string getTitle() const;
-		DEVA_WINDOW_API bool shouldClose() const;
+		DEVA_WINDOW_API bool shouldClose();
 
 		DEVA_WINDOW_API void setTitle(const std::string &title);
 		DEVA_WINDOW_API void setShouldClose(bool flag);

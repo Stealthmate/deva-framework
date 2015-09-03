@@ -106,7 +106,7 @@ std::string Window::getTitle() const
 	return this->title;
 }
 
-bool Window::shouldClose() const
+bool Window::shouldClose()
 {
 	if (!this->handle) return true;
 	this->should_close = glfwWindowShouldClose(this->handle);
