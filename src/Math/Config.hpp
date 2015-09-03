@@ -13,7 +13,6 @@
 	#else
 		#define DEVA_MATH_API
 	#endif
-#endif
 #else
 	#define DEVA_MATH_API	
 #endif

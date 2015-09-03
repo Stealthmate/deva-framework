@@ -13,9 +13,8 @@
 	#else
 		#define DEVA_WINDOW_API
 	#endif
-#endif
 #else
-	#define DEVA_WINDOW_API	
+	#define DEVA_WINDOW_API
 #endif
 
 struct GLFWwindow;
