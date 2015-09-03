@@ -52,7 +52,6 @@ public:
 		return *this;
 	}
 
-	template<> 
 	const Logger& operator<<(const std::string &msg) const
 	{
 		log_func(msg, this->level);
