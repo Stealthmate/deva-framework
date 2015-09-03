@@ -139,9 +139,9 @@ namespace DevaFramework
 		}
 
 		///@return The magnitude of the vector
-		double magnitude() const
+		float magnitude() const
 		{
-			double sum = 0;
+			float sum = 0;
 			for (int i = 0;i <= vector_length - 1; i++)
 			{
 				sum += this->operator[](i) * this->operator[](i);
@@ -153,7 +153,7 @@ namespace DevaFramework
 		Vector normal() const
 		{
 			Vector result;
-			double mag = this->magnitude();
+			float mag = this->magnitude();
 			for (int i = 0;i <= vector_length - 1;i++)
 			{
 				result[i] = this->operator()(0, i) / mag;

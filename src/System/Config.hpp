@@ -3,7 +3,7 @@
 
 #include "../Config.hpp"
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 	#ifdef DEVA_BUILD_SHARED
 		#ifdef DEVA_BUILD_SYSTEM
 			#define DEVA_SYSTEM_API __declspec(dllexport)

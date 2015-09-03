@@ -70,7 +70,7 @@ Image::Image(const Image &img) : width(img.width), height(img.height)
 
 	this->data = new unsigned char[image_size];
 
-	for (int i = 0; i < image_size; i++) this->data[i] = img.data[i];
+	for (auto i = 0; i < image_size; i++) this->data[i] = img.data[i];
 }
 
 Image::Image(Image &&img) : width(img.width), height(img.height)
