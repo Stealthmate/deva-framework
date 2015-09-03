@@ -31,7 +31,11 @@ link_directories("lib/" "bin/lib")
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # using Clang
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  SET( CMAKE_CXX_FLAGS  "$ -Wall -std=c++14" )
+	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7.0")
+		set(CMAKE_CXX_FLAGS "-std=c++0x")
+	else()
+		SET( CMAKE_CXX_FLAGS  "-Wall -std=c++14" )
+	endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel C++
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
