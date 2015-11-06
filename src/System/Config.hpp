@@ -10,7 +10,10 @@
 		#else
 			#define DEVA_SYSTEM_API __declspec(dllimport)
 		#endif
+	#else
+		#define DEVA_SYSTEM_API __declspec(dllimport)
 	#endif
+	
 #else
 	#define DEVA_SYSTEM_API
 #endif

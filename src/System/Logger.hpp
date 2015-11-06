@@ -31,14 +31,14 @@ namespace DevaFramework
 
 	public:
 
-		static DEVA_SYSTEM_API const Logger log;
-		static DEVA_SYSTEM_API const Logger warn;
-		static DEVA_SYSTEM_API const Logger err;
-		static DEVA_SYSTEM_API const Logger assert;
+		static DEVA_SYSTEM_API Logger log;
+		static DEVA_SYSTEM_API Logger warn;
+		static DEVA_SYSTEM_API Logger err;
+		static DEVA_SYSTEM_API Logger assert;
 
 		static DEVA_SYSTEM_API const std::string endl;
 
-		static DEVA_SYSTEM_API void println(const std::string &msg, const Logger& out = log);
+		static DEVA_SYSTEM_API void println(const std::string &msg, Logger& out = log);
 
 		DEVA_SYSTEM_API Logger(func_LogCallback f, LogLevel level, const std::string &stamp);
 
