@@ -28,6 +28,7 @@ int main()
 {
 
 	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
+
 	Window::setCurrentWindow(wnd);
 	wnd.setOnKeyActionCallback(OnKey);
 

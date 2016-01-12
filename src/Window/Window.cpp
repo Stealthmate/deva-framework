@@ -63,7 +63,8 @@ Window::Window(
 Window::Window(Window && wnd)
 	: width(wnd.width), height(wnd.height), 
 	title(wnd.title), 
-	should_close(wnd.should_close), close_callback(wnd.close_callback)
+	should_close(wnd.should_close), close_callback(wnd.close_callback),
+	key_callback(wnd.key_callback), mousebutton_callback(wnd.mousebutton_callback)
 {
 	this->handle = wnd.handle;
 	wnd.handle = WINDOW_HANDLE_NULL;
@@ -76,6 +77,8 @@ Window& DevaFramework::Window::operator=(Window && wnd)
 	this->title = wnd.title;
 	this->should_close = wnd.should_close;
 	this->close_callback = wnd.close_callback;
+	this->key_callback = wnd.key_callback;
+	this->mousebutton_callback = wnd.mousebutton_callback;
 	if (this->handle) glfwDestroyWindow(this->handle);
 	this->handle = wnd.handle;
 	wnd.handle = WINDOW_HANDLE_NULL;
