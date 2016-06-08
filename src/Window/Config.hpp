@@ -20,6 +20,8 @@ struct GLFWwindow;
 namespace DevaFramework
 {
 
+	extern bool __DEVA_FRAMEWORK_WINDOW_INIT;
+
 	typedef GLFWwindow* Window_Handle;
 	const Window_Handle WINDOW_HANDLE_NULL = nullptr;
 

@@ -12,6 +12,10 @@
 		#endif
 	#else
 		#define DEVA_GRAPHICS_API
+
+		#ifndef DEVA_FRAMEWORK_MASTER_H
+		#error "DO NOT INCLUDE THESE HEADERS MANUALLY! USE Deva.hpp INSTEAD!"
+		#endif
 	#endif
 #else
 	#define DEVA_GRAPHICS_API	

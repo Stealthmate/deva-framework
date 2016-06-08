@@ -3,12 +3,10 @@
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
 
-#include "../src/Window/Window.hpp"
-#include "../src/Graphics/Common.hpp"
-#include "../src/Util/Common.hpp"
-#include "../src/System/Logger.hpp"
-#include "../src/Graphics/Shader.hpp"
-#include "../src/Graphics/ShaderProgram.hpp"
+#define DEVA_USING_WINDOW
+#define DEVA_USING_UTIL
+#define DEVA_USING_GRAPHICS
+#include "../src/Deva.hpp"
 
 using namespace DevaFramework;
 using namespace gl;
@@ -21,6 +19,8 @@ void OnKey(Window &win, Key k, InputAction ia, int modmask)
 
 int main()
 {
+
+	DEVA_INIT();
 
 	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
 	Window::setCurrentWindow(wnd);

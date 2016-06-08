@@ -3,12 +3,10 @@
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
 
-#include "../src/Window/Window.hpp"
-#include "../src/Graphics/Common.hpp"
-#include "../src/Util/Common.hpp"
-#include "../src/System/Logger.hpp"
-#include "../src/Graphics/Image.hpp"
-
+#define DEVA_USING_GRAPHICS
+#define DEVA_USING_WINDOW
+#define DEVA_USING_UTIL
+#include "../src/Deva.hpp"
 
 using namespace DevaFramework;
 using namespace gl;
@@ -21,6 +19,9 @@ void OnKey(Window &win, Key k, InputAction ia, int modmask)
 
 int main()
 {
+
+	DEVA_INIT();
+
 	Window &wnd = Window::createWindow(800, 600, "OpenGL Display Image");
 	Window::setCurrentWindow(wnd);
 	wnd.setOnKeyActionCallback(OnKey);

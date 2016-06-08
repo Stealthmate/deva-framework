@@ -20,5 +20,10 @@ add_dependencies(RotatingCube deva-Window deva-Graphics deva-Util)
 target_link_libraries(RotatingCube deva-Window deva-Graphics deva-Util deva-Math deva-System ${DEVA_FRAMEWORK_SYSTEM_DEP_OGL})
 list(APPEND TEST_LIST RotatingCube)
 
+add_executable(FTText ${CURDIR}/FT_text.cpp)
+add_dependencies(FTText deva-Window deva-Graphics deva-Util)
+target_link_libraries(FTText deva-Window deva-Graphics deva-Util deva-Math deva-System ${DEVA_FRAMEWORK_SYSTEM_DEP_OGL})
+list(APPEND TEST_LIST FTText)
+
 file(GLOB_RECURSE SRCS bin/shaders/*.glsl)
 add_custom_target(Shaders ALL SOURCES ${SRCS})

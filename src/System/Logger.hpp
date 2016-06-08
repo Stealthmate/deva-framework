@@ -1,5 +1,5 @@
-#ifndef DEVA_ERROR_ERRORHANDLER_H
-#define DEVA_ERROR_ERRORHANDLER_H
+#ifndef DEVA_SYSTEM_LOGGER_H
+#define DEVA_SYSTEM_LOGGER_H
 
 #include "Config.hpp"
 
@@ -60,4 +60,4 @@ namespace DevaFramework
 
 }
 
-#endif // DEVA_ERROR_ERRORHANDLER_H
+#endif // DEVA_SYSTEM_LOGGER_H

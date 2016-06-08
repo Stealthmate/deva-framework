@@ -4,14 +4,21 @@
 #include <glbinding/Binding.h>
 #include <iostream>
 
-#include "../src/Window/Window.hpp"
+/*#include "../src/Window/Window.hpp"
 #include "../src/Graphics/Common.hpp"
 #include "../src/Util/Common.hpp"
 #include "../src/System/Logger.hpp"
 #include "../src/Graphics/Image.hpp"
 #include "../src/Math/Matrix.hpp"
 #include "../src/Math/Vector.hpp"
-#include "../src/Math/MatrixFactory.hpp"
+#include "../src/Math/MatrixFactory.hpp"*/
+
+#define DEVA_USING_WINDOW
+#define DEVA_USING_GRAPHICS
+#define DEVA_USING_UTIL
+#define DEVA_USING_MATH
+#include "../src/Deva.hpp"
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -24,8 +31,38 @@ void OnKey(Window &win, Key k, InputAction ia, int modmask)
 	if (k == Key::KEY_ESCAPE) win.close();
 }
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+int drawText(std::string str) {
+	FT_Library ft;
+
+	if (FT_Init_FreeType(&ft)) {
+		fprintf(stderr, "Could not init freetype library\n");
+		return 1;
+	}
+
+	FT_Face face;
+
+	if (FT_New_Face(ft, "FreeSans.ttf", 0, &face)) {
+		fprintf(stderr, "Could not open font\n");
+		return 1;
+	}
+
+	FT_Set_Pixel_Sizes(face, 0, 48);
+
+	if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)) {
+		fprintf(stderr, "Could not load character 'X'\n");
+		return 1;
+	}
+
+	FT_GlyphSlot g = face->glyph;
+}
+
 int main()
 {
+
+	DEVA_INIT();
 
 	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
 

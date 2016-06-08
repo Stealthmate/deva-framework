@@ -18,7 +18,6 @@
 	#define DEVA_SYSTEM_API
 #endif
 
-
 namespace DevaFramework
 {
 

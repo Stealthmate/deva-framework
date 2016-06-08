@@ -4,12 +4,11 @@
 #include <vector>
 #include <memory>
 
+#include "../src/System/Logger.hpp"
 
 using namespace DevaFramework;
 
 static std::vector<Window> opened_windows;
-
-static bool GLFW_READY = false;
 
 void Window::setCurrentWindow(const Window &wnd)
 {
@@ -23,18 +22,19 @@ Window& Window::createWindow(
 	unsigned int Xpos,
 	unsigned int Ypos)
 {
-	if (!GLFW_READY)
-	{
-		glfwInit();
-		GLFW_READY = true;
-	}
-
 	opened_windows.push_back(Window(width, height, title, Xpos, Ypos));
 	return opened_windows[opened_windows.size() - 1];
 }
 
 void Window::setup()
 {
+
+	if (!__DEVA_FRAMEWORK_WINDOW_INIT) {
+		Logger::println("Deva not initialized! Call DEVA_INIT() BEFORE you use any Deva functions. (GLFW not initialized).");
+		this->handle = nullptr;
+		return;
+	}
+
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);//For some reason, core profile doesn't draw anything
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
