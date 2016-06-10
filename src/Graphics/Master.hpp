@@ -5,6 +5,7 @@
 #include "Init.hpp"
 #include "ShaderProgram.hpp"
 #include "Image.hpp"
+#include "Model.hpp"
 #include "Common.hpp"
 
 #endif //DEVA_FRAMEWORK_GRAPHICS_H
