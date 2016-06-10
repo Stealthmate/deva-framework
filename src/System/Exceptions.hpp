@@ -30,6 +30,8 @@ namespace DevaFramework
 	public:
 		DEVA_SYSTEM_API DevaException();
 		DEVA_SYSTEM_API DevaException(const std::string &description);
+
+		DEVA_SYSTEM_API virtual const char* what() const;
 	};
 
 	class DevaInvalidInputException  : public DevaException
