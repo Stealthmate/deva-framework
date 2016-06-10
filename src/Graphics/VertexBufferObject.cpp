@@ -9,7 +9,6 @@ std::string VertexBufferObject::VertexArrayObject::str() const
 {
     std::string output = "";
     output+= "  Position: " + strm(id) + "\n";
-    output+= "  Loaded: " + strm(loaded) + "\n";
     output+= "  nValuesPerVertex: " + strm(nValuesPerVertex) + "\n";
     output+= "  dataType: " + strm(dataType) + "\n";
     output+= "  spacing:  " + strm(spacing) + "\n";
@@ -20,17 +19,14 @@ std::string VertexBufferObject::VertexArrayObject::str() const
 VertexBufferObject::VertexArrayObject::VertexArrayObject()
 {
     id = 0;
-    loaded = false;
     nValuesPerVertex = 3;
     dataType = GL_FLOAT;
     spacing = 0;
     offset = 0;
 }
 
-VertexBufferObject::VertexBufferObject()
+VertexBufferObject::VertexBufferObject() : data()
 {
-    position = 0;
-    data = 0;
     nVertices = 0;
     data_nValues = 0;
     data_byteSize = 0;
@@ -40,10 +36,8 @@ VertexBufferObject::VertexBufferObject()
 std::string VertexBufferObject::str() const
 {
     std::string output;
-    output += "\nPosition:      ";
-    output +=  strm(position);
     output+= "\nDataptr:       ";
-    output+= strm((uintptr_t) data);
+    output+= strm((uintptr_t) &data[0]);
     output+= "\nnVertices:     ";
     output+= strm(nVertices);
     output+= "\ndata_nValues:  ";
@@ -51,7 +45,7 @@ std::string VertexBufferObject::str() const
     output+= "\ndata_byteSize: ";
     output+= strm(data_byteSize);
     output+= "\nvaosptr:       ";
-    output+= strm((uintptr_t) vaos);
+    output+= strm((uintptr_t) &vaos[0]);
     output+= "\nvaos_size:     ";
     output+= strm((unsigned int) vaos_size);
     for(auto i=0;i<=this->vaos_size-1;i++) output+= "\n" +  vaos[i].str();

@@ -5,6 +5,8 @@
 
 #include <glbinding/gl/gl.h>
 
+#include <vector>
+
 namespace DevaFramework
 {
 
@@ -16,7 +18,6 @@ struct VertexBufferObject
     {
         ///The AttribPointer of the VAO
         gl::GLuint id;
-        bool loaded;
         ///The number of values stored for each vertex
 		gl::GLuint nValuesPerVertex;
         ///The type of values stored
@@ -24,18 +25,16 @@ struct VertexBufferObject
         ///The amount of bytes between each individual value
         char spacing;
         ///The offset in bytes, from the beginning of the buffer, where the array begins
-        void* offset;
+        uintptr_t offset;
 
-        VertexArrayObject();
+		DEVA_GRAPHICS_API VertexArrayObject();
 
         std::string str() const;
 
     };
 
-    ///The position of the buffer, provided by OpenGL
-	gl::GLuint position;
     ///The raw data to be copied in the buffer
-    void* data;
+	std::vector<char> data;
     ///The number of vertices, for which information is stored
 	gl::GLuint nVertices;
     ///The number of values to be stored
@@ -43,11 +42,11 @@ struct VertexBufferObject
     ///The size of the buffer to be allocated
 	gl::GLuint data_byteSize;
     ///A pointer to an array of VertexArrayObject objects, in which information about each VAO is stored
-    VertexArrayObject* vaos;
+	std::vector<VertexArrayObject> vaos;
     ///The number of VAOs stored
     char vaos_size;
 
-    VertexBufferObject();
+	DEVA_GRAPHICS_API VertexBufferObject();
 
     std::string str() const;
 };
