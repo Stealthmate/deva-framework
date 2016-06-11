@@ -21,6 +21,18 @@ namespace DevaFramework
 {
 	const float EPS = 1.0E-10f;
 	const double M_PI = 3.1415;
+
+	///Converts degrees to radians
+	float rad(float deg)
+	{
+		return M_PI*deg / 180.f;
+	}
+	///Converts radians to degrees
+	float deg(float rad)
+	{
+		return rad*180.f / M_PI;
+	}
+
 }
 
 #endif //DEVA_FRAMEWORK_MATH_CONFIG_H
