@@ -25,12 +25,12 @@ namespace DevaFramework
 	///Converts degrees to radians
 	inline float rad(float deg)
 	{
-		return M_PI*deg / 180.f;
+		return static_cast<float>(M_PI*deg / 180.f);
 	}
 	///Converts radians to degrees
 	inline float deg(float rad)
 	{
-		return rad*180.f / M_PI;
+		return static_cast<float>(rad*180.f / M_PI);
 	}
 
 }
