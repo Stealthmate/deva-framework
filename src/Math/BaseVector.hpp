@@ -5,6 +5,8 @@
 #include <initializer_list>
 #include <cmath>
 
+#include "../System/Exceptions.hpp"
+
 namespace DevaFramework
 {
 	/**
@@ -36,14 +38,7 @@ namespace DevaFramework
 		{
 			if (values.size() != vector_length)
 			{
-				Logger::assert 
-					<< Logger::err.stamp 
-					<< "Tried to create vector with " 
-					<< vector_length 
-					<< " values, but passed " 
-					<< values.size();
-
-				throw std::invalid_argument(
+				throw DevaInvalidInputException(
 					"Tried to create vector with " + strm(vector_length) + " values, but passed " + strm(values.size()));
 			}
 			auto val_i = values.begin();
@@ -56,7 +51,6 @@ namespace DevaFramework
 				}
 			}
 		}
-
 
 		/**
 			@param i - the number of the set
@@ -144,7 +138,7 @@ namespace DevaFramework
 			float sum = 0;
 			for (int i = 0;i <= vector_length - 1; i++)
 			{
-				sum += this->operator[](i) * this->operator[](i);
+				sum += this->operator()(0, i) * this->operator()(0, i);
 			}
 			return sqrt(sum);
 		}
@@ -159,6 +153,18 @@ namespace DevaFramework
 				result[i] = this->operator()(0, i) / mag;
 			}
 			return result;
+		}
+
+		std::string to_str() const
+		{
+			std::string str = "vec" + strm(vector_length) + " [";
+			for (int i = 0;i <= vector_length - 1;i++)
+			{
+				str += strm(this->operator()(0, i));
+				if(i<vector_length - 1) str += ";";
+			}
+			str += "]";
+			return str;
 		}
 	};
 }
