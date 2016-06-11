@@ -2,6 +2,8 @@
 
 #include <glbinding/gl/gl.h>
 
+#include "../src/System/Logger.hpp"
+
 using namespace DevaFramework;
 using namespace gl;
 
@@ -11,7 +13,7 @@ std::string VertexBufferObject::VertexArrayObject::str() const
     output+= "  Position: " + strm(id) + "\n";
     output+= "  nValuesPerVertex: " + strm(nValuesPerVertex) + "\n";
     output+= "  dataType: " + strm(dataType) + "\n";
-    output+= "  spacing:  " + strm(spacing) + "\n";
+    output+= "  spacing:  " + strm((int)spacing) + "\n";
     output+= "  offset: " + strm((uintptr_t)offset) + "\n";
     return output;
 }

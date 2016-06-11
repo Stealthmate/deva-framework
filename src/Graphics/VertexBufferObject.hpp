@@ -48,7 +48,7 @@ struct VertexBufferObject
 
 	DEVA_GRAPHICS_API VertexBufferObject();
 
-    std::string str() const;
+    DEVA_GRAPHICS_API std::string str() const;
 };
 
 typedef VertexBufferObject VBO;
