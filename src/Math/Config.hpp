@@ -23,12 +23,12 @@ namespace DevaFramework
 	const double M_PI = 3.1415;
 
 	///Converts degrees to radians
-	float rad(float deg)
+	inline float rad(float deg)
 	{
 		return M_PI*deg / 180.f;
 	}
 	///Converts radians to degrees
-	float deg(float rad)
+	inline float deg(float rad)
 	{
 		return rad*180.f / M_PI;
 	}
