@@ -20,7 +20,12 @@ mat4 DevaFramework::rotate(float angle, vec3 axis)
 		vec4{0, 0, 0, 1}
 	};
 }
+/*
+mat4 DevaFramework::rotate(const Quaternion &q)
+{
 
+}
+*/
 mat4 DevaFramework::scale(vec3 scale_vector)
 {
 	return{ vec4{scale_vector[0], 0, 0, 0 }, vec4{0, scale_vector[1], 0, 0}, vec4{0, 0, scale_vector[2], 0}, vec4{0, 0, 0, 1} };
