@@ -4,10 +4,10 @@
 #include <initializer_list>
 #include <string>
 #include <iostream>
-#include <exception>
 
 #include "Config.hpp"
 #include "../src/System/Logger.hpp"
+#include "../src/System/Exceptions.hpp"
 
 namespace DevaFramework
 {
@@ -35,7 +35,6 @@ namespace DevaFramework
 	{
 	protected:
 		T data[n_vectors*vector_length];
-		friend class BaseMatrix;
 
 	public:
 
@@ -65,8 +64,7 @@ namespace DevaFramework
 		{
 			if (values.size() != n_vectors)
 			{
-				Logger::assert << Logger::err.stamp << "Tried to create matrix with " << n_vectors << " columns, but passed " << values.size();
-				throw std::invalid_argument(
+				throw DevaInvalidInputException(
 					"Tried to create matrix with " + strm(n_vectors) + " columns, but passed " + strm(values.size()));
 			}
 			auto val_i = values.begin();
@@ -167,7 +165,7 @@ namespace DevaFramework
 
 
 		///@return A string representation of the matrix
-		std::string to_str() const
+		virtual std::string to_str() const
 		{
 			std::string res = "\nMat" + strm(n_vectors) + "x" + strm(vector_length) + ":\n";
 			for (int i = 0;i <= n_vectors - 1;i++)
