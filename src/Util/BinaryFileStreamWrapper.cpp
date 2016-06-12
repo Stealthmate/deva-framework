@@ -1,11 +1,14 @@
 #include "BinaryFileStreamWrapper.hpp"
-
+#include "../System/Logger.hpp"
 using namespace DevaFramework;
 
 BinaryFileStreamWrapper::BinaryFileStreamWrapper() : BinaryWriter(), BinaryReader(), stream() {}
 
 BinaryFileStreamWrapper::BinaryFileStreamWrapper(const std::string &path, std::ios::openmode openmode)
-	: BinaryWriter(), BinaryReader(), stream(path, openmode | std::fstream::binary) {}
+	: BinaryWriter(), BinaryReader(), stream() 
+{
+	stream.open(path, openmode | std::fstream::binary);
+}
 
 BinaryFileStreamWrapper& BinaryFileStreamWrapper::write(const char* data, size_t datasize)
 {
