@@ -3,6 +3,7 @@
 
 #include "Init.hpp"
 #include "Common.hpp"
-#include "BinaryFileStreamWriter.hpp"
+#include "FileStreamBinaryWriter.hpp"
+#include "ByteBufferBinaryWriter.hpp"
 
 #endif //DEVA_FRAMEWORK_UTIL_MASTER_H
