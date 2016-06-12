@@ -5,17 +5,24 @@
 #include "../System/Exceptions.hpp"
 #include "../System/Logger.hpp"
 
+#include "../Util/ByteBuffer.hpp"
+#include "../Util/BinaryFileStreamWrapper.hpp"
+
 using namespace DevaFramework;
 
-static const int32_t SERIALID = 100;
+static const int32_t SERIALID = 102;
 
-static const char DATA_TYPE_FLOAT = 0b00000001;
-static const char DATA_TYPE_INT   = 0b00000010;
-static const char DATA_TYPE_UINT  = 0b00000100;
+static const char DATA_TYPE_FLOAT = 0b10000000;
+static const char DATA_TYPE_INT   = 0b01000000;
+static const char DATA_TYPE_UINT  = 0b00100000;
 
-static const char DATA_SIZE_8  = 0b10000000;
-static const char DATA_SIZE_16 = 0b01000000;
-static const char DATA_SIZE_32 = 0b00100000;
+static const char DATA_SIZE_8  = 0b00000001;
+static const char DATA_SIZE_16 = 0b00000010;
+static const char DATA_SIZE_32 = 0b00000100;
+
+static const char DATA_SIZE_MASK = 0b000000111;
+
+static const int INDICES_PER_ELEMENT = 3;
 
 
 static gl::GLenum getGLType(int8_t token) 
@@ -58,24 +65,24 @@ static int8_t getToken(gl::GLenum type)
 
 Model Model::fromFile(const std::string &filename) {
 
-	std::ifstream file_input;
-	file_input.open(filename, std::ifstream::in | std::ifstream::binary);
+	BinaryFileStreamWrapper bfsw = BinaryFileStreamWrapper(filename, std::ios::in);
+	std::fstream &file_input = bfsw.stream;
 
 	if (!file_input.is_open()) throw DevaInvalidInputException("Cannot load model. Invalid file name (cannot open file).");
 
 	int32_t n_vertices;
-	int8_t n_components;
-	int8_t n_vao;
-	std::vector<int8_t> n_components_vao;
+	int32_t n_components;
+	int32_t n_vao;
+	std::vector<int32_t> n_components_vao;
 	std::vector<int8_t> component_type_vao;
 
 	int32_t serial_id;
-	file_input.read(reinterpret_cast<char*>(&serial_id), 4);
+	bfsw >> serial_id;
 	if (serial_id != SERIALID) throw DevaInvalidInputException("Cannot load model. Serial ID does not match current version. (file id: " + strm(serial_id) + ")");
 
-	file_input.read(reinterpret_cast<char*>(&n_vertices), 4);
-	file_input.read(reinterpret_cast<char*>(&n_components), 1);
-	file_input.read(reinterpret_cast<char*>(&n_vao), 1);
+	bfsw >> n_vertices;
+	bfsw >> n_components;
+	bfsw >> n_vao;
 
 	VBO vbo;
 	vbo.nVertices = n_vertices;
@@ -91,8 +98,8 @@ Model Model::fromFile(const std::string &filename) {
 	int vao_bytesize = 0;
 	for (int i = 0; i <= n_vao - 1;i++) 
 	{
-		file_input.read(reinterpret_cast<char*>(&n_components_vao[i]), 1);
-		file_input.read(reinterpret_cast<char*>(&component_type_vao[i]), 1);
+		bfsw >> n_components_vao[i];
+		bfsw >> component_type_vao[i];
 
 		VAO vao;
 		vao.id = i;
@@ -115,25 +122,30 @@ Model Model::fromFile(const std::string &filename) {
 	std::vector<char> data;
 	data.resize(vbo.data_byteSize);
 
-	file_input.read(&data[0], vbo.data_byteSize);
+	bfsw.read(&data[0], vbo.data_byteSize);
 	
 	vbo.data = data;
 
 	int32_t n_elements;
-	file_input.read(reinterpret_cast<char*>(&n_elements), 4);
-	std::vector<uint16_t> indices;
-	indices.resize(n_elements * 3);
+	bfsw >> n_elements;
 
-	file_input.read((char*)(&indices[0]), n_elements * 3 * 2);
+	int8_t index_type;
+	bfsw >> index_type;
 
-	Model model = Model(vbo, indices);
+	if (!(index_type & DATA_TYPE_INT || index_type & DATA_TYPE_UINT))
+		throw DevaInvalidInputException("Cannot load model. Bad index type. (type: " + strm((int)index_type) + ")");
 
-	return model;
+	std::vector<char> index_data;
+	index_data.resize(n_elements * INDICES_PER_ELEMENT * (index_type & DATA_SIZE_MASK));
+
+	bfsw.read((char*)(&index_data[0]), n_elements * 3 * (index_type & DATA_SIZE_MASK));
+
+	return Model(vbo, getGLType(index_type), index_data);
 }
-
-/*std::vector<char> Model::exportBinary(const Model &model)
+/*
+std::vector<char> Model::exportBinary(const Model &model)
 {
-	std::vector<char> binary;
+	std::vector<char> buffer;
 
 	int nVertices = model.vbo.nVertices;
 	int data_byteSize = model.vbo.data_byteSize;
@@ -149,16 +161,16 @@ Model Model::fromFile(const std::string &filename) {
 	}
 }*/
 
-Model::Model() : vbo(), index_arr() {}
+Model::Model() : vbo(), index_type(gl::GL_INT), indices() {}
 
-Model::Model(const VBO &vbo, const std::vector<uint16_t> &index_arr) : vbo(vbo), index_arr(index_arr) {}
+Model::Model(const VBO &vbo, gl::GLenum index_type, const std::vector<char> &indices) : vbo(vbo), index_type(index_type), indices(indices) {}
 
 const VBO& Model::getVBO() const
 {
 	return this->vbo;
 }
 
-const std::vector<uint16_t>& Model::getIndexArray() const
+const std::vector<char>& Model::getIndexArray() const
 {
-	return this->index_arr;
+	return this->indices;
 }
