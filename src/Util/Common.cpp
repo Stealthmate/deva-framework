@@ -14,6 +14,5 @@ std::string DevaFramework::readTextFile(const char* filepath)
 			text += "\n" + Line;
 		input.close();
 	}
-
 	return text;
 }
