@@ -16,7 +16,7 @@ namespace DevaFramework
 		std::fstream stream;
 
 		DEVA_UTIL_API BinaryFileStreamWrapper();
-		DEVA_UTIL_API BinaryFileStreamWrapper(const std::string &path, std::ios_base::openmode openmode = std::fstream::in);
+		DEVA_UTIL_API BinaryFileStreamWrapper(const std::string &path, std::ios::openmode openmode = std::ios::in);
 
 		DEVA_UTIL_API BinaryFileStreamWrapper& write(const char* data, size_t count);
 		DEVA_UTIL_API BinaryFileStreamWrapper& read(char* data, size_t count);
