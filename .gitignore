@@ -5,6 +5,7 @@ bin/*.exp
 bin/*.dll
 bin/*.lib
 bin/*.exe
+bin/*.devaobj
 bin/lib**
 !CMakeLists.txt
 !*.glsl
