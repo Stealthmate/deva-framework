@@ -33,41 +33,41 @@ namespace DevaFramework
 			
 			@param source - the source code of the shader. Can be omitted during construction.
 		*/
-		DEVA_GRAPHICS_API Shader(GLenum shaderType, const std::string &source = "");
+		DEVA_FRAMEWORK_API Shader(GLenum shaderType, const std::string &source = "");
 	
-		DEVA_GRAPHICS_API Shader(const Shader &shader) = delete;
+		DEVA_FRAMEWORK_API Shader(const Shader &shader) = delete;
 
 		/**
 			Obtains ownership of the OpenGL ShaderObject
 			associated with, and thus invalidates \b shader.
 		*/
-		DEVA_GRAPHICS_API Shader(Shader &&shader);
+		DEVA_FRAMEWORK_API Shader(Shader &&shader);
 		
-		DEVA_GRAPHICS_API Shader& operator=(const Shader &shader) = delete;
+		DEVA_FRAMEWORK_API Shader& operator=(const Shader &shader) = delete;
 
 		/**
 			Calls glDeleteShader() on the current shader and obtains ownership of the OpenGL ShaderObject
 			associated with, and thus invalidates \b shader.
 		*/
-		DEVA_GRAPHICS_API Shader& operator=(Shader &&shader);
+		DEVA_FRAMEWORK_API Shader& operator=(Shader &&shader);
 
 		///@return A GLuint representing the handle to the OpenGL shader object
-		DEVA_GRAPHICS_API inline GLuint getHandle() const
+		DEVA_FRAMEWORK_API inline GLuint getHandle() const
 		{
 			return this->handle;
 		}
 
 		///(Re)sets the shader source code. @param source - the (new) source code of the shader
-		DEVA_GRAPHICS_API void setSource(const std::string &source);
+		DEVA_FRAMEWORK_API void setSource(const std::string &source);
 
 		/**
 			Calls glCompileShader() on the shader and returns either 
 			\b COMPILE_STATUS_OK upon successful compilation or
 			the OpenGL Info Log of the compilation process
 		*/
-		DEVA_GRAPHICS_API std::string compile() const;
+		DEVA_FRAMEWORK_API std::string compile() const;
 
-		DEVA_GRAPHICS_API ~Shader();
+		DEVA_FRAMEWORK_API ~Shader();
 	};
 
 }

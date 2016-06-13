@@ -4,42 +4,28 @@
 #include "Config.hpp"
 
 #include "System/Master.hpp"
-
-#ifdef DEVA_USING_UTIL
 #include "Util/Master.hpp"
+#include "Math/Master.hpp"
+#include "Window/Master.hpp"
+#include "Graphics/Master.hpp"
+
 int __deva_init_util() 
 {
 	DevaFramework::Logger::println("Initializing Util...");
 	return DevaFramework::DEVA_INIT_UTIL();
 }
-#else
-int __deva_init_util() { return 0; }
-#endif
 
-#ifdef DEVA_USING_MATH
-#include "Math/Master.hpp"
 int __deva_init_math() 
 {
 	DevaFramework::Logger::println("Initializing Math...");
 	return DevaFramework::DEVA_INIT_MATH();
 }
-#else
-int __deva_init_math() { return 0; }
-#endif
 
-#ifdef DEVA_USING_GRAPHICS
-#include "Graphics/Master.hpp"
 int __deva_init_graphics() 
 {
 	DevaFramework::Logger::println("Initializing Graphics...");
 	return DevaFramework::DEVA_INIT_GRAPHICS();
 }
-#else
-int __deva_init_graphics() { return 0; }
-#endif
-
-#ifdef DEVA_USING_WINDOW
-#include "Window/Master.hpp"
 int __deva_init_window()
 {
 	DevaFramework::Logger::println("Initializing Window...");
@@ -54,9 +40,6 @@ int __deva_init_window()
 	}
 	return DevaFramework::DEVA_INIT_WINDOW();
 }
-#else
-int __deva_init_window() { return 0; }
-#endif
 
 namespace DevaFramework
 {

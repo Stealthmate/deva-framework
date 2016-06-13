@@ -5,7 +5,7 @@
 
 namespace DevaFramework {
 
-	DEVA_WINDOW_API int DEVA_INIT_WINDOW();
+	DEVA_FRAMEWORK_API int DEVA_INIT_WINDOW();
 }
 
 #endif //DEVA_FRAMEWORK_WINDOW_INIT_H

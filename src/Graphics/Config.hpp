@@ -3,24 +3,6 @@
 
 #include "../Config.hpp"
 
-#ifdef _MSC_VER
-	#ifdef DEVA_BUILD_GRAPHICS
-		#ifdef DEVA_BUILD_SHARED
-			#define DEVA_GRAPHICS_API __declspec(dllexport)
-		#else
-			#define DEVA_GRAPHICS_API __declspec(dllimport)
-		#endif
-	#else
-		#define DEVA_GRAPHICS_API
-
-		#ifndef DEVA_FRAMEWORK_MASTER_H
-		#error "DO NOT INCLUDE THESE HEADERS MANUALLY! USE Deva.hpp INSTEAD!"
-		#endif
-	#endif
-#else
-	#define DEVA_GRAPHICS_API	
-#endif
-
 namespace DevaFramework
 {
 	///The number of bits per pixel used in all internal representations of an image

@@ -3,9 +3,6 @@
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
 
-#define DEVA_USING_WINDOW
-#define DEVA_USING_UTIL
-#define DEVA_USING_GRAPHICS
 #include "../src/Deva.hpp"
 
 using namespace DevaFramework;

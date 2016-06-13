@@ -83,7 +83,7 @@ RawImage DevaFramework::readPNG(const std::string &filename)
 
     for (size_t i = 0; i < imgHeight; i++)
     {
-        png_uint_32 q = (imgHeight- i - 1) * stride;
+        png_uint_32 q = (png_uint_32) ((imgHeight- i - 1) * stride);
         rowPtrs[i] = (png_bytep)data + q;
     }
 

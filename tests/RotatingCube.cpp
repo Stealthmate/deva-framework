@@ -4,19 +4,6 @@
 #include <glbinding/Binding.h>
 #include <iostream>
 
-/*#include "../src/Window/Window.hpp"
-#include "../src/Graphics/Common.hpp"
-#include "../src/Util/Common.hpp"
-#include "../src/System/Logger.hpp"
-#include "../src/Graphics/Image.hpp"
-#include "../src/Math/Matrix.hpp"
-#include "../src/Math/Vector.hpp"
-#include "../src/Math/MatrixFactory.hpp"*/
-
-#define DEVA_USING_WINDOW
-#define DEVA_USING_GRAPHICS
-#define DEVA_USING_UTIL
-#define DEVA_USING_MATH
 #include "../src/Deva.hpp"
 
 #define _USE_MATH_DEFINES
@@ -29,34 +16,6 @@ using namespace glbinding;
 void OnKey(Window &win, Key k, InputAction ia, int modmask)
 {
 	if (k == Key::KEY_ESCAPE) win.close();
-}
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-int drawText(std::string str) {
-	FT_Library ft;
-
-	if (FT_Init_FreeType(&ft)) {
-		fprintf(stderr, "Could not init freetype library\n");
-		return 1;
-	}
-
-	FT_Face face;
-
-	if (FT_New_Face(ft, "FreeSans.ttf", 0, &face)) {
-		fprintf(stderr, "Could not open font\n");
-		return 1;
-	}
-
-	FT_Set_Pixel_Sizes(face, 0, 48);
-
-	if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)) {
-		fprintf(stderr, "Could not load character 'X'\n");
-		return 1;
-	}
-
-	FT_GlyphSlot g = face->glyph;
 }
 
 int main()
@@ -84,25 +43,25 @@ int main()
 
 	GLfloat coords[] =
 	{
-		-0.5f, -0.5f, +0.0f, +1.0f,//x
+		-0.2f, -0.2f, -0.2f, +1.0f,//x
 		+0.0f, +1.0f, +0.0f, +1.0f,//r
-		+0.5f, -0.5f, +0.0f, +1.0f,//x
+		+0.2f, -0.2f, -0.2f, +1.0f,//x
 		+1.0f, +1.0f, +0.0f, +1.0f,//r
-		+0.5f, +0.5f, +0.0f, +1.0f,//x
+		+0.2f, +0.2f, -0.2f, +1.0f,//x
 		+0.0f, +1.0f, +1.0f, +1.0f,//r
-		-0.5f, +0.5f, +0.0f, +1.0f,//x
+		-0.2f, +0.2f, -0.2f, +1.0f,//x
 		+1.0f, +1.0f, +0.0f, +1.0f,//r
-		-0.5f, -0.5f, +0.5f, +1.0f,//x
+		-0.2f, -0.2f, +0.2f, +1.0f,//x
 		+0.0f, +1.0f, +1.0f, +1.0f,//r
-		+0.5f, -0.5f, +0.5f, +1.0f,//x
+		+0.2f, -0.2f, +0.2f, +1.0f,//x
 		+1.0f, +0.0f, +1.0f, +1.0f,//r
-		+0.5f, +0.5f, +0.5f, +1.0f,//x
+		+0.2f, +0.2f, +0.2f, +1.0f,//x
 		+0.0f, +1.0f, +1.0f, +1.0f,//r
-		-0.5f, +0.5f, +0.5f, +1.0f,//x
+		-0.2f, +0.2f, +0.2f, +1.0f,//x
 		+1.0f, +0.0f, +1.0f, +1.0f,//r
 	};
 	glFrontFace(GL_CW);
-	GLushort indecies[] =
+	std::vector<char> indices =
 	{
 		0,1,2,
 		0,2,3,
@@ -115,8 +74,58 @@ int main()
 		2,6,3,
 		6,7,3,
 		0,4,1,
-		1,4,5,
+		1,4,5
 	};
+
+	VBO vbo;
+	vbo.data = std::vector<char>(reinterpret_cast<char*>(&coords[0]), reinterpret_cast<char*>(&coords[0]) + sizeof(coords));
+	vbo.data_byteSize = sizeof(coords);
+	vbo.data_nValues = 64;
+	vbo.nVertices = 8;
+	vbo.vaos_size = 2;
+	VAO vao1;
+	vao1.dataType = GL_FLOAT;
+	vao1.id = 0;
+	vao1.nValuesPerVertex = 4;
+	vao1.offset = 0;
+	vao1.spacing = 32;
+	vbo.vaos.push_back(vao1);
+	VAO vao2;
+	vao2.dataType = GL_FLOAT;
+	vao2.id = 1;
+	vao2.nValuesPerVertex = 4;
+	vao2.offset = 16;
+	vao2.spacing = 32;
+	vbo.vaos.push_back(vao2);
+
+	Model model = Model(vbo, gl::GL_UNSIGNED_BYTE , indices);
+
+	std::ofstream file_out;
+	file_out.open("test.devaobj", std::ofstream::trunc | std::ofstream::binary);
+	auto bin = Model::exportBinary(model);
+	file_out.write(&bin[0], bin.size());
+	file_out.close();
+	/*BinaryFileStreamWrapper fsbw("test.devaobj", std::ios::out | std::ios::trunc);
+	fsbw << 102 << 3 << 8 << 2 << 4 << (int8_t)0b10000100 <<  4 << (int8_t)0b10000100;
+	fsbw << -0.2f << -0.2f << 0.f << 1.f;
+	fsbw << 0.2f << -0.2f << 0.f << 1.f;
+	fsbw << 0.f << 0.2f << 0.f << 1.f;
+	fsbw << 1.f << 0.f << 0.f << 1.f;
+	fsbw << 0.f << 1.f << 0.f << 1.f;
+	fsbw << 1.f << 0.f << 0.f << 1.f;
+	fsbw << 2 << (int8_t)0b01000010;
+	fsbw << (uint16_t)0 << (uint16_t)1 << (uint16_t)2;
+	fsbw << (uint16_t)0 << (uint16_t)2 << (uint16_t)1;
+	fsbw.stream.close();*/
+
+	try
+	{
+		model = Model::fromFile("test.devaobj");
+	}
+	catch (DevaException ex)
+	{
+		Logger::println(ex.what());
+	}
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -127,24 +136,24 @@ int main()
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbuf);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(coords), coords, GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indecies), indecies, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, model.getVBO().data_byteSize, &model.getVBO().data[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.getIndexArray().size(), &model.getIndexArray()[0], GL_STATIC_DRAW);
 	glUseProgram(progid);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,
-		4,
-		GL_FLOAT,
+		model.getVBO().vaos[0].nValuesPerVertex,
+		model.getVBO().vaos[0].dataType,
 		GL_FALSE,
-		8 * sizeof(float),
-		NULL);
+		model.getVBO().vaos[0].spacing,
+		reinterpret_cast<const void*>(model.getVBO().vaos[0].offset));
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1,
-		4,
-		GL_FLOAT,
+		model.getVBO().vaos[1].nValuesPerVertex,
+		model.getVBO().vaos[1].dataType,
 		GL_FALSE,
-		8 * sizeof(float),
-		(const void*)(4 * sizeof(float)));
+		model.getVBO().vaos[1].spacing,
+		reinterpret_cast<const void*>(model.getVBO().vaos[1].offset));
 
 	float angle = 0;
 
@@ -158,7 +167,7 @@ int main()
 	GLfloat Near_plane = 0.1f;
 	GLfloat Far_plane = 1000.f;
 	GLfloat frustum_length = Far_plane - Near_plane;
-	GLfloat FoV = 70.f * M_PI / 180.f;
+	GLfloat FoV = 30.f * M_PI / 180.f;
 	GLfloat aspect_ratio = 800.f / 600.f;
 	GLfloat y_scale = (1 / tan(FoV)) * aspect_ratio;
 	GLfloat x_scale = y_scale / aspect_ratio;
@@ -174,25 +183,27 @@ int main()
 	glUniformMatrix4fv(uniform_PROJ_MAT, 1, GL_FALSE, projection_matrix);
 
 
+
 	GLuint mvpunif = glGetUniformLocation(progid, "MVP");
-	glUniformMatrix4fv(mvpunif, sizeof(mvp), GL_FALSE, mvp);
-	float dAngle = 1.0f;
+	glUniformMatrix4fv(mvpunif, 1, GL_FALSE, mvp);
+	float dAngle = rad(1.0f);
 	while (!wnd.shouldClose())
 	{
-		if (angle > 359)
+		if (angle > TWOPI)
 		{
-			angle = 1.0f;
+			angle = 0.0f;
 		}
 		angle += dAngle;
-
-		mvp = rotate(angle*M_PI/180.f, vec3{0, 1, 0});
+		
+		mvp = roll(angle) * pitch(angle) * yaw(angle);
 		glUniformMatrix4fv(mvpunif, 1, GL_FALSE, mvp);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
+		//glDisable(GL_CULL_FACE);
+		glDrawElements(GL_TRIANGLES, model.getIndexArray().size(), model.getIndexType(), 0);
+
 
 		wnd.update();
-		///TODO: IMplement OBJ file support
 	}
 	Logger::println("Terminating");
 }

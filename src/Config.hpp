@@ -24,6 +24,22 @@
 	#define strm(a) std::to_string(a)
 #endif
 
+
+#ifdef _MSC_VER
+	#ifdef DEVA_BUILD_SHARED
+		#define DEVA_FRAMEWORK_API __declspec(dllexport)
+	#else
+		#define DEVA_FRAMEWORK_API __declspec(dllimport)
+
+		#ifndef DEVA_FRAMEWORK_MASTER_H
+			#error "DO NOT INCLUDE THESE HEADERS MANUALLY! USE Deva.hpp INSTEAD!"
+		#endif
+	#endif
+	
+#else
+	#define DEVA_FRAMEWORK_API
+#endif
+
 struct GLFWwindow;
 
 ///Encloses the whole Deva Framework and the functionality it provides

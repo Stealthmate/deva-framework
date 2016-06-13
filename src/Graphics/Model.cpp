@@ -12,13 +12,13 @@ using namespace DevaFramework;
 
 static const int32_t SERIALID = 102;
 
-static const char DATA_TYPE_FLOAT = 0b10000000;
-static const char DATA_TYPE_INT   = 0b01000000;
-static const char DATA_TYPE_UINT  = 0b00100000;
+static const char DATA_TYPE_FLOAT = (char)0b10000000;
+static const char DATA_TYPE_INT   = (char)0b01000000;
+static const char DATA_TYPE_UINT  = (char)0b00100000;
 
-static const char DATA_SIZE_8  = 0b00000001;
-static const char DATA_SIZE_16 = 0b00000010;
-static const char DATA_SIZE_32 = 0b00000100;
+static const char DATA_SIZE_8  = (char)0b00000001;
+static const char DATA_SIZE_16 = (char)0b00000010;
+static const char DATA_SIZE_32 = (char)0b00000100;
 
 static const char DATA_SIZE_MASK = 0b000000111;
 
@@ -149,7 +149,7 @@ std::vector<char> Model::exportBinary(const Model &model)
 	int n_comp_vert = model.vbo.data_nValues / nVertices;
 	int n_vaos = model.vbo.vaos_size;
 
-	int index_arr_size = model.indices.size();
+	int index_arr_size = (int)model.indices.size();
 	int8_t index_type = getToken(model.index_type);
 
 	ByteBuffer buffer = ByteBuffer(16 + (n_vaos * 5) + data_byteSize + 5 + index_arr_size + 1);
@@ -164,7 +164,7 @@ std::vector<char> Model::exportBinary(const Model &model)
 	for (int i = 0;i <= n_vaos - 1;i++)
 	{
 		int step = model.vbo.vaos[i].spacing;
-		int offset = model.vbo.vaos[i].offset;
+		uintptr_t offset = model.vbo.vaos[i].offset;
 		int compsize = getToken(model.vbo.vaos[i].dataType) & DATA_SIZE_MASK;
 		int comps = model.vbo.vaos[i].nValuesPerVertex;
 		for (int j = 0; j <= nVertices - 1; j++)

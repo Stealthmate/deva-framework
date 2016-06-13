@@ -1,4 +1,4 @@
 mkdir Win64
 cd Win64
-cmake -G "Visual Studio 14 Win64" ..
+cmake -DDEVA_BUILD_SPLIT:BOOL=FALSE -G "Visual Studio 14 Win64" ..
 cd ..

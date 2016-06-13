@@ -48,11 +48,12 @@ void default_log_func(const std::string &msg, Logger::LogLevel l)
 	}
 }
 
-DEVA_SYSTEM_API Logger Logger::log    = Logger(default_log_func, MESSAGE, STAMP_MESSAGE);
-DEVA_SYSTEM_API Logger Logger::warn   = Logger(default_log_func, WARNING, STAMP_WARNING);
-DEVA_SYSTEM_API Logger Logger::err    = Logger(default_log_func, ERROR, STAMP_ERROR);
-DEVA_SYSTEM_API Logger Logger::assert = Logger(default_log_func, FATAL_ERROR, STAMP_FATAL_ERROR);
-DEVA_SYSTEM_API const std::string Logger::endl = "\n";
+Logger DevaFramework::Logger::log    = Logger(default_log_func, MESSAGE, STAMP_MESSAGE);
+Logger Logger::warn   = Logger(default_log_func, WARNING, STAMP_WARNING);
+Logger Logger::err    = Logger(default_log_func, ERROR, STAMP_ERROR);
+Logger Logger::assert = Logger(default_log_func, FATAL_ERROR, STAMP_FATAL_ERROR);
+
+const std::string Logger::endl = "\n";
 
 void Logger::println(const std::string &msg, Logger &out)
 {

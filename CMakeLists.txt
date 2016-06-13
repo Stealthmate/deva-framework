@@ -3,7 +3,7 @@
 
 project(DevaFramework)
 #cmake_minimum_required(VERSION 2.8.12)
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 3.2.2)
 
 set(BINDIR ../bin)
 set(LIBDIR ../bin/lib)
@@ -30,17 +30,20 @@ link_directories("lib/" "bin/lib")
 set(REQUIRED_COMPILER_VERSION_GCC "4.7")
 set(REQUIRED_COMPILER_VERSION_MSVC "19.0")
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+set(COMPILER ${CMAKE_CXX_COMPILER_ID})
+
+if (${COMPILER} STREQUAL "Clang")
   # using Clang
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+elseif (${COMPILER} STREQUAL "GNU")
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7.0")
 		set(CMAKE_CXX_FLAGS "-std=c++0x")
 	else()
 		SET( CMAKE_CXX_FLAGS  "-Wall -std=c++14" )
 	endif()
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+elseif (${COMPILER} STREQUAL "Intel")
   # using Intel C++
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  
+elseif (${COMPILER} STREQUAL MSVC) # For some reason CMake complains about dereferencing MSVC when it's a string
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${REQUIRED_COMPILER_VERSION_MSVC})
 		message( SEND_ERROR "Compiler version is lower than required (${REQUIRED_COMPILER_VERSION_MSVC})! Build may fail!")
 	endif()
@@ -62,7 +65,15 @@ set(DEVA_FRAMEWORK_PROV_DEP_PNG libpng16)
 set(DEVA_FRAMEWORK_PROV_DEP_FREETYPE freetype263)
 
 #All dependencies
-set(DEVA_FRAMEWORK_DEP ${DEVA_SYSTEM_DEP_OGL} ${DEVA_PROV_DEP_PNG} ${DEVA_PROV_DEP_LUA})
+set(
+	DEVA_FRAMEWORK_DEP 
+	${DEVA_FRAMEWORK_SYSTEM_DEP_OGL} 
+	${DEVA_FRAMEWORK_PROV_DEP_GLBINDING}
+	${DEVA_FRAMEWORK_PROV_DEP_GLFW} 
+	${DEVA_FRAMEWORK_PROV_DEP_PNG} 
+	#${DEVA_FRAMEWORK_PROV_DEP_LUA} 
+	${DEVA_FRAMEWORK_PROV_DEP_FREETYPE}
+)
 
 set(SHADERS_OUTPUT_DIR bin/shaders)
 

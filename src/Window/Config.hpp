@@ -3,18 +3,6 @@
 
 #include "../Config.hpp"
 
-#ifdef _MSC_VER
-	#ifdef DEVA_BUILD_WINDOW
-		#ifdef DEVA_BUILD_SHARED
-			#define DEVA_WINDOW_API __declspec(dllexport)
-		#else
-			#define DEVA_WINDOW_API __declspec(dllimport)
-		#endif
-	#else
-		#define DEVA_WINDOW_API __declspec(dllimport)
-	#endif
-#endif
-
 struct GLFWwindow;
 
 namespace DevaFramework

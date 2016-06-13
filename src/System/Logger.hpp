@@ -26,32 +26,29 @@ namespace DevaFramework
 
 		LogLevel level;
 
-
-
-
 	public:
 
-		static DEVA_SYSTEM_API Logger log;
-		static DEVA_SYSTEM_API Logger warn;
-		static DEVA_SYSTEM_API Logger err;
-		static DEVA_SYSTEM_API Logger assert;
+		static DEVA_FRAMEWORK_API Logger log;
+		static DEVA_FRAMEWORK_API Logger warn;
+		static DEVA_FRAMEWORK_API Logger err;
+		static DEVA_FRAMEWORK_API Logger assert;
 
-		static DEVA_SYSTEM_API const std::string endl;
+		static DEVA_FRAMEWORK_API const std::string endl;
 
-		static DEVA_SYSTEM_API void println(const std::string &msg, Logger& out = log);
+		static DEVA_FRAMEWORK_API void println(const std::string &msg, Logger& out = log);
 
-		DEVA_SYSTEM_API Logger(func_LogCallback f, LogLevel level, const std::string &stamp);
+		DEVA_FRAMEWORK_API Logger(func_LogCallback f, LogLevel level, const std::string &stamp);
 
 		std::string stamp;
 
 		template<typename T>
-		const Logger& operator<<(const T &msg) const
+		inline const Logger& operator<<(const T &msg) const
 		{
 			log_func(strm(msg), this->level);
 			return *this;
 		}
 
-		const Logger& operator<<(const std::string &msg) const
+		inline const Logger& operator<<(const std::string &msg) const
 		{
 			log_func(msg, this->level);
 			return *this;

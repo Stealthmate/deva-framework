@@ -1,5 +1,17 @@
-file(GLOB_RECURSE SRCS ${CURDIR}/*.cpp ${CURDIR}/*.hpp)
+set(
+	DEVA_SOURCE_LIST
+	${DEVA_SOURCE_LIST}
+	${CURDIR}/Config.hpp
+	${CURDIR}/Exceptions.cpp
+	${CURDIR}/Exceptions.hpp
+	${CURDIR}/Init.cpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Logger.cpp
+	${CURDIR}/Logger.hpp
+	${CURDIR}/Master.hpp
+)
 
-add_library(deva-System ${LIBTYPE} ${SRCS})
-set_property(TARGET deva-System PROPERTY CXX_STANDARD 11)
-set_target_properties(deva-System PROPERTIES COMPILE_DEFINITIONS DEVA_BUILD_SYSTEM)
+set(
+	DEVA_PUBLIC_HEADERS
+	${DEVA_PUBLIC_HEADERS}
+)

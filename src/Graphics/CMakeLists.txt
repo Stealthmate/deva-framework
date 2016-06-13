@@ -1,7 +1,43 @@
-file(GLOB_RECURSE SRCS ${CURDIR}/*.cpp ${CURDIR}/*.hpp)
+set(
+	DEVA_SOURCE_LIST
+	${DEVA_SOURCE_LIST}
+	${CURDIR}/Common.cpp
+	${CURDIR}/Common.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/glConfig.hpp
+	${CURDIR}/glFunctions.hpp
+	${CURDIR}/glTypes.hpp
+	${CURDIR}/Image.cpp
+	${CURDIR}/Image.hpp
+	${CURDIR}/ImageReaders.cpp
+	${CURDIR}/ImageReaders.hpp
+	${CURDIR}/Init.cpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+	${CURDIR}/Model.cpp
+	${CURDIR}/Model.hpp
+	${CURDIR}/Shader.cpp
+	${CURDIR}/Shader.hpp
+	${CURDIR}/ShaderProgram.cpp
+	${CURDIR}/ShaderProgram.hpp
+	${CURDIR}/VertexBufferObject.cpp
+	${CURDIR}/VertexBufferObject.hpp
+)
 
-add_library(deva-Graphics ${LIBTYPE} ${SRCS})
-set_property(TARGET deva-Graphics PROPERTY CXX_STANDARD 11)
-target_link_libraries(deva-Graphics deva-System deva-Util ${DEVA_FRAMEWORK_PROV_DEP_FREETYPE} ${DEVA_FRAMEWORK_PROV_DEP_GLBINDING} ${DEVA_FRAMEWORK_PROV_DEP_PNG} ${DEVA_FRAMEWORK_SYSTEM_DEP_OGL})
-set_target_properties(deva-Graphics PROPERTIES COMPILE_DEFINITIONS DEVA_BUILD_GRAPHICS)
-list(APPEND PRIVATE_HEADERS ImageReaders.hpp)
+set(
+	DEVA_PUBLIC_HEADERS
+	${DEVA_PUBLIC_HEADERS}
+	${CURDIR}/Common.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/glConfig.hpp
+	${CURDIR}/glFunctions.hpp
+	${CURDIR}/glTypes.hpp
+	${CURDIR}/Image.hpp
+	${CURDIR}/ImageReaders.hpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+	${CURDIR}/Model.hpp
+	${CURDIR}/Shader.hpp
+	${CURDIR}/ShaderProgram.hpp
+	${CURDIR}/VertexBufferObject.hpp
+)

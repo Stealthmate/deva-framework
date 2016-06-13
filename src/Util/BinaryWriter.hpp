@@ -8,7 +8,7 @@ namespace DevaFramework
 	class BinaryWriter
 	{
 	public:
-		DEVA_UTIL_API virtual BinaryWriter& write(const char* data, size_t count) = 0;
+		DEVA_FRAMEWORK_API virtual BinaryWriter& write(const char* data, size_t count) = 0;
 	};
 
 	inline BinaryWriter& operator<<(BinaryWriter &os, int8_t data) { return os.write(reinterpret_cast<const char*>(&data), sizeof(int8_t)); };

@@ -27,7 +27,7 @@ struct VertexBufferObject
         ///The offset in bytes, from the beginning of the buffer, where the array begins
         uintptr_t offset;
 
-		DEVA_GRAPHICS_API VertexArrayObject();
+		DEVA_FRAMEWORK_API VertexArrayObject();
 
         std::string str() const;
 
@@ -46,9 +46,9 @@ struct VertexBufferObject
     ///The number of VAOs stored
     char vaos_size;
 
-	DEVA_GRAPHICS_API VertexBufferObject();
+	DEVA_FRAMEWORK_API VertexBufferObject();
 
-    DEVA_GRAPHICS_API std::string str() const;
+    DEVA_FRAMEWORK_API std::string str() const;
 };
 
 typedef VertexBufferObject VBO;

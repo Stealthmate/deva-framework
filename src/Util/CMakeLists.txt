@@ -1,6 +1,29 @@
-file(GLOB_RECURSE SRCS ${CURDIR}/*.cpp ${CURDIR}/*.hpp)
+set(
+	DEVA_SOURCE_LIST
+	${DEVA_SOURCE_LIST}
+	${CURDIR}/BinaryFileStreamWrapper.cpp
+	${CURDIR}/BinaryFileStreamWrapper.hpp
+	${CURDIR}/BinaryReader.hpp
+	${CURDIR}/BinaryWriter.hpp
+	${CURDIR}/ByteBuffer.cpp
+	${CURDIR}/ByteBuffer.hpp
+	${CURDIR}/Common.cpp
+	${CURDIR}/Common.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/Init.cpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+)
 
-add_library(deva-Util ${LIBTYPE} ${SRCS})
-target_link_libraries(deva-Util deva-System)
-set_property(TARGET deva-Util PROPERTY CXX_STANDARD 11)
-set_target_properties(deva-Util PROPERTIES COMPILE_DEFINITIONS DEVA_BUILD_UTIL)
+set(
+	DEVA_PUBLIC_HEADERS
+	${DEVA_PUBLIC_HEADERS}
+	${CURDIR}/BinaryFileStreamWrapper.hpp
+	${CURDIR}/BinaryReader.hpp
+	${CURDIR}/BinaryWriter.hpp
+	${CURDIR}/ByteBuffer.hpp
+	${CURDIR}/Common.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+)

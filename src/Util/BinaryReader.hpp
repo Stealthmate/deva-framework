@@ -8,7 +8,7 @@ namespace DevaFramework
 	class BinaryReader
 	{
 	public:
-		DEVA_UTIL_API virtual BinaryReader& read(char* dest, size_t count) = 0;
+		DEVA_FRAMEWORK_API virtual BinaryReader& read(char* dest, size_t count) = 0;
 	};
 
 	inline BinaryReader& operator>>(BinaryReader &reader, int8_t &dest) { return reader.read(reinterpret_cast<char*>(&dest), sizeof(int8_t)); };

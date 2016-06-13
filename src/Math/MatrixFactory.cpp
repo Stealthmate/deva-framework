@@ -7,8 +7,8 @@ mat4 DevaFramework::rotate(float angle, vec3 axis)
 {
 	vec3 axis_normal = axis.normal();
 
-	float c = std::cos((double)angle);
-	float s = std::sin((double)angle);
+	float c = (float)std::cos((double)angle);
+	float s = (float)std::sin((double)angle);
 	float x = axis_normal[0];
 	float y = axis_normal[1];
 	float z = axis_normal[2];

@@ -19,18 +19,18 @@ namespace DevaFramework
 
 	public:
 
-		DEVA_UTIL_API ByteBuffer(size_t size);
-		DEVA_UTIL_API ByteBuffer(std::vector<char> &&buffer);
+		DEVA_FRAMEWORK_API ByteBuffer(size_t size);
+		DEVA_FRAMEWORK_API ByteBuffer(std::vector<char> &&buffer);
 
-		DEVA_UTIL_API ByteBuffer& write(const char* data, size_t count);
-		DEVA_UTIL_API ByteBuffer& read(char* dest, size_t count);
+		DEVA_FRAMEWORK_API ByteBuffer& write(const char* data, size_t count);
+		DEVA_FRAMEWORK_API ByteBuffer& read(char* dest, size_t count);
 
-		DEVA_UTIL_API void setPosition(size_t new_pos);
-		DEVA_UTIL_API size_t getPosition() const;
+		DEVA_FRAMEWORK_API void setPosition(size_t new_pos);
+		DEVA_FRAMEWORK_API size_t getPosition() const;
 
-		DEVA_UTIL_API void resize(size_t new_size);
+		DEVA_FRAMEWORK_API void resize(size_t new_size);
 
-		DEVA_UTIL_API const std::vector<char>& getBuffer() const;
+		DEVA_FRAMEWORK_API const std::vector<char>& getBuffer() const;
 
 	};
 }

@@ -80,9 +80,9 @@ namespace DevaFramework
 
 	public:
 
-		DEVA_GRAPHICS_API static Model fromFile(const std::string &filename);
+		DEVA_FRAMEWORK_API static Model fromFile(const std::string &filename);
 		/**TODO: NOT FULLY IMPLEMENTED!!!!!!*/
-		DEVA_GRAPHICS_API static std::vector<char> exportBinary(const Model &model);
+		DEVA_FRAMEWORK_API static std::vector<char> exportBinary(const Model &model);
 
 	private:
 		
@@ -91,14 +91,14 @@ namespace DevaFramework
 		std::vector<char> indices;
 
 	public:
-		DEVA_GRAPHICS_API Model();
-		DEVA_GRAPHICS_API Model(const VBO &vbo, gl::GLenum index_type, const std::vector<char> &index_arr);
+		DEVA_FRAMEWORK_API Model();
+		DEVA_FRAMEWORK_API Model(const VBO &vbo, gl::GLenum index_type, const std::vector<char> &index_arr);
 
-		DEVA_GRAPHICS_API const VBO& getVBO() const;
-		DEVA_GRAPHICS_API gl::GLenum getIndexType() const;
-		DEVA_GRAPHICS_API const std::vector<char>& getIndexArray() const;
+		DEVA_FRAMEWORK_API const VBO& getVBO() const;
+		DEVA_FRAMEWORK_API gl::GLenum getIndexType() const;
+		DEVA_FRAMEWORK_API const std::vector<char>& getIndexArray() const;
 
-		DEVA_GRAPHICS_API std::string str();
+		DEVA_FRAMEWORK_API std::string str();
 	};
 }
 

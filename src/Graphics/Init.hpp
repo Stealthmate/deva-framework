@@ -4,7 +4,7 @@
 #include "Config.hpp"
 
 namespace DevaFramework {
-	DEVA_GRAPHICS_API int DEVA_INIT_GRAPHICS();
+	DEVA_FRAMEWORK_API int DEVA_INIT_GRAPHICS();
 }
 
 #endif //DEVA_FRAMEWORK_GRAPHICS_MAIN_H
