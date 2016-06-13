@@ -95,6 +95,7 @@ namespace DevaFramework
 		DEVA_GRAPHICS_API Model(const VBO &vbo, gl::GLenum index_type, const std::vector<char> &index_arr);
 
 		DEVA_GRAPHICS_API const VBO& getVBO() const;
+		DEVA_GRAPHICS_API gl::GLenum getIndexType() const;
 		DEVA_GRAPHICS_API const std::vector<char>& getIndexArray() const;
 
 		DEVA_GRAPHICS_API std::string str();

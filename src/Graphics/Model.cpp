@@ -78,7 +78,8 @@ Model Model::fromFile(const std::string &filename) {
 
 	int32_t serial_id;
 	bfsw >> serial_id;
-	if (serial_id != SERIALID) throw DevaInvalidInputException("Cannot load model. Serial ID does not match current version. (file id: " + strm(serial_id) + ")");
+	if (serial_id != SERIALID) 
+		throw DevaInvalidInputException("Cannot load model. Serial ID does not match current version. (file id: " + strm(serial_id) + ")");
 
 	bfsw >> n_vertices;
 	bfsw >> n_components;
@@ -99,7 +100,7 @@ Model Model::fromFile(const std::string &filename) {
 	for (int i = 0; i <= n_vao - 1;i++) 
 	{
 		bfsw >> n_components_vao[i];
-		bfsw >> component_type_vao[i];
+		bfsw >> (int8_t)component_type_vao[i];
 
 		VAO vao;
 		vao.id = i;
@@ -107,9 +108,7 @@ Model Model::fromFile(const std::string &filename) {
 		vao.spacing = 0;
 		vao.dataType = getGLType(component_type_vao[i]);
 
-		if (component_type_vao[i] & DATA_SIZE_8)      vao_bytesize = 1 * n_components_vao[i];
-		else if (component_type_vao[i] & DATA_SIZE_16) vao_bytesize = 2 * n_components_vao[i];
-		else if (component_type_vao[i] & DATA_SIZE_32) vao_bytesize = 4 * n_components_vao[i];
+		vao_bytesize = (component_type_vao[i] & DATA_SIZE_MASK) * n_components_vao[i] * n_vertices;
 
 
 		bytesize += vao_bytesize;
@@ -118,12 +117,11 @@ Model Model::fromFile(const std::string &filename) {
 	}
 
 	vbo.vaos = vaos;
-	vbo.data_byteSize = bytesize * n_vertices;
+	vbo.data_byteSize = bytesize;
 	std::vector<char> data;
 	data.resize(vbo.data_byteSize);
-
 	bfsw.read(&data[0], vbo.data_byteSize);
-	
+
 	vbo.data = data;
 
 	int32_t n_elements;
@@ -138,28 +136,54 @@ Model Model::fromFile(const std::string &filename) {
 	std::vector<char> index_data;
 	index_data.resize(n_elements * INDICES_PER_ELEMENT * (index_type & DATA_SIZE_MASK));
 
-	bfsw.read((char*)(&index_data[0]), n_elements * 3 * (index_type & DATA_SIZE_MASK));
+	bfsw.read((char*)(&index_data[0]), n_elements * INDICES_PER_ELEMENT * (index_type & DATA_SIZE_MASK));
 
 	return Model(vbo, getGLType(index_type), index_data);
 }
-/*
+
 std::vector<char> Model::exportBinary(const Model &model)
 {
-	std::vector<char> buffer;
 
 	int nVertices = model.vbo.nVertices;
 	int data_byteSize = model.vbo.data_byteSize;
+	int n_comp_vert = model.vbo.data_nValues / nVertices;
 	int n_vaos = model.vbo.vaos_size;
 
-	std::vector<int8_t> n_components_vao;
-	std::vector<int8_t> component_type_vao;
+	int index_arr_size = model.indices.size();
+	int8_t index_type = getToken(model.index_type);
+
+	ByteBuffer buffer = ByteBuffer(16 + (n_vaos * 5) + data_byteSize + 5 + index_arr_size + 1);
+
+	buffer << SERIALID << nVertices << n_comp_vert << n_vaos;
 
 	for (int i = 0;i <= n_vaos - 1;i++)
 	{
-		n_components_vao.push_back(model.vbo.vaos[i].nValuesPerVertex);
-		component_type_vao.push_back(getToken(model.vbo.vaos[i].dataType));
+		buffer << model.vbo.vaos[i].nValuesPerVertex << getToken(model.vbo.vaos[i].dataType);
 	}
-}*/
+	auto data = model.vbo.data;
+	for (int i = 0;i <= n_vaos - 1;i++)
+	{
+		int step = model.vbo.vaos[i].spacing;
+		int offset = model.vbo.vaos[i].offset;
+		int compsize = getToken(model.vbo.vaos[i].dataType) & DATA_SIZE_MASK;
+		int comps = model.vbo.vaos[i].nValuesPerVertex;
+		for (int j = 0; j <= nVertices - 1; j++)
+		{
+			for (int v = 0; v <= comps - 1;v++)
+			{
+				for (int k = 0;k <= compsize - 1;k++)
+				{
+					buffer << (int8_t)data[offset + (j*step) + (v*compsize) + k];
+				}
+			}
+		}
+	}
+
+	buffer << index_arr_size / ((index_type & DATA_SIZE_MASK)*INDICES_PER_ELEMENT);
+	buffer << (int8_t)index_type;
+	buffer.write(&model.indices[0], model.indices.size());
+	return buffer.getBuffer();
+}
 
 Model::Model() : vbo(), index_type(gl::GL_INT), indices() {}
 
@@ -168,6 +192,11 @@ Model::Model(const VBO &vbo, gl::GLenum index_type, const std::vector<char> &ind
 const VBO& Model::getVBO() const
 {
 	return this->vbo;
+}
+
+gl::GLenum Model::getIndexType() const
+{
+	return this->index_type;
 }
 
 const std::vector<char>& Model::getIndexArray() const

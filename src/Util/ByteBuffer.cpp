@@ -54,6 +54,11 @@ ByteBuffer& ByteBuffer::read(char* dest, size_t count)
 	return *this;
 }
 
+void ByteBuffer::resize(size_t new_size)
+{
+	buffer.resize(new_size);
+}
+
 const std::vector<char>& ByteBuffer::getBuffer() const
 {
 	return buffer;

@@ -10,7 +10,7 @@
 
 namespace DevaFramework
 {
-	class ByteBuffer : public BinaryWriter
+	class ByteBuffer : public BinaryWriter, public BinaryReader
 	{
 	private:
 
@@ -27,6 +27,8 @@ namespace DevaFramework
 
 		DEVA_UTIL_API void setPosition(size_t new_pos);
 		DEVA_UTIL_API size_t getPosition() const;
+
+		DEVA_UTIL_API void resize(size_t new_size);
 
 		DEVA_UTIL_API const std::vector<char>& getBuffer() const;
 
