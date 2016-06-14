@@ -36,7 +36,6 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 	else if (raw.bitdepth == 8)
 	{
 		unsigned char* new_data = new unsigned char[raw.width*raw.height*DEVA_IMAGE_BITS_PER_PIXEL];
-		Logger::warn << (int)raw.channels;
 		for (unsigned int i = 0;i <= raw.height - 1;i++)
 		{
 			for (unsigned int j = 0;j < raw.width - 1;j++)
