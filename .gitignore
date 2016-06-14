@@ -1,12 +1,5 @@
 Win64/**
-bin/*.pdb
-bin/*.ilk
-bin/*.exp
-bin/*.dll
-bin/*.lib
-bin/*.exe
-bin/*.devaobj
-bin/lib**
+bin/**
 !CMakeLists.txt
 !*.glsl
 !*.png
