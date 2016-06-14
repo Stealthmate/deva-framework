@@ -17,9 +17,6 @@ void OnKey(Window &win, Key k, InputAction ia, int modmask)
 	if (k == Key::KEY_ESCAPE) win.close();
 }
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
 int main()
 {
 
@@ -37,12 +34,12 @@ int main()
 	GLuint progid = loadShaderSet(vshader, fshader);
 
 	const float triangle_coords_colors[] =
-	{ -1.0f, -1.0f, +0.0f, +1.0f,
+	{   -1.0f, -1.0f, +0.0f, +1.0f,
 		+1.0f, -1.0f, +0.0f, +1.0f,
 		+1.0f, +1.0f, +0.0f, +1.0f,
 		+1.0f, +1.0f, +0.0f, +1.0f,
-		-1.0f, +1.0f, +0.0f, +1.0f,
-		-1.0f, -1.0f, +0.0f, +1.0f };
+	    -1.0f, +1.0f, +0.0f, +1.0f,
+	    -1.0f, -1.0f, +0.0f, +1.0f};
 
 	GLuint buffer = 0;
 
@@ -56,32 +53,8 @@ int main()
 	GLuint tb;
 	glGenTextures(1, &tb);
 	glBindTexture(GL_TEXTURE_2D, tb);
-
-	FT_Library ft;
-
-	if (FT_Init_FreeType(&ft)) {
-		fprintf(stderr, "Could not init freetype library\n");
-		return -1;
-	}
-
-	FT_Face face;
-
-	if (FT_New_Face(ft, "testfont.ttf", 0, &face)) {
-		fprintf(stderr, "Could not open font\n");
-		return -1;
-	}
-
-	FT_Set_Pixel_Sizes(face, 0, wnd.getHeight());
-
-	if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)) {
-		fprintf(stderr, "Could not load character 'X'\n");
-		return -1;
-	}
-	Logger::println("What");
-	FT_GlyphSlot g = face->glyph;
-
 	glTexImage2D(GL_TEXTURE_2D,
-		0, static_cast<GLint>(GL_RGBA), g->bitmap.width, g->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
+		0, static_cast<GLint>(GL_RGBA), img.width, img.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.getData());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	GLuint texunif = glGetUniformLocation(progid, "samp");

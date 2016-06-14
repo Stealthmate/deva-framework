@@ -16,24 +16,8 @@ set(
 	${CURDIR}/Deva.hpp
 )
 
-set(TEMP_DIR ${CURDIR})
-# System
-set(CURDIR ${TEMP_DIR}/System)
-include(${CURDIR}/CMakeLists.txt)
-# Window
-set(CURDIR ${TEMP_DIR}/Window)
-include(${CURDIR}/CMakeLists.txt)
-# Graphics
-set(CURDIR ${TEMP_DIR}/Graphics)
-include(${CURDIR}/CMakeLists.txt)
-# Math
-set(CURDIR ${TEMP_DIR}/Math)
-include(${CURDIR}/CMakeLists.txt)
-# Util
-set(CURDIR ${TEMP_DIR}/Util)
-include(${CURDIR}/CMakeLists.txt)
+include(${CURDIR}/CMakeSourceList.txt)
 
-# file(GLOB_RECURSE SRCS ${CURDIR}/*.cpp ${CURDIR}/*.hpp)
 set(SRCS ${DEVA_SOURCE_LIST})
 add_library(deva ${LIBTYPE} ${SRCS})
 
@@ -48,7 +32,6 @@ foreach(source IN LISTS SRCS)
 	string(REGEX REPLACE "/[a-zA-Z]*.[ch]pp" "" source_path "${source_path}")
     string(REPLACE "/" "\\" source_path_msvc "${source_path}")
 	if(source_path_msvc)
-		#message(${source_path_msvc})
 		source_group("${source_path_msvc}" FILES "${source}")
 	endif()
 endforeach()
