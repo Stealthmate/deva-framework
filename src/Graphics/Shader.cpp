@@ -9,6 +9,7 @@ const std::string Shader::COMPILE_STATUS_OK = "SHADER_COMPILE_SUCCESS";
 
 Shader::Shader(GLenum shaderType, const std::string &source)
 {
+
 	this->handle = glCreateShader(shaderType);
 	setSource(source);
 }

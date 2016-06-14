@@ -7,17 +7,18 @@
 
 using namespace DevaFramework;
 
-int loadFreeType() {
-	FT_Library ft;
+namespace {
+	int loadFreeType() {
+		FT_Library ft;
 
-	if (FT_Init_FreeType(&ft)) {
-		Logger::err.println("Could not load FreeType.");
-		return -1;
+		if (FT_Init_FreeType(&ft)) {
+			Logger::err.println("Could not load FreeType.");
+			return -1;
+		}
+
+		return 0;
 	}
-
-	return 0;
 }
-
 int DevaFramework::DEVA_INIT_GRAPHICS() {
 
 	if (loadFreeType() != 0) return -1;

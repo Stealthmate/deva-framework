@@ -4,18 +4,21 @@
 #include <glbinding/Binding.h>
 #include <iostream>
 
-#include "../src/Deva.hpp"
+#include "../../src/Deva.hpp"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace DevaFramework;
-using namespace gl;
-using namespace glbinding;
+namespace {
 
-void OnKey(Window &win, Key k, InputAction ia, int modmask)
-{
-	if (k == Key::KEY_ESCAPE) win.close();
+	using namespace DevaFramework;
+	using namespace gl;
+	using namespace glbinding;
+
+	void OnKey(Window &win, Key k, InputAction ia, int modmask)
+	{
+		if (k == Key::KEY_ESCAPE) win.close();
+	}
 }
 
 int main()
@@ -104,14 +107,14 @@ int main()
 	vao1.id = 0;
 	vao1.nValuesPerVertex = 4;
 	vao1.offset = 0;
-	vao1.spacing = 32;
+	vao1.stride = 32;
 	vbo.vaos.push_back(vao1);
 	VAO vao2;
 	vao2.dataType = GL_FLOAT;
 	vao2.id = 2;
 	vao2.nValuesPerVertex = 4;
 	vao2.offset = 16;
-	vao2.spacing = 32;
+	vao2.stride = 32;
 	vbo.vaos.push_back(vao2);
 
 	Model model = Model(vbo, gl::GL_UNSIGNED_BYTE, indices);
@@ -151,14 +154,14 @@ int main()
 		model.getVBO().vaos[0].nValuesPerVertex,
 		model.getVBO().vaos[0].dataType,
 		GL_FALSE,
-		model.getVBO().vaos[0].spacing,
+		model.getVBO().vaos[0].stride,
 		0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1,
 		model.getVBO().vaos[1].nValuesPerVertex,
 		model.getVBO().vaos[1].dataType,
 		GL_FALSE,
-		model.getVBO().vaos[1].spacing,
+		model.getVBO().vaos[1].stride,
 		reinterpret_cast<const void*>(model.getVBO().vaos[1].offset));
 
 	float angle = 0;
@@ -199,7 +202,7 @@ int main()
 		{
 			angle = 0.0f;
 		}
-		if (transform) angle += dAngle;
+		angle += dAngle;
 
 		mvp = roll(angle) * pitch(angle) * yaw(angle);
 		glUniformMatrix4fv(mvpunif, 1, GL_FALSE, mvp);

@@ -105,7 +105,7 @@ Model Model::fromFile(const std::string &filename) {
 		VAO vao;
 		vao.id = i;
 		vao.nValuesPerVertex = n_components_vao[i];
-		vao.spacing = 0;
+		vao.stride = 0;
 		vao.dataType = getGLType(component_type_vao[i]);
 
 		vao_bytesize = (component_type_vao[i] & DATA_SIZE_MASK) * n_components_vao[i] * n_vertices;
@@ -161,18 +161,22 @@ std::vector<char> Model::exportBinary(const Model &model)
 		buffer << model.vbo.vaos[i].nValuesPerVertex << getToken(model.vbo.vaos[i].dataType);
 	}
 	auto data = model.vbo.data;
+
 	for (int i = 0;i <= n_vaos - 1;i++)
 	{
-		int step = model.vbo.vaos[i].spacing;
+		int step = model.vbo.vaos[i].stride;
 		uintptr_t offset = model.vbo.vaos[i].offset;
 		int compsize = getToken(model.vbo.vaos[i].dataType) & DATA_SIZE_MASK;
 		int comps = model.vbo.vaos[i].nValuesPerVertex;
+		if (step == 0) step = comps*compsize;
 		for (int j = 0; j <= nVertices - 1; j++)
 		{
 			for (int v = 0; v <= comps - 1;v++)
 			{
+				//Logger::log << "Writing Point " << *reinterpret_cast<const float*>(&data[offset + (j*step) + (v*compsize)]) << "\n";
 				for (int k = 0;k <= compsize - 1;k++)
 				{
+					//Logger::log << offset + (j*compsize*comps) + (j*step) + (v*compsize) + k << Logger::endl;
 					buffer << (int8_t)data[offset + (j*step) + (v*compsize) + k];
 				}
 			}

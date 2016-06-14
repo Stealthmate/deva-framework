@@ -7,21 +7,25 @@ function(add_approval_test name)
 	set(TEMP_DIR ${CURDIR})
 	set(CURDIR ${TEMP_DIR}/${name})
 	
+	if(__OPTIONAL_SRCS)
+		string(REGEX REPLACE "([^;]+;?)" "${CURDIR}\/\\1" __OPTIONAL_SRCS "${__OPTIONAL_SRCS}")
+	endif()
+	
 	add_executable(test-${name} ${CURDIR}/test-${name}.cpp ${__OPTIONAL_SRCS})
 	target_link_libraries(test-${name} deva)
 	
 	set(TEST_LIST ${TEST_LIST} test-${name} PARENT_SCOPE)
-	set(TEST_SRC_LIST ${TEST_SRC_LIST} ${CURDIR}/test-${name}.cpp PARENT_SCOPE)
+	set(TEST_SRC_LIST ${TEST_SRC_LIST} ${CURDIR}/test-${name}.cpp ${__OPTIONAL_SRCS} PARENT_SCOPE)
 endfunction()
 
 add_approval_test("Window")
-add_approval_test("OpenGL")
+add_approval_test("OpenGL" "VertexShader.inl" "FragmentShader.inl")
 add_approval_test("Images")
 add_approval_test("RotatingCube")
 add_approval_test("Model")
 add_approval_test("FT_text")
 
-add_custom_target(test-all SOURCES ${TEST_SRC_LIST})
+add_library(test-all STATIC ${TEST_SRC_LIST})
 add_dependencies(test-all ${TEST_LIST})
 foreach(source IN LISTS TEST_SRC_LIST)
     get_filename_component(source_path "${source}" ABSOLUTE)

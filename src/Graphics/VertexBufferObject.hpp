@@ -22,12 +22,18 @@ struct VertexBufferObject
 		gl::GLuint nValuesPerVertex;
         ///The type of values stored
 		gl::GLenum dataType;
-        ///The amount of bytes between each individual value
-        char spacing;
+        ///The amount of bytes between each individual vertex component set
+        gl::GLsizei stride;
         ///The offset in bytes, from the beginning of the buffer, where the array begins
         uintptr_t offset;
 
 		DEVA_FRAMEWORK_API VertexArrayObject();
+		DEVA_FRAMEWORK_API VertexArrayObject(
+			gl::GLuint id, 
+			gl::GLuint nValuesPerVertex, 
+			gl::GLenum dataType, 
+			gl::GLsizei stride, 
+			uintptr_t offset);
 
         std::string str() const;
 
@@ -44,9 +50,16 @@ struct VertexBufferObject
     ///A pointer to an array of VertexArrayObject objects, in which information about each VAO is stored
 	std::vector<VertexArrayObject> vaos;
     ///The number of VAOs stored
-    char vaos_size;
+    unsigned int vaos_size;
 
 	DEVA_FRAMEWORK_API VertexBufferObject();
+	DEVA_FRAMEWORK_API VertexBufferObject(
+		const std::vector<char> &data, 
+		gl::GLuint nVertices, 
+		gl::GLuint data_nValues, 
+		gl::GLuint data_byteSize,
+		const std::vector<VertexArrayObject> &vaos,
+		unsigned int vaos_size);
 
     DEVA_FRAMEWORK_API std::string str() const;
 };

@@ -3,18 +3,18 @@
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
 
-#define DEVA_USING_GRAPHICS
-#define DEVA_USING_WINDOW
-#define DEVA_USING_UTIL
-#include "../src/Deva.hpp"
+#include "../../src/Deva.hpp"
 
-using namespace DevaFramework;
-using namespace gl;
-using namespace glbinding;
-
-void OnKey(Window &win, Key k, InputAction ia, int modmask)
+namespace 
 {
-	if (k == Key::KEY_ESCAPE) win.close();
+	using namespace DevaFramework;
+	using namespace gl;
+	using namespace glbinding;
+
+	void OnKey(Window &win, Key k, InputAction ia, int modmask)
+	{
+		if (k == Key::KEY_ESCAPE) win.close();
+	}
 }
 
 int main()

@@ -13,27 +13,30 @@ std::string VertexBufferObject::VertexArrayObject::str() const
     output+= "  Position: " + strm(id) + "\n";
     output+= "  nValuesPerVertex: " + strm(nValuesPerVertex) + "\n";
     output+= "  dataType: " + strm(dataType) + "\n";
-    output+= "  spacing:  " + strm((int)spacing) + "\n";
+    output+= "  stride:  " + strm(stride) + "\n";
     output+= "  offset: " + strm((uintptr_t)offset) + "\n";
     return output;
 }
 
 VertexBufferObject::VertexArrayObject::VertexArrayObject()
-{
-    id = 0;
-    nValuesPerVertex = 3;
-    dataType = GL_FLOAT;
-    spacing = 0;
-    offset = 0;
-}
+	: id(0), nValuesPerVertex(0), dataType(gl::GLenum::GL_NONE), stride(0), offset(0) {}
 
-VertexBufferObject::VertexBufferObject() : data()
-{
-    nVertices = 0;
-    data_nValues = 0;
-    data_byteSize = 0;
-    vaos_size = 0;
-}
+VertexBufferObject::VertexArrayObject::VertexArrayObject(
+	gl::GLuint id,
+	gl::GLuint nValuesPerVertex,
+	gl::GLenum dataType,
+	gl::GLsizei stride,
+	uintptr_t offset) : id(id), nValuesPerVertex(nValuesPerVertex), dataType(dataType), stride(stride), offset(offset) {}
+
+VertexBufferObject::VertexBufferObject() : data(), nVertices(0), data_nValues(0), data_byteSize(0), vaos(), vaos_size(0) {}
+VertexBufferObject::VertexBufferObject(
+	const std::vector<char> &data,
+	gl::GLuint nVertices,
+	gl::GLuint data_nValues,
+	gl::GLuint data_byteSize,
+	const std::vector<VertexArrayObject> &vaos,
+	unsigned int vaos_size) 
+	: data(data), nVertices(nVertices), data_nValues(data_nValues), data_byteSize(data_byteSize), vaos(vaos), vaos_size(vaos_size) {}
 
 std::string VertexBufferObject::str() const
 {
