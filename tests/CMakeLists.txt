@@ -18,9 +18,20 @@ function(add_approval_test name)
 	set(TEST_SRC_LIST ${TEST_SRC_LIST} ${CURDIR}/test-${name}.cpp ${__OPTIONAL_SRCS} PARENT_SCOPE)
 endfunction()
 
-add_approval_test("Window")
-add_approval_test("OpenGL" "VertexShader.inl" "FragmentShader.inl")
-add_approval_test("Images")
+function(target_copy_files target dest files)
+
+	set(__FILES ${files} ${ARGN})
+	string(REGEX REPLACE "(.+)" "../${CURDIR}\/${target}\/\\1" __FILES "${__FILES}")
+	message(${target})
+	add_custom_command(TARGET test-${target} 
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${dest} 
+		COMMAND ${CMAKE_COMMAND} -E copy ${__FILES} ${dest})
+endfunction()
+
+add_approval_test(Window)
+add_approval_test(OpenGL "VertexShader.inl" "FragmentShader.inl")
+add_approval_test(Images "VertexShader.inl" "FragmentShader.inl")
+target_copy_files(Images ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources SS1.png)
 add_approval_test("RotatingCube")
 add_approval_test("Model")
 add_approval_test("FT_text")
@@ -37,6 +48,10 @@ foreach(source IN LISTS TEST_SRC_LIST)
 	endif()
 endforeach()
 
+file(GLOB MY_PUBLIC_HEADERS
+  "myDir/*.h"
+)
+file(COPY ${MY_PUBLIC_HEADERS} DESTINATION myDestination)
 
 file(GLOB_RECURSE SRCS bin/shaders/*.glsl)
 add_custom_target(Shaders ALL SOURCES ${SRCS})
