@@ -64,7 +64,7 @@ int main()
 
 	DEVA_INIT();
 
-	Logger::println(TEST_DESCRIPTION);
+	DevaLogger::log.println(TEST_DESCRIPTION);
 
 	Window &wnd = Window::createWindow(1366, 768, "OpenGL Display Image");
 	Window::setCurrentWindow(wnd);
@@ -129,6 +129,6 @@ int main()
 		wnd.update();
 	}
 
-	Logger::println("Test Successful");
-	Logger::println("Terminating");
+	DevaLogger::log.println("Test Successful");
+	DevaLogger::log.println("Terminating");
 }

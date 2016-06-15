@@ -6,6 +6,9 @@
 
 using namespace DevaFramework;
 
+
+#include "Logger-format.inl"
+
 std::string timestamp()
 {
 	/*using namespace std::chrono;
@@ -24,42 +27,7 @@ std::string timestamp()
 	return "";
 }
 
-const std::string STAMP_MESSAGE = "[Deva Framework]: Message: ";
-const std::string STAMP_WARNING = "[Deva Framework]: Warning: ";
-const std::string STAMP_ERROR = "[Deva Framework]: Error: ";
-const std::string STAMP_FATAL_ERROR = "[Deva Framework]: Fatal Error: ";
-
-
-
-void default_log_func(const std::string &msg, Logger::LogLevel l)
-{
-	switch (l)
-	{
-	case Logger::LogLevel::MESSAGE:
-	{
-		std::cout << msg;
-	}break;
-	case Logger::LogLevel::WARNING:
-	case Logger::LogLevel::ERROR:
-	case Logger::LogLevel::FATAL_ERROR:
-	{
-		std::cerr << msg;
-	}
-	}
-}
-
-Logger DevaFramework::Logger::log    = Logger(default_log_func, MESSAGE, STAMP_MESSAGE);
-Logger Logger::warn   = Logger(default_log_func, WARNING, STAMP_WARNING);
-Logger Logger::err    = Logger(default_log_func, ERROR, STAMP_ERROR);
-Logger Logger::assert = Logger(default_log_func, FATAL_ERROR, STAMP_FATAL_ERROR);
 
 const std::string Logger::endl = "\n";
 
-void Logger::println(const std::string &msg, Logger &out)
-{
-	out << out.stamp << msg << Logger::endl;
-}
-
-Logger::Logger(func_LogCallback f, LogLevel level, const std::string &stamp) 
-	: log_func(f), level(level), stamp(stamp) {}
-
+Logger::Logger(const std::string &stampstr) : stampstr(stampstr) {}

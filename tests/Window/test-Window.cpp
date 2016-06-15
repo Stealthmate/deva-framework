@@ -20,7 +20,7 @@ int main()
 {
 	DEVA_INIT();
 
-	Logger::println(TEST_DESCRIPTION);
+	DevaLogger::log.println(TEST_DESCRIPTION);
 
 	Window &wnd = Window::createWindow(800, 600, "test-Window");
 	Window::setCurrentWindow(wnd);
@@ -31,6 +31,6 @@ int main()
 		wnd.update();
 	}
 
-	Logger::println("Test successful.");
-	Logger::println("Terminating");
+	DevaLogger::log.println("Test successful.");
+	DevaLogger::log.println("Terminating");
 }

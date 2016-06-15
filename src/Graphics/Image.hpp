@@ -13,7 +13,7 @@ struct Image
         @param filename The name of the file, the image is stored in
         @param format The format of the image (Supported formats specified in ImageFormat)
     */
-    static DEVA_FRAMEWORK_API Image loadImageFromFile(const std::string &filename, ImageFormat format);
+    DEVA_FRAMEWORK_API static Image loadImageFromFile(const std::string &filename, ImageFormat format);
 
 private:
     unsigned char* data;

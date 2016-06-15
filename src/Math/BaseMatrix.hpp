@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "Config.hpp"
-#include "../src/System/Logger.hpp"
 #include "../src/System/Exceptions.hpp"
 
 namespace DevaFramework

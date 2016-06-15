@@ -11,6 +11,8 @@ set(
 	${CURDIR}/Init.hpp
 	${CURDIR}/Logger.cpp
 	${CURDIR}/Logger.hpp
+	${CURDIR}/DevaLogger.cpp
+	${CURDIR}/DevaLogger.hpp
 	${CURDIR}/Master.hpp
 )
 
@@ -82,8 +84,8 @@ set(
 	${CURDIR}/Matrix.cpp
 	${CURDIR}/MatrixFactory.cpp
 	${CURDIR}/MatrixFactory.hpp
-	${CURDIR}/Quaternion.cpp
-	${CURDIR}/Quaternion.hpp
+	# ${CURDIR}/Quaternion.cpp
+	# ${CURDIR}/Quaternion.hpp
 	${CURDIR}/Vector.hpp
 )
 

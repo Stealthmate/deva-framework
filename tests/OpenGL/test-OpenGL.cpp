@@ -65,14 +65,14 @@ int main()
 
 	DEVA_INIT();
 
-	Logger::println(TEST_DESCRIPTION);
+	DevaLogger::log.println(TEST_DESCRIPTION);
 
 	Window &wnd = Window::createWindow(800, 600, "test-OpenGL");
 	Window::setCurrentWindow(wnd);
 	wnd.setOnKeyActionCallback(OnKey);
 
 	glbinding::Binding::initialize();
-	Logger::println("Initialized glBinding");
+	DevaLogger::log.println("Initialized glBinding");
 
 	std::string vshader = VERTEX_SHADER;
 	std::string fshader = FRAGMENT_SHADER;
@@ -85,7 +85,7 @@ int main()
 
 	GLuint progid = prog.getHandle();
 
-	Logger::println("Loaded Shaders");
+	DevaLogger::log.println("Loaded Shaders");
 
 	GLuint buffer = 0;
 
@@ -94,7 +94,7 @@ int main()
 	glBindBuffer(gl::GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, test_vbo.data_byteSize, &test_vbo.data[0], GL_STATIC_DRAW);
 
-	Logger::println("Loaded buffer");
+	DevaLogger::log.println("Loaded buffer");
 
 	for (auto vao : test_vbo.vaos)
 	{
@@ -116,6 +116,6 @@ int main()
 		wnd.update();
 	}
 
-	Logger::println("Test successful.");
-	Logger::println("Terminating");
+	DevaLogger::log.println("Test successful.");
+	DevaLogger::log.println("Terminating");
 }

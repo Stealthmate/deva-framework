@@ -3,7 +3,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "../src/System/Logger.hpp"
+#include "../src/System/DevaLogger.hpp"
 
 using namespace DevaFramework;
 
@@ -12,7 +12,7 @@ namespace {
 		FT_Library ft;
 
 		if (FT_Init_FreeType(&ft)) {
-			Logger::err.println("Could not load FreeType.");
+			DevaLogger::err.println("Could not load FreeType.");
 			return -1;
 		}
 

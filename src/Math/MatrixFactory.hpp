@@ -5,7 +5,7 @@
 
 #include "Matrix.hpp"
 #include "Vector.hpp"
-#include "Quaternion.hpp"
+//#include "Quaternion.hpp"
 
 namespace DevaFramework
 {
@@ -35,7 +35,7 @@ namespace DevaFramework
 		@param q - a Quaternion representing the rotation
 		@return A 4x4 float matrix, representing the rotation
 	*/
-	DEVA_FRAMEWORK_API mat4 rotate(const Quaternion &q);
+	//DEVA_FRAMEWORK_API mat4 rotate(const Quaternion &q);
 
 	/**
 		@return A 4x4 float matrix, representing a translation operation with vector \b translation_vec

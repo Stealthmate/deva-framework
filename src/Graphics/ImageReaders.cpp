@@ -1,7 +1,7 @@
 #include "ImageReaders.hpp"
 
 #include <fstream>
-#include "../src/System/Logger.hpp"
+#include "../src/System/Exceptions.hpp"
 #include <iostream>
 using namespace DevaFramework;
 
@@ -21,8 +21,7 @@ RawImage DevaFramework::readPNG(const std::string &filename)
 
     if(!source.is_open())
     {
-		Logger::println("Image does not exist.", Logger::err);
-        return raw_data; /// No image
+		throw DevaInvalidInputException("Image does not found. (" + filename + ")");
     }
 
     png_byte png_signature[8];
@@ -32,25 +31,22 @@ RawImage DevaFramework::readPNG(const std::string &filename)
     is_not_png = png_sig_cmp(png_signature, 0, 8);
     if(is_not_png)
     {
-		Logger::println("Image is not PNG", Logger::err);
-        return raw_data;
+		throw DevaInvalidInputException("readPNG: Image is not PNG.");
 
     }
 
     png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (!pngPtr)
     {
-        raw_data.error = RawImage::ERROR_LIBPNG_FAIL;
-        return raw_data; ///Something happened.
+		throw DevaInvalidInputException("readPNG: libPNG failed. (Could not create read_struct)");
     }
 
     png_infop infoPtr = png_create_info_struct(pngPtr);
 
     if (!infoPtr)
     {
-        raw_data.error = RawImage::ERROR_LIBPNG_FAIL;
         png_destroy_read_struct(&pngPtr, (png_infopp)0, (png_infopp)0);
-        return raw_data;
+		throw DevaInvalidInputException("readPNG: libPNG failed. (Could not create info_struct)");
     }
 
 

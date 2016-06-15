@@ -31,18 +31,18 @@ int main()
 	Window::setCurrentWindow(wnd);
 	wnd.setOnKeyActionCallback(OnKey);
 
-	Logger::println("Created Window");
+	DevaLogger::log.println("Created Window");
 
 	glbinding::Binding::initialize();
 
-	Logger::println("Initialized glBinding");
+	DevaLogger::log.println("Initialized glBinding");
 
 	std::string vshader = readTextFile("shaders/Empty.vertex.glsl");
 	std::string fshader = readTextFile("shaders/Empty.fragment.glsl");
 
 	GLuint progid = loadShaderSet(vshader, fshader);
 
-	Logger::println("Loaded Shaders");
+	DevaLogger::log.println("Loaded Shaders");
 
 	std::vector<GLfloat> coords =
 	{
@@ -126,14 +126,14 @@ int main()
 	file_out.write(&bin[0], bin.size());
 	file_out.close();
 
-	Logger::println("Test");
+	DevaLogger::log.println("Test");
 	try
 	{
 		model = Model::fromFile("test.devaobj");
 	}
 	catch (DevaException ex)
 	{
-		Logger::println(ex.what());
+		DevaLogger::log.println(ex.what());
 	}
 
 	glEnable(GL_CULL_FACE);
@@ -214,5 +214,5 @@ int main()
 
 		wnd.update();
 	}
-	Logger::println("Terminating");
+	DevaLogger::log.println("Terminating");
 }

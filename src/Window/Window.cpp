@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include "../src/System/Logger.hpp"
+#include "../src/System/Exceptions.hpp"
 
 using namespace DevaFramework;
 
@@ -30,9 +30,7 @@ void Window::setup()
 {
 
 	if (!__DEVA_FRAMEWORK_WINDOW_INIT) {
-		Logger::println("Deva not initialized! Call DEVA_INIT() BEFORE you use any Deva functions. (GLFW not initialized).");
-		this->handle = nullptr;
-		return;
+		throw DevaProgrammerErrorException("Deva not initialized! Call DEVA_INIT() BEFORE you use any Deva functions. (GLFW not initialized).");
 	}
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);//For some reason, core profile doesn't draw anything

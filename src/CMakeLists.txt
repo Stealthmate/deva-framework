@@ -14,6 +14,7 @@ set(
 	${DEVA_SOURCE_LIST} 
 	${CURDIR}/Config.hpp
 	${CURDIR}/Deva.hpp
+	${CURDIR}/Deva.cpp
 )
 
 include(${CURDIR}/CMakeSourceList.txt)

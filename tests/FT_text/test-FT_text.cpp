@@ -148,7 +148,7 @@ void render_text(std::string str, float x, float y, int fontsize)
 			+ strm(base_coords[indices[i + 4]*4 + 1]) + "] ["
 			+ strm(base_coords[indices[i + 5]*4]) + ";"
 			+ strm(base_coords[indices[i + 5]*4 + 1]) + "]\n";
-		Logger::println(out);
+		DevaLogger::log.println(out);
 	}*/
 }
 
@@ -237,5 +237,5 @@ int main()
 		
 		wnd.update();
 	}
-	Logger::println("Terminating");
+	DevaLogger::log.println("Terminating");
 }

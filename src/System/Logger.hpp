@@ -1,5 +1,5 @@
-#ifndef DEVA_SYSTEM_LOGGER_H
-#define DEVA_SYSTEM_LOGGER_H
+#ifndef DEVA_FRAMEWORK_LOGGER_H
+#define DEVA_FRAMEWORK_LOGGER_H
 
 #include "Config.hpp"
 
@@ -10,51 +10,43 @@ namespace DevaFramework
 
 	class Logger
 	{
-	public:
-		enum LogLevel
-		{
-			MESSAGE = 0,
-			WARNING = 1,
-			ERROR = 2,
-			FATAL_ERROR = 3
-		};
-		typedef void(*func_LogCallback)(const std::string &msg, LogLevel l);
-
-	private:
-
-		func_LogCallback log_func;
-
-		LogLevel level;
-
+	protected:
+		std::string stampstr;
 	public:
 
-		static DEVA_FRAMEWORK_API Logger log;
-		static DEVA_FRAMEWORK_API Logger warn;
-		static DEVA_FRAMEWORK_API Logger err;
-		static DEVA_FRAMEWORK_API Logger assert;
+		DEVA_FRAMEWORK_API static const std::string endl;
 
-		static DEVA_FRAMEWORK_API const std::string endl;
+		DEVA_FRAMEWORK_API Logger(const std::string &stampstr);
 
-		static DEVA_FRAMEWORK_API void println(const std::string &msg, Logger& out = log);
+		inline virtual const Logger& println(const std::string &msg) const { return *this << msg << endl; }
 
-		DEVA_FRAMEWORK_API Logger(func_LogCallback f, LogLevel level, const std::string &stamp);
 
-		std::string stamp;
+		inline virtual const Logger& operator<<(const std::string &msg) const { return this->print(msg); }
+		//DEVA_FRAMEWORK_API virtual const Logger& operator<<(const std::string &msg) const;
+		/*
+		To the future Me (or whoever reads this):
+		Please do not blame me for using defines. I'm trying as hard as I can to follow the DRY principle.
+		Thank you.
+		*/
+#define INSERTION_FOR_TYPE(TYPE) inline virtual const Logger& operator<<(TYPE msg) const { return this->print(strm(msg)); }
+		INSERTION_FOR_TYPE(signed char)
+			INSERTION_FOR_TYPE(unsigned char)
+			INSERTION_FOR_TYPE(signed short)
+			INSERTION_FOR_TYPE(unsigned short)
+			INSERTION_FOR_TYPE(signed int)
+			INSERTION_FOR_TYPE(unsigned int)
+			INSERTION_FOR_TYPE(signed long long)
+			INSERTION_FOR_TYPE(unsigned long long)
+			INSERTION_FOR_TYPE(bool)
+#undef INSERTION_FOR_TYPE
 
-		template<typename T>
-		inline const Logger& operator<<(const T &msg) const
-		{
-			log_func(strm(msg), this->level);
-			return *this;
-		}
-
-		inline const Logger& operator<<(const std::string &msg) const
-		{
-			log_func(msg, this->level);
-			return *this;
-		}
+	protected:
+		DEVA_FRAMEWORK_API virtual const Logger& print(const std::string &msg) const = 0;
 	};
 
+	extern const Logger& __deva_log;
+	extern const Logger& __deva_warn;
+	extern const Logger& __deva_err;
 }
 
-#endif // DEVA_SYSTEM_LOGGER_H
+#endif // DEVA_FRAMEWORK_LOGGER_H

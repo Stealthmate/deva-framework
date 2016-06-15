@@ -1,7 +1,9 @@
 #include "Image.hpp"
 
 #include "ImageReaders.hpp"
-#include "../System/Logger.hpp"
+#include "../System/DevaLogger.hpp"
+
+#include <string>
 
 using namespace DevaFramework;
 
@@ -20,7 +22,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 
 	if (raw.error)
 	{
-		Logger::err << Logger::err.stamp << "Could not load image. Error code: " << raw.error << Logger::endl;
+		DevaLogger::err << DevaLogger::err.stamp() << "Could not load image. Error code: " << raw.error << Logger::endl;
 		return Image();
 	}
 
