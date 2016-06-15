@@ -66,7 +66,6 @@ int main()
 	DEVA_INIT();
 
 	DevaLogger::log.println(TEST_DESCRIPTION);
-	DevaLogger::log << DevaLogger::NumberFormat::HEX << 255 << Logger::endl;
 
 	Window &wnd = Window::createWindow(800, 600, "test-OpenGL");
 	Window::setCurrentWindow(wnd);
