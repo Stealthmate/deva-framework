@@ -31,3 +31,5 @@ std::string timestamp()
 const std::string Logger::endl = "\n";
 
 Logger::Logger(const std::string &stampstr) : stampstr(stampstr) {}
+
+const Logger& Logger::println(const std::string &msg) const { return *this << stampstr << msg << endl; }

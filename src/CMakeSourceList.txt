@@ -13,6 +13,8 @@ set(
 	${CURDIR}/Logger.hpp
 	${CURDIR}/DevaLogger.cpp
 	${CURDIR}/DevaLogger.hpp
+	${CURDIR}/NumberFormat.cpp
+	${CURDIR}/NumberFormat.hpp
 	${CURDIR}/Master.hpp
 )
 

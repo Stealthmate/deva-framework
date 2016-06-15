@@ -198,7 +198,7 @@ int main()
 
 	glUniform1i(texunif, static_cast<GLint>(GL_TEXTURE0));
 	glActiveTexture(GL_TEXTURE0);*/
-	render_text("Hello!", -0.9, 0, 100);
+	render_text("Hello!", -0.9f, 0.f, 100);
 	//glUseProgram(progid);
 
 	while (!wnd.shouldClose())

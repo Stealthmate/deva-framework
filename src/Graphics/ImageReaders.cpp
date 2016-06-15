@@ -51,7 +51,7 @@ RawImage DevaFramework::readPNG(const std::string &filename)
 
 
     png_bytep* rowPtrs = NULL;
-    unsigned char* data = NULL;
+    byte_t* data = NULL;
 
     png_set_read_fn(pngPtr,(png_voidp)&source, readData);
 
@@ -73,7 +73,7 @@ RawImage DevaFramework::readPNG(const std::string &filename)
 
     rowPtrs = new png_bytep[imgHeight];
 
-    data = new unsigned char[imgWidth * imgHeight * bitdepth * channels / 8];
+    data = new byte_t[imgWidth * imgHeight * bitdepth * channels / 8];
 
     const unsigned int stride = imgWidth * bitdepth * channels / 8;
 
@@ -88,7 +88,7 @@ RawImage DevaFramework::readPNG(const std::string &filename)
     delete[] (png_bytep)rowPtrs;
     png_destroy_read_struct(&pngPtr, &infoPtr,(png_infopp)0);
 
-    raw_data.data = data;
+    raw_data.data = (char*)data;
 
     source.close();
 

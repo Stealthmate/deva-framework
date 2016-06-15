@@ -32,12 +32,12 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 
 	if (raw.color_type == COLOR_TYPE_RGBA && raw.bitdepth == 8)
 	{
-		img.data = raw.data;
+		img.data = (byte_t*)raw.data;
 		return img;
 	}
 	else if (raw.bitdepth == 8)
 	{
-		unsigned char* new_data = new unsigned char[raw.width*raw.height*DEVA_IMAGE_BITS_PER_PIXEL];
+		byte_t* new_data = new byte_t[raw.width*raw.height*DEVA_IMAGE_BITS_PER_PIXEL];
 		for (unsigned int i = 0;i <= raw.height - 1;i++)
 		{
 			for (unsigned int j = 0;j < raw.width - 1;j++)
@@ -69,7 +69,7 @@ Image::Image(const Image &img) : width(img.width), height(img.height)
 {
 	unsigned long int image_size = width * height * DEVA_IMAGE_BITS_PER_PIXEL / 8;
 
-	this->data = new unsigned char[image_size];
+	this->data = new byte_t[image_size];
 
 	for (unsigned int i = 0; i < image_size; i++) this->data[i] = img.data[i];
 }
@@ -88,7 +88,7 @@ Image& Image::operator=(const Image& img)
 
 	if (!this->data) delete[] this->data;
 
-	this->data = new unsigned char[image_size];
+	this->data = new byte_t[image_size];
 
 	for (unsigned int i = 0; i < image_size; i++) this->data[i] = img.data[i];
 
@@ -109,7 +109,7 @@ Image& Image::operator=(Image &&img)
 	return *this;
 }
 
-unsigned char * const Image::getData() const {
+byte_t * const Image::getData() const {
 	return this->data;
 }
 

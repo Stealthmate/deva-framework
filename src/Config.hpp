@@ -46,10 +46,12 @@ struct GLFWwindow;
 namespace DevaFramework
 {
 
-typedef GLFWwindow* Window_Handle;
+	typedef GLFWwindow* Window_Handle;
 
-typedef uint32_t ShaderID;
-typedef uint32_t TextureID;
+	typedef uint32_t ShaderID;
+	typedef uint32_t TextureID;
+
+	typedef uint8_t byte_t;
 }
 
 #endif // DEVA_FRAMEWORK_CONFIG_H

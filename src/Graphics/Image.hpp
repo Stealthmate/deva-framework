@@ -16,7 +16,7 @@ struct Image
     DEVA_FRAMEWORK_API static Image loadImageFromFile(const std::string &filename, ImageFormat format);
 
 private:
-    unsigned char* data;
+    byte_t* data;
 public:
 
     unsigned int width;
@@ -35,7 +35,7 @@ public:
 	DEVA_FRAMEWORK_API Image& operator=(Image &&img);
 
     ///Returns an immutable pointer to the raw image data
-	DEVA_FRAMEWORK_API unsigned char * const getData() const;
+	DEVA_FRAMEWORK_API byte_t * const getData() const;
 
 	DEVA_FRAMEWORK_API ~Image();
 };

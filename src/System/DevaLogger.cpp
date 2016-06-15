@@ -1,5 +1,7 @@
 #include "DevaLogger.hpp"
 
+#include "NumberFormatter.hpp"
+
 #include <iostream>
 
 namespace
@@ -11,8 +13,6 @@ namespace
 	const std::string STAMP_FATAL_ERROR = "[Deva Framework]: Fatal Error: ";
 
 	using namespace DevaFramework;
-
-
 }
 
 const DevaLogger DevaLogger::log = DevaLogger(STAMP_MESSAGE, DevaLogger::LogLevel::LOG_MESSAGE);
@@ -27,69 +27,47 @@ const Logger& DevaLogger::print(const std::string &msg) const
 	{
 	case DevaLogger::LogLevel::LOG_MESSAGE:
 	{
-		std::cout << stampstr << msg;
+		std::cout << msg;
 	}break;
 	case DevaLogger::LogLevel::LOG_WARNING:
 	case DevaLogger::LogLevel::LOG_ERROR:
 	{
-		std::cerr << stampstr << msg;
+		std::cerr << msg;
 	}
 	}
 	return *this;
 }
 
+template<typename T>
+std::string formatNumberIfNeeded(T num, DevaLogger::NumberFormat format)
+{
+	switch (format)
+	{
+	case DevaLogger::NumberFormat::BINARY:
+		return NumberFormatter::toBinary(num);
+		break;
+	case DevaLogger::NumberFormat::HEX:
+		return NumberFormatter::toHex(num);
+		break;
+	case DevaLogger::NumberFormat::PLAIN:
+	default:
+		return strm(num);
+	}
+}
+
 const Logger& DevaLogger::operator<<(const std::string &msg) const { return this->print(msg); }
-const Logger& DevaLogger::operator<<(signed char msg) const 
+const Logger& DevaLogger::operator<<(byte_t msg) const {return print(formatNumberIfNeeded(msg, this->numformat)); }
+const Logger& DevaLogger::operator<<(signed short msg) const { return print(formatNumberIfNeeded(msg, this->numformat)); }
+const Logger& DevaLogger::operator<<(unsigned short msg) const { return print(formatNumberIfNeeded(msg, this->numformat)); }
+const Logger& DevaLogger::operator<<(signed int msg) const { return print(formatNumberIfNeeded(msg, this->numformat)); }
+const Logger& DevaLogger::operator<<(unsigned int msg) const { return print(formatNumberIfNeeded(msg, this->numformat)); }
+const Logger& DevaLogger::operator<<(signed long long msg) const { return print(formatNumberIfNeeded(msg, this->numformat)); }
+const Logger& DevaLogger::operator<<(unsigned long long msg) const { return print(formatNumberIfNeeded(msg, this->numformat)); }
+const Logger& DevaLogger::operator<<(bool msg) const { return print(formatNumberIfNeeded(msg, this->numformat)); }
+
+
+const Logger& DevaLogger::operator<<(DevaLogger::NumberFormat numformat) const
 {
-	std::string str = strm(msg);
-	if (format_numbers) str += " char;";
-	return print(str);
-}
-const Logger& DevaLogger::operator<<(unsigned char msg) const
-{
-	std::string str = strm(msg);
-	if (format_numbers) str += " uchar;";
-	return print(str);
-}
-const Logger& DevaLogger::operator<<(signed short msg) const
-{
-	std::string str = strm(msg);
-	if (format_numbers) str += " short;";
-	return print(str);
-}
-const Logger& DevaLogger::operator<<(unsigned short msg) const
-{
-	std::string str = strm(msg);
-	if (format_numbers) str += " ushort;";
-	return print(str);
-}
-const Logger& DevaLogger::operator<<(signed int msg) const
-{
-	std::string str = strm(msg);
-	if (format_numbers) str += " int;";
-	return print(str);
-}
-const Logger& DevaLogger::operator<<(unsigned int msg) const
-{
-	std::string str = strm(msg);
-	if (format_numbers) str += " uint;";
-	return print(str);
-}
-const Logger& DevaLogger::operator<<(signed long long msg) const
-{
-	std::string str = strm(msg);
-	if (format_numbers) str += " long;";
-	return print(str);
-}
-const Logger& DevaLogger::operator<<(unsigned long long msg) const
-{
-	std::string str = strm(msg);
-	if (format_numbers) str += " ulong;";
-	return print(str);
-}
-const Logger& DevaLogger::operator<<(bool msg) const
-{
-	std::string str = strm(msg);
-	if (format_numbers) str += " bool;";
-	return print(str);
+	this->numformat = numformat;
+	return *this;
 }

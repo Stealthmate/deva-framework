@@ -16,12 +16,12 @@ struct RawImage
 
     unsigned short error = 0;
 
-    unsigned char* data = 0;
+    char* data = 0;
     unsigned int width = 0;
     unsigned int height = 0;
-    unsigned char channels = 0;
-    unsigned char bitdepth = 0;
-    unsigned char color_type = 0;
+    unsigned int channels = 0;
+    unsigned int bitdepth = 0;
+    unsigned int color_type = 0;
 };
 
 ///Returns a RawImage, read from a PNG file

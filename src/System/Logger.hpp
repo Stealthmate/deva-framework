@@ -18,7 +18,7 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API Logger(const std::string &stampstr);
 
-		inline virtual const Logger& println(const std::string &msg) const { return *this << msg << endl; }
+		DEVA_FRAMEWORK_API virtual const Logger& println(const std::string &msg) const;
 
 
 		inline virtual const Logger& operator<<(const std::string &msg) const { return this->print(msg); }
@@ -29,15 +29,14 @@ namespace DevaFramework
 		Thank you.
 		*/
 #define INSERTION_FOR_TYPE(TYPE) inline virtual const Logger& operator<<(TYPE msg) const { return this->print(strm(msg)); }
-		INSERTION_FOR_TYPE(signed char)
-			INSERTION_FOR_TYPE(unsigned char)
-			INSERTION_FOR_TYPE(signed short)
-			INSERTION_FOR_TYPE(unsigned short)
-			INSERTION_FOR_TYPE(signed int)
-			INSERTION_FOR_TYPE(unsigned int)
-			INSERTION_FOR_TYPE(signed long long)
-			INSERTION_FOR_TYPE(unsigned long long)
-			INSERTION_FOR_TYPE(bool)
+		INSERTION_FOR_TYPE(byte_t);
+		INSERTION_FOR_TYPE(signed short);
+		INSERTION_FOR_TYPE(unsigned short);
+		INSERTION_FOR_TYPE(signed int);
+		INSERTION_FOR_TYPE(unsigned int);
+		INSERTION_FOR_TYPE(signed long long);
+		INSERTION_FOR_TYPE(unsigned long long);
+		INSERTION_FOR_TYPE(bool);
 #undef INSERTION_FOR_TYPE
 
 	protected:

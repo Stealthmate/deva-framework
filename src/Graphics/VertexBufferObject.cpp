@@ -53,7 +53,7 @@ std::string VertexBufferObject::str() const
     output+= strm((uintptr_t) &vaos[0]);
     output+= "\nvaos_size:     ";
     output+= strm((unsigned int) vaos_size);
-    for(auto i=0;i<=this->vaos_size-1;i++) output+= "\n" +  vaos[i].str();
+    for(unsigned int i=0;i<=this->vaos_size-1;i++) output+= "\n" +  vaos[i].str();
     output+= "\n";
     return output;
 }
