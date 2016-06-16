@@ -1,15 +1,17 @@
 #include "Shader.hpp"
 #include "glFunctions.hpp"
 
-USE_GL;
-#include "../src/System/Logger.hpp"
+#include "../src/System/DevaLogger.hpp"
+
+#include <vector>
+
+using namespace gl;
 using namespace DevaFramework;
 
 const std::string Shader::COMPILE_STATUS_OK = "SHADER_COMPILE_SUCCESS";
 
 Shader::Shader(GLenum shaderType, const std::string &source)
 {
-
 	this->handle = glCreateShader(shaderType);
 	setSource(source);
 }
@@ -50,10 +52,9 @@ std::string Shader::compile() const
 	{
 		GLint infoLogLength;
 		glGetShaderiv(this->handle, GL_INFO_LOG_LENGTH, &infoLogLength);
-		GLchar * log = new GLchar[infoLogLength];
-		glGetShaderInfoLog(this->handle, infoLogLength, nullptr, log);
-		std::string result(log);
-		delete[] log;
+		std::vector<GLchar> log(infoLogLength);
+		glGetShaderInfoLog(this->handle, infoLogLength, nullptr, &log[0]);
+		std::string result(&log[0], &log[log.size()-1]);
 		return result;
 	}
 
