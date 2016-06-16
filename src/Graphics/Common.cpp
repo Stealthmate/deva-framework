@@ -49,3 +49,5 @@ GLuint DevaFramework::loadShaderSet(std::string VertexShaderCode, std::string Fr
 
 	return ProgramID;
 }
+
+#include "Common-setUniform.inl"
