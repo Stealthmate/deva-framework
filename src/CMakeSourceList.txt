@@ -13,8 +13,8 @@ set(
 	${CURDIR}/Logger.hpp
 	${CURDIR}/DevaLogger.cpp
 	${CURDIR}/DevaLogger.hpp
-	${CURDIR}/NumberFormat.cpp
-	${CURDIR}/NumberFormat.hpp
+	${CURDIR}/NumberFormatter.cpp
+	${CURDIR}/NumberFormatter.hpp
 	${CURDIR}/Master.hpp
 )
 
@@ -31,6 +31,10 @@ set(
 	${DEVA_SOURCE_LIST}
 	${CURDIR}/Common.cpp
 	${CURDIR}/Common.hpp
+	${CURDIR}/Common-setUniform.inl
+	${CURDIR}/Common-setShaderUniform-primitive.inl
+	${CURDIR}/Common-setShaderUniform-vec.inl
+	${CURDIR}/Common-setShaderUniform-mat.inl
 	${CURDIR}/Config.hpp
 	${CURDIR}/glConfig.hpp
 	${CURDIR}/glFunctions.hpp
@@ -84,6 +88,7 @@ set(
 	${CURDIR}/Init.hpp
 	${CURDIR}/Master.hpp
 	${CURDIR}/Matrix.cpp
+	${CURDIR}/Matrix.hpp
 	${CURDIR}/MatrixFactory.cpp
 	${CURDIR}/MatrixFactory.hpp
 	# ${CURDIR}/Quaternion.cpp
