@@ -14,21 +14,22 @@ namespace DevaFramework
 
 	//Specific
 	class DevaInvalidInputException;
+	class DevaInvalidArgumentException;
 	class DevaProgrammerErrorException;
+	class DevaExternalFailureException;
 	
 
 	//Definitions
 
 	class DevaException : public std::exception 
 	{
-
-		std::string description;
-
 	protected:
-
 		DEVA_FRAMEWORK_API virtual const std::string getStamp() const;
 
 	public:
+
+		const std::string description;
+
 		DEVA_FRAMEWORK_API DevaException();
 		DEVA_FRAMEWORK_API DevaException(const std::string &description);
 
@@ -47,6 +48,26 @@ protected: \
 
 	__DEVA_EXCEPTION_SIMPLE(DevaInvalidInputException);
 	__DEVA_EXCEPTION_SIMPLE(DevaProgrammerErrorException);
+	__DEVA_EXCEPTION_SIMPLE(DevaInvalidArgumentException);
+
+
+	class DevaExternalFailureException : public DevaException
+	{
+	public:
+
+		const std::string external_dependency;
+		const std::string failed_external_function;
+		const std::string failed_internal_function;
+
+		DEVA_FRAMEWORK_API DevaExternalFailureException(
+			const std::string& description,
+			const std::string& external_dependency,
+			const std::string& failed_external_function,
+			const std::string& failed_internal_function);
+
+		DEVA_FRAMEWORK_API virtual const char* what() const;
+	};
+
 }
 
 #endif //DEVA_FRAMEWORK_SYSTEM_EXCEPTIONS_H
