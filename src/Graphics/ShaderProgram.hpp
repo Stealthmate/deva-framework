@@ -5,19 +5,19 @@
 #include "glTypes.hpp"
 
 #include "Shader.hpp"
+#include "ShaderVariable.hpp"
 
 #include <vector>
 
 namespace DevaFramework
 {
-	USE_GL;
+
 
 	/**
 		@brief A wrapper class for an OpenGL Program.
 	*/
 	class ShaderProgram
 	{
-		
 		static const GLuint SHADERPROGRAM_HANDLE_NULL = 999999;
 
 		GLuint handle;
@@ -59,6 +59,9 @@ namespace DevaFramework
 		the OpenGL Info Log of the linking process. If the program links successfully, detaches all shader objects.
 		*/
 		DEVA_FRAMEWORK_API std::string link();
+
+		template<typename T>
+		DEVA_FRAMEWORK_API ShaderVariable<T> operator[](const std::string &name);
 
 		DEVA_FRAMEWORK_API ~ShaderProgram();
 

@@ -74,11 +74,8 @@ int main()
 	glbinding::Binding::initialize();
 	DevaLogger::log.println("Initialized glBinding");
 
-	std::string vshader = VERTEX_SHADER;
-	std::string fshader = FRAGMENT_SHADER;
-
-	Shader vs = Shader(GL_VERTEX_SHADER, vshader);
-	Shader fs = Shader(GL_FRAGMENT_SHADER, fshader);
+	Shader vs = Shader(GL_VERTEX_SHADER, VERTEX_SHADER);
+	Shader fs = Shader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
 
 	ShaderProgram prog = ShaderProgram();
 	prog.attachShader(vs).attachShader(fs).link();

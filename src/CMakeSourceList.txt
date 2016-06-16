@@ -35,6 +35,10 @@ set(
 	${CURDIR}/Common-setShaderUniform-primitive.inl
 	${CURDIR}/Common-setShaderUniform-vec.inl
 	${CURDIR}/Common-setShaderUniform-mat.inl
+	${CURDIR}/ShaderVariableDataType.cpp
+	${CURDIR}/ShaderVariableDataType.hpp
+	${CURDIR}/ShaderVariableDataType_int.cpp
+	${CURDIR}/ShaderVariableDataType_int.hpp
 	${CURDIR}/Config.hpp
 	${CURDIR}/glConfig.hpp
 	${CURDIR}/glFunctions.hpp

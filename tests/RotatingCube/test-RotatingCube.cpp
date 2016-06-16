@@ -8,41 +8,47 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-using namespace DevaFramework;
-using namespace gl;
-using namespace glbinding;
-
-bool transform = true;
-
-void OnKey(Window &win, Key k, InputAction ia, int modmask)
+namespace
 {
-	if (k == Key::KEY_ESCAPE) win.close();
-	else if (k == Key::KEY_SPACE && ia == InputAction::PRESS) transform = !transform;
+	const char* TEST_DESCRIPTION =
+		R"description(Test Description:
+	This test should open a window and draw a triangle on it. The triangle should take the maximum available space
+	and it's bottom two corners should be at the bottom two corners of the window. The triangle should also be colored - 
+	bottom left should be colored green; bottom right should be colored red; top should be colored blue. The window
+	should close when Escape is pressed.)description";
+
+	using namespace DevaFramework;
+	using namespace gl;
+	using namespace glbinding;
+
+	bool transform = true;
+
+	void OnKey(Window &win, Key k, InputAction ia, int modmask)
+	{
+		if (k == Key::KEY_ESCAPE) win.close();
+		else if (k == Key::KEY_SPACE && ia == InputAction::PRESS) transform = !transform;
+	}
 }
+
 
 int main()
 {
 
 	DEVA_INIT();
+	DevaLogger::log.println(TEST_DESCRIPTION);
 
-	Window &wnd = Window::createWindow(800, 600, "Test_OpenGL");
+	Window &wnd = Window::createWindow(800, 600, "test-RotatingCube");
 
 	Window::setCurrentWindow(wnd);
 	wnd.setOnKeyActionCallback(OnKey);
 
-	DevaLogger::log.println("Created Window");
-
 	glbinding::Binding::initialize();
-
-	DevaLogger::log.println("Initialized glBinding");
 
 	std::string vshader = readTextFile("shaders/Empty.vertex.glsl");
 	std::string fshader = readTextFile("shaders/Empty.fragment.glsl");
 
 	GLuint progid = loadShaderSet(vshader, fshader);
 
-	DevaLogger::log.println("Loaded Shaders");
 	/*
 	GLfloat coords[] =
 	{

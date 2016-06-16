@@ -72,18 +72,12 @@ int main()
 
 	glbinding::Binding::initialize();
 
-	std::string vshader = VERTEX_SHADER;
-	std::string fshader = FRAGMENT_SHADER;
-
-	GLuint progid = loadShaderSet(vshader, fshader);
-
-	const float triangle_coords_colors[] =
-	{   -1.0f, -1.0f, +0.0f, +1.0f,
-		+1.0f, -1.0f, +0.0f, +1.0f,
-		+1.0f, +1.0f, +0.0f, +1.0f,
-		+1.0f, +1.0f, +0.0f, +1.0f,
-	    -1.0f, +1.0f, +0.0f, +1.0f,
-	    -1.0f, -1.0f, +0.0f, +1.0f};
+	Shader vertex_shader = Shader(GL_VERTEX_SHADER, VERTEX_SHADER);
+	Shader fragment_shader = Shader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
+	ShaderProgram shadprog;
+	shadprog.attachShader(vertex_shader).attachShader(fragment_shader);
+	shadprog.link();
+	GLuint progid = shadprog.getHandle();
 
 	GLuint buffer = 0;
 
@@ -104,6 +98,7 @@ int main()
 	}
 
 	Image img = Image::loadImageFromFile("resources/SS1.png", ImageFormat::PNG);
+	
 	GLuint tb;
 	glGenTextures(1, &tb);
 	glBindTexture(GL_TEXTURE_2D, tb);
@@ -113,12 +108,8 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
-	GLuint texunif = glGetUniformLocation(progid, "samp");
-
-	glUniform1i(texunif, static_cast<GLint>(GL_TEXTURE0));
+	setShaderUniform(glGetUniformLocation(progid, "samp"), static_cast<GLint>(GL_TEXTURE0));
 	glActiveTexture(GL_TEXTURE0);
-	glUseProgram(progid);
-
 
 	while (!wnd.shouldClose())
 	{
