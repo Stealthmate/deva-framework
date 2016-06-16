@@ -1,6 +1,8 @@
 #ifndef DEVA_FRAMEWORK_MASTER_H
 #define DEVA_FRAMEWORK_MASTER_H
 
+#include "Platform.hpp"
+
 #include "Config.hpp"
 
 #include "System/Master.hpp"

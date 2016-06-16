@@ -1,3 +1,21 @@
+#------------------Root-------------------------------------------------
+set(
+	DEVA_SOURCE_LIST
+	${DEVA_SOURCE_LIST} 
+	${CURDIR}/Config.hpp
+	${CURDIR}/Deva.hpp
+	${CURDIR}/Deva.cpp
+	${CURDIR}/Platform.hpp
+)
+
+set(
+	DEVA_PUBLIC_HEADERS
+	${DEVA_PUBLIC_HEADERS}
+	${CURDIR}/Config.hpp
+	${CURDIR}/Deva.hpp
+	${CURDIR}/Platform.hpp
+)
+
 #------------------System-----------------------------------------------
 set(TEMP_DIR ${CURDIR})
 set(CURDIR ${TEMP_DIR}/System)
@@ -158,6 +176,9 @@ set(
 	${CURDIR}/Master.hpp
 	${CURDIR}/Window.cpp
 	${CURDIR}/Window.hpp
+	${CURDIR}/Window_new.cpp
+	${CURDIR}/Window_new.hpp
+	${CURDIR}/win/Window_impl_windows.cpp
 )
 
 set(

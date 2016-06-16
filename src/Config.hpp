@@ -40,6 +40,8 @@
 	#define DEVA_FRAMEWORK_API
 #endif
 
+#include "Platform.hpp"
+
 struct GLFWwindow;
 
 ///Encloses the whole Deva Framework and the functionality it provides
