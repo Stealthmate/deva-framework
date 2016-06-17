@@ -13,61 +13,51 @@ namespace DevaFramework
 	class DevaException;
 
 	//Specific
-	class DevaInvalidInputException;
-	class DevaInvalidArgumentException;
-	class DevaProgrammerErrorException;
-	class DevaExternalFailureException;
-	
+	struct DevaInvalidInputException;
+	struct DevaInvalidArgumentException;
 
+	struct DevaProgrammerErrorException;
+
+	struct DevaFailureException;
+	struct DevaExternalFailureException;
+	
 	//Definitions
 
 	class DevaException : public std::exception 
 	{
+
 	protected:
-		DEVA_FRAMEWORK_API virtual const std::string getStamp() const;
+
+		const std::string full_description;
+
+		DEVA_FRAMEWORK_API DevaException(const std::string &stamp, const std::string &description, const std::string &full_description);
 
 	public:
 
+		const std::string stamp;
 		const std::string description;
 
 		DEVA_FRAMEWORK_API DevaException();
 		DEVA_FRAMEWORK_API DevaException(const std::string &description);
 
-		DEVA_FRAMEWORK_API virtual const char* what() const;
+		DEVA_FRAMEWORK_API virtual const char* what() const final;
 	};
 
 #define __DEVA_EXCEPTION_SIMPLE(name) \
-class name  : public DevaException \
+struct name  : public DevaException \
 { \
-public: \
 	name() : DevaException() {} \
 	name(const std::string &description) : DevaException(description) {} \
 protected: \
-	inline virtual const std::string getStamp() const { return #name; } \
 }; \
 
 	__DEVA_EXCEPTION_SIMPLE(DevaInvalidInputException);
-	__DEVA_EXCEPTION_SIMPLE(DevaProgrammerErrorException);
 	__DEVA_EXCEPTION_SIMPLE(DevaInvalidArgumentException);
 
-
-	class DevaExternalFailureException : public DevaException
-	{
-	public:
-
-		const std::string external_dependency;
-		const std::string failed_external_function;
-		const std::string failed_internal_function;
-
-		DEVA_FRAMEWORK_API DevaExternalFailureException(
-			const std::string& description,
-			const std::string& external_dependency,
-			const std::string& failed_external_function,
-			const std::string& failed_internal_function);
-
-		DEVA_FRAMEWORK_API virtual const char* what() const;
-	};
-
 }
+
+#include "Exceptions/DevaFailureException.hpp"
+#include "Exceptions/DevaExternalFailureException.hpp"
+#include "Exceptions/DevaProgrammerErrorException.hpp"
 
 #endif //DEVA_FRAMEWORK_SYSTEM_EXCEPTIONS_H

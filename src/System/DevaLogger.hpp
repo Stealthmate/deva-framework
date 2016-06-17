@@ -38,6 +38,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API DevaLogger(const std::string &stamp, LogLevel loglvl);
 
 		DEVA_FRAMEWORK_API virtual const Logger& operator<<(const std::string &msg) const;
+		DEVA_FRAMEWORK_API virtual const Logger& operator<<(const char *msg) const;
 		DEVA_FRAMEWORK_API virtual const Logger& operator<<(byte_t msg) const;
 		DEVA_FRAMEWORK_API virtual const Logger& operator<<(signed short msg) const;
 		DEVA_FRAMEWORK_API virtual const Logger& operator<<(unsigned short msg) const;

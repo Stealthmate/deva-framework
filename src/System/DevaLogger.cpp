@@ -56,6 +56,7 @@ std::string formatNumberIfNeeded(T num, DevaLogger::NumberFormat format)
 }
 
 const Logger& DevaLogger::operator<<(const std::string &msg) const { return this->print(msg); }
+const Logger& DevaLogger::operator<<(const char *msg) const { return this->print(std::string(msg)); }
 const Logger& DevaLogger::operator<<(byte_t msg) const {return print(formatNumberIfNeeded(msg, this->numformat)); }
 const Logger& DevaLogger::operator<<(signed short msg) const { return print(formatNumberIfNeeded(msg, this->numformat)); }
 const Logger& DevaLogger::operator<<(unsigned short msg) const { return print(formatNumberIfNeeded(msg, this->numformat)); }

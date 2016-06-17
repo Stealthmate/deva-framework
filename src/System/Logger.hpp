@@ -22,6 +22,7 @@ namespace DevaFramework
 
 
 		inline virtual const Logger& operator<<(const std::string &msg) const { return this->print(msg); }
+		inline virtual const Logger& operator<<(const char *msg) const { return this->print(std::string(msg)); }
 		//DEVA_FRAMEWORK_API virtual const Logger& operator<<(const std::string &msg) const;
 		/*
 		To the future Me (or whoever reads this):
