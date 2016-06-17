@@ -1,44 +1,97 @@
-#include "../Window_new.hpp"
-
-#include "../../System/Exceptions.hpp"
-
-#include <assert.h>
+#include "../Window.hpp"
 
 #ifndef DEVA_OS_WIN32
 #error "Platform not supported."
 #else
 
+#include "../../System/Exceptions.hpp"
+
+#include "impl_keycode_mapping.inl"
+
+#include <map>
+#include <memory>
+
 using namespace DevaFramework;
+
 
 namespace
 {
-	LRESULT CALLBACK WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+
+	std::map<HWND, Window*>  hwnd_map;
+
+	enum ExType
 	{
-		Window * window = reinterpret_cast<Window*>(
-			GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+		DEVA_FAILURE_EXCEPTION = 1,
+	};
 
-		switch (uMsg) {
-		case WM_CLOSE:
-			//window->Close();
-			return 0;
-		case WM_SIZE:
-			// we get here if the window has changed size, we should rebuild most
-			// of our window resources before rendering to this window again.
-			// ( no need for this because our window sizing by hand is disabled )
-			break;
-		default:
-			break;
+	bool init_call = false;
+
+	typedef std::pair<ExType, std::shared_ptr<DevaException>> DelayedException;
+	DelayedException ex;
+
+	void downcastExAndThrow(const DelayedException &ex)
+	{
+		switch (ex.first)
+		{
+		case ExType::DEVA_FAILURE_EXCEPTION: 
+		{
+			throw *static_cast<DevaFailureException*>(ex.second.get());
 		}
-
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		}
 	}
 
+	std::shared_ptr<WindowEventStruct_KeyEvent> createWindowEventInfo_Key(WindowEvent evt, WPARAM keycode, LPARAM options)
+	{
+		std::shared_ptr<WindowEventStruct_KeyEvent> infostruct = std::shared_ptr<WindowEventStruct_KeyEvent>(new WindowEventStruct_KeyEvent);
+		infostruct->evt = evt;
+		Key k = Key::KEY_UNKNOWN;
+		auto i = SUPPORTED_KEYS.find(keycode);
+		if (i != SUPPORTED_KEYS.end()) k = i->second;
+		infostruct->key = k;
 
+		if (infostruct->key == Key::KEY_UNKNOWN) return std::move(infostruct);
+
+		infostruct->scancode = (reinterpret_cast<int8_t*>(&options)[2] & 0xF0);
+		infostruct->wasPressed = (reinterpret_cast<int8_t*>(&options)[3] & 0b01000000) != 0;
+
+		return std::move(infostruct);
+	}
+}
+
+LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (init_call) return DefWindowProc(hWnd, uMsg, wParam, lParam);
+
+	Window &current_wnd = *reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+
+	switch (uMsg) {
+	case WM_CLOSE:
+		//window->sendCloseMsg();
+		current_wnd.window_should_run = false;
+		return 0;
+	case WM_SIZE:
+		// we get here if the window has changed size, we should rebuild most
+		// of our window resources before rendering to this window again.
+		// ( no need for this because our window sizing by hand is disabled )
+		break;
+	case WM_KEYUP:
+	{
+		current_wnd.eventObserver->fire(current_wnd, std::move(createWindowEventInfo_Key(WindowEvent::KEY_UP, wParam, lParam)));
+	}
+	case WM_KEYDOWN:
+	{
+		current_wnd.eventObserver->fire(current_wnd, std::move(createWindowEventInfo_Key(WindowEvent::KEY_DOWN, wParam, lParam)));
+	}
+	default:
+		break;
+	}
+
+	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 uint64_t Window::impl_win32_class_id_counter = 0;
 
-void Window::initOSWindow()
+void Window::impl_init()
 {
 	WNDCLASSEX win_class{};
 
@@ -59,7 +112,7 @@ void Window::initOSWindow()
 	win_class.hInstance = impl_win32_instance; // hInstance
 	win_class.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	win_class.hCursor = LoadCursor(NULL, IDC_ARROW);
-	win_class.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	win_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 	win_class.lpszMenuName = NULL;
 	win_class.lpszClassName = impl_win32_class_name.c_str();
 	win_class.hIconSm = LoadIcon(NULL, IDI_WINLOGO);
@@ -75,6 +128,9 @@ void Window::initOSWindow()
 	// Create window with the registered class:
 	RECT wr = { 0, 0, LONG(this->surface_width), LONG(this->surface_height) };
 	AdjustWindowRectEx(&wr, style, FALSE, ex_style);
+
+	init_call = true;
+
 	impl_win32_window = CreateWindowEx(0,
 		impl_win32_class_name.c_str(),		// class name
 		this->name.c_str(),			// app name
@@ -87,18 +143,22 @@ void Window::initOSWindow()
 		this->impl_win32_instance,				// hInstance
 		NULL);							// no extra parameters
 
+	init_call = false;
+
 	if (!this->impl_win32_window) {
 		throw DevaExternalFailureException("Could not create window.", "Windows", "CreateWindowEx", "DevaFramework::Window::initOSWindow");
 	}
 
-	SetWindowLongPtr(impl_win32_window, GWLP_USERDATA, (LONG_PTR)this);
+	hwnd_map.insert({this->impl_win32_window, this});
+
+	SetWindowLongPtr(this->impl_win32_window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
 	ShowWindow(this->impl_win32_window, SW_SHOW);
 	SetForegroundWindow(this->impl_win32_window);
 	SetFocus(this->impl_win32_window);
 }
 
-void Window::moveOSWindow(Window &&wnd)
+void Window::impl_move(Window &&wnd)
 {
 	this->impl_win32_class_id_counter = wnd.impl_win32_class_id_counter;
 	wnd.impl_win32_class_id_counter = NULL;
@@ -108,16 +168,20 @@ void Window::moveOSWindow(Window &&wnd)
 	wnd.impl_win32_instance = NULL;
 	this->impl_win32_window = wnd.impl_win32_window;
 	wnd.impl_win32_window = NULL;
+
+	SetWindowLongPtr(this->impl_win32_window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 }
 
-void Window::deInitOSWindow()
+void Window::impl_deInit()
 {
 	DestroyWindow(this->impl_win32_window);
 	UnregisterClass(this->impl_win32_class_name.c_str(), this->impl_win32_instance);
 }
 
-void Window::updateOSWindow()
+void Window::impl_update()
 {
+	if (ex.second) downcastExAndThrow(ex);
+
 	MSG msg;
 	if (PeekMessage(&msg, this->impl_win32_window, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);

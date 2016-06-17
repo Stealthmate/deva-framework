@@ -5,25 +5,6 @@
 
 #include <stdint.h>
 #include <string>
-#include <ostream>
-#include <sstream>
-
-#ifdef _MSC_VER
-	namespace patch ///to_string doesn't work in MinGW
-	{
-		template < typename T > std::string to_string( const T& n )
-		{
-			std::ostringstream stm ;
-			stm << n ;
-			return stm.str() ;
-		}
-	}
-
-	#define strm(a) patch::to_string(a)
-#else
-	#define strm(a) std::to_string(a)
-#endif
-
 
 #ifdef _MSC_VER
 	#ifdef DEVA_BUILD_SHARED
@@ -35,25 +16,37 @@
 			#error "DO NOT INCLUDE THESE HEADERS MANUALLY! USE Deva.hpp INSTEAD!"
 		#endif
 	#endif
-	
+#include <ostream>
+#include <sstream>
+	namespace patch ///to_string doesn't work in MinGW
+	{
+		template < typename T > std::string to_string(const T& n)
+		{
+			std::ostringstream stm;
+			stm << n;
+			return stm.str();
+		}
+	}
+	#define strm(a) patch::to_string(a)
 #else
+	#define strm(a) std::to_string(a)
 	#define DEVA_FRAMEWORK_API
 #endif
 
 #include "Platform.hpp"
 
-struct GLFWwindow;
-
 ///Encloses the whole Deva Framework and the functionality it provides
 namespace DevaFramework
 {
-
-	typedef GLFWwindow* Window_Handle;
-
 	typedef uint32_t ShaderID;
 	typedef uint32_t TextureID;
 
 	typedef uint8_t byte_t;
 }
+
+
+#ifdef DEVA_DEBUG
+#include "System/DevaLogger.hpp"
+#endif
 
 #endif // DEVA_FRAMEWORK_CONFIG_H

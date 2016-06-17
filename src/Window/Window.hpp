@@ -1,123 +1,64 @@
-#ifndef DEVA_FRAMEWORK_GRAPHICS_WINDOW_WINDOW_H
-#define DEVA_FRAMEWORK_GRAPHICS_WINDOW_WINDOW_H
-
-#include <string>
+#ifndef DEVA_FRAMEWORK_WINDOW_WINDOW_NEW_H
+#define DEVA_FRAMEWORK_WINDOW_WINDOW_NEW_H
 
 #include "Config.hpp"
 
+#ifdef DEVA_OS_WIN32
+#include <windows.h>
+#endif
+
+#include "WindowObserver.hpp"
+
+#include <memory>
+
 namespace DevaFramework
 {
-	void OnKeyAction(Window_Handle, int, int, int, int);
-	void OnMouseButtonAction(Window_Handle, int, int, int);
-	void OnWindowShouldClose(Window_Handle);
-
-	/**
-	 @brief A Window to be used for displaying stuff on the screen.
-	*/
 	class Window
 	{
 	public:
-
-		/**
-		A function which can be set as a callback for when the window should be closed.
-		@param wnd The Window that should be closed
-		*/
-		typedef void(*func_WindowCloseCallback)(Window& wnd);
-
-		typedef void (*func_OnKeyAction)(Window&, Key, InputAction, int modmask);
-		typedef void (*func_OnMouseButtonAction)(Window&, MouseButton, InputAction, int modmask);
-
-	private:
-		///Default Xpos
-		static const unsigned int DEFAULT_XPOS = 0;
-		///Default Ypos
-		static const unsigned int DEFAULT_YPOS = 0;
-
-		friend void OnWindowShouldClose(Window_Handle);
-		friend void OnMouseButtonAction(Window_Handle, int, int, int);
-		friend void OnKeyAction(Window_Handle, int, int, int, int);
-
-	public:
-
-		///Set the context, routing all draw calls to the specified window
-		DEVA_FRAMEWORK_API static void setCurrentWindow(const Window &wnd);
-		///Create a Window with the given parameters
-		DEVA_FRAMEWORK_API static Window& createWindow(
-			unsigned int width, 
-			unsigned int height, 
-			const std::string& title, 
-			unsigned int Xpos = DEFAULT_XPOS, 
-			unsigned int Ypos = DEFAULT_YPOS);
-
+		DEVA_FRAMEWORK_API static Window& openWindow(uint32_t width, uint32_t height, const std::string &name);
+	
 	private:
 
-		///An underlying handle for the window
-		Window_Handle handle;
-		///The width of the window
-		unsigned int width;
-		///The height of the window
-		unsigned int height;
-		///The X coordinate of the top left corner of the window
-		unsigned int Xpos;
-		///The Y coordinate of the top left corner of the window
-		unsigned int Ypos;
-		///The title of the window
-		std::string title;
-		///True if the window has received a close event, false otherwise
-		bool should_close;
+		std::string name;
+		uint32_t surface_width;
+		uint32_t surface_height;
 
-		///The function to be called when the window receives a close event
-		func_WindowCloseCallback close_callback;
-		func_OnKeyAction key_callback;
-		func_OnMouseButtonAction mousebutton_callback;
+		bool window_should_run = true;
 
-		///Constructs a window with the specified parameters
-		Window(
-			unsigned int width,
-			unsigned int height,
-			const std::string& title,
-			unsigned int Xpos = DEFAULT_XPOS,
-			unsigned int Ypos = DEFAULT_YPOS);
+		std::shared_ptr<WindowObserver> eventObserver;
 
+#ifdef DEVA_OS_WIN32
+		friend LRESULT CALLBACK WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+		HINSTANCE		impl_win32_instance;
+		HWND			impl_win32_window;
+		std::string		impl_win32_class_name;
+		static uint64_t	impl_win32_class_id_counter;
+#endif
+
+		Window(uint32_t size_x, uint32_t size_y, const std::string &name);
 		Window(const Window &wnd) = delete;
-		Window& operator=(const Window &wnd) = delete;
+	public:
+		DEVA_FRAMEWORK_API Window(Window &&wnd);
+		DEVA_FRAMEWORK_API ~Window();
 
-		void setup();
+	private:
+		void impl_init();
+		void impl_move(Window &&wnd);
+		void impl_deInit();
+		void impl_update();
+		void initOSSurface();
 
 	public:
-		///Transfers ownership of the window from wnd
-		DEVA_FRAMEWORK_API Window(Window &&wnd);
-		///Destroys the current window and transfers ownership from wnd
-		DEVA_FRAMEWORK_API Window& operator=(Window &&wnd);
 
-		DEVA_FRAMEWORK_API unsigned int getWidth() const;
-		DEVA_FRAMEWORK_API unsigned int getHeight() const;
-		DEVA_FRAMEWORK_API std::string getTitle() const;
-		DEVA_FRAMEWORK_API bool shouldClose();
-
-		DEVA_FRAMEWORK_API void setTitle(const std::string &title);
-		DEVA_FRAMEWORK_API void setShouldClose(bool flag);
-		DEVA_FRAMEWORK_API void setCloseCallback(func_WindowCloseCallback close_callback);
-
-		DEVA_FRAMEWORK_API bool isKeyDown(Key k) const;
-		DEVA_FRAMEWORK_API bool isMouseButtonDown(MouseButton mb) const;
-		DEVA_FRAMEWORK_API void setOnKeyActionCallback(func_OnKeyAction cb);
-		DEVA_FRAMEWORK_API void setOnMouseButtonActionCallback(func_OnMouseButtonAction cb);
-
-		///Resizes the window to the specified dimensions
-		DEVA_FRAMEWORK_API void resize(unsigned int width, unsigned int height);
-		///Moves the top left corner of the window to the specified position
-		DEVA_FRAMEWORK_API void move(unsigned int x, unsigned int y);
-
-		///Swaps the buffers and updates the event queue
-		DEVA_FRAMEWORK_API void update();
-		///Marks the window closed and destroys it, releasing any resources associated with it in the process
+		DEVA_FRAMEWORK_API bool update();
 		DEVA_FRAMEWORK_API void close();
 
-		///Calls close() if the window is still open
-		DEVA_FRAMEWORK_API ~Window();
+		DEVA_FRAMEWORK_API WindowObserver& getEventObserver();
+		DEVA_FRAMEWORK_API const WindowObserver& getEventObserver() const;
+		DEVA_FRAMEWORK_API void setWindowObserver();
 	};
-
 }
 
-#endif // DEVA_FRAMEWORK_GRAPHICS_WINDOW_WINDOW_H
+#endif //DEVA_FRAMEWORK_WINDOW_WINDOW_NEW_H

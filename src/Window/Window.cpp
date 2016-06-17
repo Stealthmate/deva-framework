@@ -1,224 +1,57 @@
 #include "Window.hpp"
 
-#include <GLFW/glfw3.h>
-#include <vector>
-#include <memory>
+#include "../src/System/DevaLogger.hpp"
 
-#include "../src/System/Exceptions.hpp"
+#include <vector>
 
 using namespace DevaFramework;
 
-static std::vector<Window> opened_windows;
-
-void Window::setCurrentWindow(const Window &wnd)
+namespace
 {
-	glfwMakeContextCurrent(wnd.handle);
+	static std::vector<Window> window_list;
 }
 
-Window& Window::createWindow(
-	unsigned int width, 
-	unsigned int height, 
-	const std::string& title,
-	unsigned int Xpos,
-	unsigned int Ypos)
+Window& Window::openWindow(uint32_t width, uint32_t height, const std::string &name)
 {
-	opened_windows.push_back(Window(width, height, title, Xpos, Ypos));
-	return opened_windows[opened_windows.size() - 1];
+	Window wnd = Window(width, height, name);
+	window_list.push_back(std::move(wnd));
+	return window_list[window_list.size() - 1];
 }
 
-void Window::setup()
+Window::Window(uint32_t width, uint32_t height, const std::string &name)
+	: surface_width(width), surface_height(height), name(name), eventObserver(std::shared_ptr<WindowObserver>(new WindowObserver()))
 {
-
-	if (!__DEVA_FRAMEWORK_WINDOW_INIT) {
-		throw DevaProgrammerErrorException("Deva not initialized! Call DEVA_INIT() BEFORE you use any Deva functions. (GLFW not initialized).");
-	}
-
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);//For some reason, core profile doesn't draw anything
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	this->handle = glfwCreateWindow(this->width, this->height, this->title.c_str(), nullptr, nullptr);
-	this->should_close = false;
-	glfwSetWindowCloseCallback(this->handle, OnWindowShouldClose);
-	this->close_callback = nullptr;
-	glfwSetKeyCallback(handle, OnKeyAction);
-	this->key_callback = nullptr;
-	glfwSetMouseButtonCallback(handle, OnMouseButtonAction);
-	this->mousebutton_callback = nullptr;
+	this->impl_init();
 }
 
-
-Window::Window(
-	unsigned int width, 
-	unsigned int height, 
-	const std::string& title,
-	unsigned int Xpos,
-	unsigned int Ypos)
-	: width(width), height(height), title(title), Xpos(Xpos), Ypos(Ypos)
+Window::Window(Window &&wnd)
+	: surface_width(wnd.surface_width), surface_height(wnd.surface_height), name(wnd.name), eventObserver(std::move(wnd.eventObserver))
 {
-	this->setup();
+	this->impl_move(std::move(wnd));
+	wnd.surface_width = 0;
+	wnd.surface_height = 0;
+	wnd.name = "";
 }
 
-Window::Window(Window && wnd)
-	: width(wnd.width), height(wnd.height), 
-	title(wnd.title), 
-	should_close(wnd.should_close), close_callback(wnd.close_callback),
-	key_callback(wnd.key_callback), mousebutton_callback(wnd.mousebutton_callback)
+WindowObserver& Window::getEventObserver()
 {
-	this->handle = wnd.handle;
-	wnd.handle = WINDOW_HANDLE_NULL;
+	return *this->eventObserver;
 }
 
-Window& DevaFramework::Window::operator=(Window && wnd)
+bool Window::update()
 {
-	this->width = wnd.width;
-	this->height = wnd.height;
-	this->title = wnd.title;
-	this->should_close = wnd.should_close;
-	this->close_callback = wnd.close_callback;
-	this->key_callback = wnd.key_callback;
-	this->mousebutton_callback = wnd.mousebutton_callback;
-	if (this->handle) glfwDestroyWindow(this->handle);
-	this->handle = wnd.handle;
-	wnd.handle = WINDOW_HANDLE_NULL;
-	return *this;
-}
-
-unsigned int Window::getWidth() const
-{
-	return this->width;
-}
-
-unsigned int Window::getHeight() const
-{
-	return this->height;
-}
-
-std::string Window::getTitle() const
-{
-	return this->title;
-}
-
-bool Window::shouldClose()
-{
-	if (!this->handle) return true;
-	this->should_close = glfwWindowShouldClose(this->handle) != 0;
-	return this->should_close;
-}
-
-void Window::setTitle(const std::string &title)
-{
-	glfwSetWindowTitle(this->handle, title.c_str());
-	this->title = title;
-}
-
-void Window::setShouldClose(bool flag)
-{
-	this->should_close = true;
-	glfwSetWindowShouldClose(this->handle, this->should_close);
-}
-
-void DevaFramework::OnWindowShouldClose(Window_Handle hwnd)
-{
-	for (int i = 0;i <= opened_windows.size() - 1;i++)
-	{
-		if (opened_windows[i].handle == hwnd)
-		{
-			opened_windows[i].setShouldClose(true);
-			if (opened_windows[i].close_callback)
-				opened_windows[i].close_callback(opened_windows[i]);
-			break;
-		}
-	}
-}
-
-
-void Window::setCloseCallback(func_WindowCloseCallback close_callback)
-{
-	this->close_callback = close_callback;
-}
-
-bool Window::isKeyDown(Key k) const
-{
-	return glfwGetKey(this->handle, k) == InputAction::PRESS;
-}
-
-bool Window::isMouseButtonDown(MouseButton mb) const
-{
-	return glfwGetMouseButton(this->handle, mb) == InputAction::PRESS;
-}
-
-void DevaFramework::OnKeyAction(Window_Handle hwnd, int key, int scancode, int action, int modmask)
-{
-	for (int i = 0;i <= opened_windows.size() - 1;i++)
-	{
-		if (opened_windows[i].handle == hwnd)
-		{
-			if (opened_windows[i].key_callback) 
-				opened_windows[i].key_callback(
-					opened_windows[i], static_cast<Key>(key), static_cast<InputAction>(action), modmask);
-			break;
-		}
-	}
-}
-
-void Window::setOnKeyActionCallback(func_OnKeyAction cb)
-{
-	this->key_callback = cb;
-}
-
-void DevaFramework::OnMouseButtonAction(Window_Handle hwnd, int mousebutton, int action, int modmask)
-{
-	for (int i = 0;i <= opened_windows.size() - 1;i++)
-	{
-		if (opened_windows[i].handle == hwnd)
-		{
-			if (opened_windows[i].mousebutton_callback)
-				opened_windows[i].mousebutton_callback(
-					opened_windows[i], static_cast<MouseButton>(mousebutton), static_cast<InputAction>(action), modmask);
-			break;
-		}
-	}
-}
-
-void Window::setOnMouseButtonActionCallback(func_OnMouseButtonAction cb)
-{
-	this->mousebutton_callback = cb;
-}
-
-void Window::resize(unsigned int width, unsigned int height)
-{
-	this->width = width;
-	this->height = height;
-	glfwSetWindowSize(this->handle, this->width, this->height);
-}
-
-void Window::move(unsigned int topleft_X, unsigned int topleft_Y)
-{
-	glfwSetWindowPos(this->handle, topleft_X, topleft_Y);
-	this->Xpos = topleft_X;
-	this->Ypos = topleft_Y;
-}
-
-void Window::update()
-{
-	if (!this->handle) return;
-	glfwSwapBuffers(this->handle);
-	glfwPollEvents();
+	this->impl_update();
+	return window_should_run;
 }
 
 void Window::close()
 {
-	if (this->handle)
-	{
-		glfwSetWindowShouldClose(this->handle, true);
-		glfwDestroyWindow(this->handle);
-		this->handle = WINDOW_HANDLE_NULL;
-	}
+	this->window_should_run = false;
 }
 
 Window::~Window()
 {
-	if (this->handle) this->close();
+	impl_deInit();
 }
 
 
