@@ -3,7 +3,7 @@
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
 
-#include "../../src/Deva.hpp"
+#include <Deva.hpp>
 
 namespace 
 {

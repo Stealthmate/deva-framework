@@ -1,0 +1,12 @@
+#------------------Root-------------------------------------------------
+set(
+	DEVA_ENGINE_SOURCE_LIST
+	${DEVA_ENGINE_SOURCE_LIST}
+	${CURDIR}/Renderer.cpp
+	${CURDIR}/Renderer.hpp
+)
+
+set(
+	DEVA_ENGINE_PUBLIC_HEADERS
+	${DEVA_ENGINE_PUBLIC_HEADERS}
+)
