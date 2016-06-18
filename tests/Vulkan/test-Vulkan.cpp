@@ -17,7 +17,7 @@ int main()
 		auto lstnr = std::shared_ptr<MyListener>(new MyListener());
 		Window &wnd = Window::openWindow(800, 600, "Deva: test-Window");
 		wnd.getEventObserver().attachListener(
-		{WindowEvent::KEY_DOWN, WindowEvent::KEY_UP}, std::move(lstnr));
+		{WindowEvent::EVENT_KEY_DOWN, WindowEvent::EVENT_KEY_UP}, std::move(lstnr));
 		while (wnd.update());
 	}
 	catch (DevaFailureException &ex)

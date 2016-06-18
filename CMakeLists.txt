@@ -1,8 +1,7 @@
-#Deva Framework
+#Deva
 #Version 1.0
 
-project(DevaFramework)
-#cmake_minimum_required(VERSION 2.8.12)
+project(Deva)
 cmake_minimum_required(VERSION 3.2.2)
 
 set(BINDIR ../bin)
@@ -69,7 +68,7 @@ set(
 	DEVA_FRAMEWORK_DEP 
 	${DEVA_FRAMEWORK_SYSTEM_DEP_OGL} 
 	${DEVA_FRAMEWORK_PROV_DEP_GLBINDING}
-	${DEVA_FRAMEWORK_PROV_DEP_GLFW} 
+	# ${DEVA_FRAMEWORK_PROV_DEP_GLFW} 
 	${DEVA_FRAMEWORK_PROV_DEP_PNG} 
 	#${DEVA_FRAMEWORK_PROV_DEP_LUA} 
 	${DEVA_FRAMEWORK_PROV_DEP_FREETYPE}
@@ -77,9 +76,17 @@ set(
 
 set(SHADERS_OUTPUT_DIR bin/shaders)
 
+set(DEVA_MASTER_DIR src)
+
 #Framework Sources
-set(CURDIR src)
+set(CURDIR ${DEVA_MASTER_DIR}/Framework)
+set(DEVA_ENGINE_INCLUDE_DIR ${DEVA_MASTER_DIR}/framework_include)
 include(${CURDIR}/CMakeLists.txt)
+
+#Engine Sources
+set(CURDIR src/Engine)
+include(${CURDIR}/CMakeLists.txt)
+
 #Tests
 set(CURDIR tests)
 include(${CURDIR}/CMakeLists.txt)

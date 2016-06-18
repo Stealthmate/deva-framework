@@ -1,0 +1,12 @@
+#------------------Root-------------------------------------------------
+set(
+	DEVA_SOURCE_LIST
+	${DEVA_SOURCE_LIST}
+)
+
+set(
+	DEVA_PUBLIC_HEADERS
+	${DEVA_PUBLIC_HEADERS}
+)
+
+set(CURDIR ${TEMP_DIR})

@@ -30,7 +30,7 @@ int main()
 	DevaLogger::log.println("Opened window.");
 
 	auto lstnr = std::shared_ptr<MyListener>(new MyListener());
-	wnd.getEventObserver().attachListener(WindowEvent::KEY_DOWN, std::move(lstnr));
+	wnd.getEventObserver().attachListener(WindowEvent::EVENT_KEY_DOWN, std::move(lstnr));
 	DevaLogger::log.println("Attached listener.");
 
 

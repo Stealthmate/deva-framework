@@ -1,0 +1,207 @@
+#------------------Root-------------------------------------------------
+set(
+	DEVA_FRAMEWORK_SOURCE_LIST
+	${DEVA_FRAMEWORK_SOURCE_LIST} 
+	${CURDIR}/Config.hpp
+	${CURDIR}/Deva.hpp
+	${CURDIR}/Deva.cpp
+	${CURDIR}/Platform.hpp
+)
+
+set(
+	DEVA_FRAMEWORK_PUBLIC_HEADERS
+	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
+	${CURDIR}/Config.hpp
+	${CURDIR}/Deva.hpp
+	${CURDIR}/Platform.hpp
+)
+
+#------------------System-----------------------------------------------
+set(TEMP_DIR ${CURDIR})
+set(CURDIR ${TEMP_DIR}/System)
+set(
+	DEVA_FRAMEWORK_SOURCE_LIST
+	${DEVA_FRAMEWORK_SOURCE_LIST}
+	${CURDIR}/Config.hpp
+	${CURDIR}/Exceptions.cpp
+	${CURDIR}/Exceptions.hpp
+	${CURDIR}/Exceptions/DevaFailureException.cpp
+	${CURDIR}/Exceptions/DevaFailureException.hpp
+	${CURDIR}/Exceptions/DevaExternalFailureException.cpp
+	${CURDIR}/Exceptions/DevaExternalFailureException.hpp
+	${CURDIR}/Exceptions/DevaProgrammerErrorException.cpp
+	${CURDIR}/Exceptions/DevaProgrammerErrorException.hpp
+	${CURDIR}/Init.cpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Logger.cpp
+	${CURDIR}/Logger.hpp
+	${CURDIR}/DevaLogger.cpp
+	${CURDIR}/DevaLogger.hpp
+	${CURDIR}/NumberFormatter.cpp
+	${CURDIR}/NumberFormatter.hpp
+	${CURDIR}/Master.hpp
+)
+
+set(
+	DEVA_FRAMEWORK_PUBLIC_HEADERS
+	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
+)
+
+
+#------------------Graphics-----------------------------------------------
+set(CURDIR ${TEMP_DIR}/Graphics)
+set(
+	DEVA_FRAMEWORK_SOURCE_LIST
+	${DEVA_FRAMEWORK_SOURCE_LIST}
+	${CURDIR}/Common.cpp
+	${CURDIR}/Common.hpp
+	${CURDIR}/Common-setUniform.inl
+	${CURDIR}/Common-setShaderUniform-primitive.inl
+	${CURDIR}/Common-setShaderUniform-vec.inl
+	${CURDIR}/Common-setShaderUniform-mat.inl
+	${CURDIR}/ShaderVariableDataType.cpp
+	${CURDIR}/ShaderVariableDataType.hpp
+	${CURDIR}/ShaderVariableDataType_int.cpp
+	${CURDIR}/ShaderVariableDataType_int.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/glConfig.hpp
+	${CURDIR}/glFunctions.hpp
+	${CURDIR}/glTypes.hpp
+	${CURDIR}/Image.cpp
+	${CURDIR}/Image.hpp
+	${CURDIR}/ImageReaders.cpp
+	${CURDIR}/ImageReaders.hpp
+	${CURDIR}/Init.cpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+	${CURDIR}/Model.cpp
+	${CURDIR}/Model.hpp
+	${CURDIR}/Shader.cpp
+	${CURDIR}/Shader.hpp
+	${CURDIR}/ShaderProgram.cpp
+	${CURDIR}/ShaderProgram.hpp
+	${CURDIR}/VertexBufferObject.cpp
+	${CURDIR}/VertexBufferObject.hpp
+)
+
+set(
+	DEVA_FRAMEWORK_PUBLIC_HEADERS
+	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
+	${CURDIR}/Common.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/glConfig.hpp
+	${CURDIR}/glFunctions.hpp
+	${CURDIR}/glTypes.hpp
+	${CURDIR}/Image.hpp
+	${CURDIR}/ImageReaders.hpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+	${CURDIR}/Model.hpp
+	${CURDIR}/Shader.hpp
+	${CURDIR}/ShaderProgram.hpp
+	${CURDIR}/VertexBufferObject.hpp
+)
+
+
+#------------------Math-----------------------------------------------
+set(CURDIR ${TEMP_DIR}/Math)
+set(
+	DEVA_FRAMEWORK_SOURCE_LIST
+	${DEVA_FRAMEWORK_SOURCE_LIST}
+	${CURDIR}/BaseMatrix.hpp
+	${CURDIR}/BaseVector.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/EulerAngles.hpp
+	${CURDIR}/Init.cpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+	${CURDIR}/Matrix.cpp
+	${CURDIR}/Matrix.hpp
+	${CURDIR}/MatrixFactory.cpp
+	${CURDIR}/MatrixFactory.hpp
+	# ${CURDIR}/Quaternion.cpp
+	# ${CURDIR}/Quaternion.hpp
+	${CURDIR}/Vector.hpp
+)
+
+set(
+	DEVA_FRAMEWORK_PUBLIC_HEADERS
+	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
+	${CURDIR}/BaseMatrix.hpp
+	${CURDIR}/BaseVector.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/EulerAngles.hpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+	${CURDIR}/Quaternion.hpp
+	${CURDIR}/Vector.hpp
+)
+
+
+#------------------Util-----------------------------------------------
+set(CURDIR ${TEMP_DIR}/Util)
+set(
+	DEVA_FRAMEWORK_SOURCE_LIST
+	${DEVA_FRAMEWORK_SOURCE_LIST}
+	${CURDIR}/BinaryFileStreamWrapper.cpp
+	${CURDIR}/BinaryFileStreamWrapper.hpp
+	${CURDIR}/BinaryReader.hpp
+	${CURDIR}/BinaryWriter.hpp
+	${CURDIR}/ByteBuffer.cpp
+	${CURDIR}/ByteBuffer.hpp
+	${CURDIR}/Common.cpp
+	${CURDIR}/Common.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/Init.cpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+)
+
+set(
+	DEVA_FRAMEWORK_PUBLIC_HEADERS
+	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
+	${CURDIR}/BinaryFileStreamWrapper.hpp
+	${CURDIR}/BinaryReader.hpp
+	${CURDIR}/BinaryWriter.hpp
+	${CURDIR}/ByteBuffer.hpp
+	${CURDIR}/Common.hpp
+	${CURDIR}/Config.hpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+)
+
+
+#------------------Window-----------------------------------------------
+set(CURDIR ${TEMP_DIR}/Window)
+set(
+	DEVA_FRAMEWORK_SOURCE_LIST
+	${DEVA_FRAMEWORK_SOURCE_LIST}
+	${CURDIR}/Config.hpp
+	${CURDIR}/Events.hpp
+	${CURDIR}/Init.cpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Input.hpp
+	${CURDIR}/Master.hpp
+	${CURDIR}/Window.cpp
+	${CURDIR}/Window.hpp
+	${CURDIR}/WindowEventInfo.hpp
+	${CURDIR}/WindowEventListener.cpp
+	${CURDIR}/WindowEventListener.hpp
+	${CURDIR}/WindowObserver.cpp
+	${CURDIR}/WindowObserver.hpp
+	${CURDIR}/win/impl_win32_Window.cpp
+	${CURDIR}/win/impl_keycode_mapping.inl
+)
+
+set(
+	DEVA_FRAMEWORK_PUBLIC_HEADERS
+	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
+	${CURDIR}/Config.hpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Master.hpp
+	${CURDIR}/Window.hpp
+)
+
+
+#------------------------------------------------------------------------
+set(CURDIR ${TEMP_DIR})
