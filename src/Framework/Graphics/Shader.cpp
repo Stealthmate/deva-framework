@@ -1,8 +1,6 @@
 #include "Shader.hpp"
 #include "glFunctions.hpp"
 
-#include "../src/System/DevaLogger.hpp"
-
 #include <vector>
 
 using namespace gl;

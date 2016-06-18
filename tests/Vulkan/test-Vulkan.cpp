@@ -1,4 +1,4 @@
-#include "../src/Deva.hpp"
+#include <Deva.hpp>
 
 using namespace DevaFramework;
 

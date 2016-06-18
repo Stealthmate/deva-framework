@@ -2,8 +2,6 @@
 
 #include "glFunctions.hpp"
 
-#include "../src/System/Logger.hpp"
-
 USE_GL;
 using namespace DevaFramework;
 

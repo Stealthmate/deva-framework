@@ -1,6 +1,6 @@
 #include "Window.hpp"
 
-#include "../src/System/DevaLogger.hpp"
+#include "../DevaLogger.hpp"
 
 #include <vector>
 

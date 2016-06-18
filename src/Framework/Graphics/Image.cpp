@@ -1,7 +1,7 @@
 #include "Image.hpp"
 
 #include "ImageReaders.hpp"
-#include "../System/DevaLogger.hpp"
+#include "../DevaLogger.hpp"
 
 #include <string>
 

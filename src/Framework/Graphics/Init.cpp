@@ -3,7 +3,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "../src/System/DevaLogger.hpp"
+#include "../DevaLogger.hpp"
 
 using namespace DevaFramework;
 

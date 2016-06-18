@@ -74,18 +74,22 @@ set(
 	${DEVA_FRAMEWORK_PROV_DEP_FREETYPE}
 )
 
+
 set(SHADERS_OUTPUT_DIR bin/shaders)
 
 set(DEVA_MASTER_DIR src)
 
 #Framework Sources
 set(CURDIR ${DEVA_MASTER_DIR}/Framework)
-set(DEVA_ENGINE_INCLUDE_DIR ${DEVA_MASTER_DIR}/framework_include)
+set(DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR ${DEVA_MASTER_DIR}/framework_include)
+set(DEVA_ENGINE_PUBLIC_INCLUDE_DIR ${DEVA_MASTER_DIR}/engine_include)
 include(${CURDIR}/CMakeLists.txt)
 
 #Engine Sources
 set(CURDIR src/Engine)
 include(${CURDIR}/CMakeLists.txt)
+
+set(DEVA_ENGINE_LINK_LIBRARIES deva-Engine deva-Framework ${DEVA_FRAMEWORK_PROV_DEP})
 
 #Tests
 set(CURDIR tests)

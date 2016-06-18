@@ -4,9 +4,9 @@
 #error "Platform not supported."
 #else
 
-#include "../../System/Exceptions.hpp"
+#include "../../Exceptions.hpp"
 
-#include "../../System/DevaLogger.hpp"
+#include "../../DevaLogger.hpp"
 
 #include "impl_keycode_mapping.inl"
 
@@ -81,7 +81,6 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 	}
 	case WM_KEYDOWN:
 	{
-		DevaLogger::log << "Keycode " << wParam;
 		current_wnd.eventObserver->fire(current_wnd, std::move(createWindowEventInfo_Key(WindowEvent::EVENT_KEY_DOWN, wParam, lParam)));
 	}
 	default:

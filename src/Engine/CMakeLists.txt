@@ -7,12 +7,12 @@ endif()
 
 include(${CURDIR}/CMakeSourceList.txt)
 
-set(SRCS ${DEVA_SOURCE_LIST})
+set(SRCS ${DEVA_ENGINE_SOURCE_LIST})
 add_library(deva-Engine ${LIBTYPE} ${SRCS})
 
 set_target_properties(deva-Engine PROPERTIES COMPILE_DEFINITIONS ${DEVA_BUILD_DEFINES})
 target_link_libraries(deva-Engine deva-Framework ${DEVA_FRAMEWORK_DEP})
-target_include_directories(deva-Engine PRIVATE ${DEVA_ENGINE_INCLUDE_DIR})
+target_include_directories(deva-Engine PRIVATE ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR})
 
 foreach(source IN LISTS SRCS)
     get_filename_component(source_path "${source}" ABSOLUTE)

@@ -3,26 +3,9 @@ set(
 	DEVA_FRAMEWORK_SOURCE_LIST
 	${DEVA_FRAMEWORK_SOURCE_LIST} 
 	${CURDIR}/Config.hpp
-	${CURDIR}/Deva.hpp
 	${CURDIR}/Deva.cpp
-	${CURDIR}/Platform.hpp
-)
-
-set(
-	DEVA_FRAMEWORK_PUBLIC_HEADERS
-	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
-	${CURDIR}/Config.hpp
 	${CURDIR}/Deva.hpp
 	${CURDIR}/Platform.hpp
-)
-
-#------------------System-----------------------------------------------
-set(TEMP_DIR ${CURDIR})
-set(CURDIR ${TEMP_DIR}/System)
-set(
-	DEVA_FRAMEWORK_SOURCE_LIST
-	${DEVA_FRAMEWORK_SOURCE_LIST}
-	${CURDIR}/Config.hpp
 	${CURDIR}/Exceptions.cpp
 	${CURDIR}/Exceptions.hpp
 	${CURDIR}/Exceptions/DevaFailureException.cpp
@@ -45,10 +28,22 @@ set(
 set(
 	DEVA_FRAMEWORK_PUBLIC_HEADERS
 	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
+	${CURDIR}/Config.hpp
+	${CURDIR}/Deva.hpp
+	${CURDIR}/Platform.hpp
+	${CURDIR}/Exceptions.hpp
+	${CURDIR}/Exceptions/DevaFailureException.hpp
+	${CURDIR}/Exceptions/DevaExternalFailureException.hpp
+	${CURDIR}/Exceptions/DevaProgrammerErrorException.hpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/Logger.hpp
+	${CURDIR}/DevaLogger.hpp
+	${CURDIR}/NumberFormatter.hpp
+	${CURDIR}/Master.hpp
 )
 
-
 #------------------Graphics-----------------------------------------------
+set(TEMP_DIR ${CURDIR})
 set(CURDIR ${TEMP_DIR}/Graphics)
 set(
 	DEVA_FRAMEWORK_SOURCE_LIST
@@ -59,6 +54,7 @@ set(
 	${CURDIR}/Common-setShaderUniform-primitive.inl
 	${CURDIR}/Common-setShaderUniform-vec.inl
 	${CURDIR}/Common-setShaderUniform-mat.inl
+	${CURDIR}/ShaderVariable.hpp
 	${CURDIR}/ShaderVariableDataType.cpp
 	${CURDIR}/ShaderVariableDataType.hpp
 	${CURDIR}/ShaderVariableDataType_int.cpp
@@ -99,6 +95,9 @@ set(
 	${CURDIR}/Model.hpp
 	${CURDIR}/Shader.hpp
 	${CURDIR}/ShaderProgram.hpp
+	${CURDIR}/ShaderVariableDataType.hpp
+	${CURDIR}/ShaderVariableDataType_int.hpp
+	${CURDIR}/ShaderVariable.hpp
 	${CURDIR}/VertexBufferObject.hpp
 )
 
@@ -133,6 +132,8 @@ set(
 	${CURDIR}/EulerAngles.hpp
 	${CURDIR}/Init.hpp
 	${CURDIR}/Master.hpp
+	${CURDIR}/Matrix.hpp
+	${CURDIR}/MatrixFactory.hpp
 	${CURDIR}/Quaternion.hpp
 	${CURDIR}/Vector.hpp
 )
@@ -197,9 +198,14 @@ set(
 	DEVA_FRAMEWORK_PUBLIC_HEADERS
 	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
 	${CURDIR}/Config.hpp
+	${CURDIR}/Events.hpp
 	${CURDIR}/Init.hpp
+	${CURDIR}/Input.hpp
 	${CURDIR}/Master.hpp
 	${CURDIR}/Window.hpp
+	${CURDIR}/WindowObserver.hpp
+	${CURDIR}/WindowEventListener.hpp
+	${CURDIR}/WindowEventInfo.hpp
 )
 
 

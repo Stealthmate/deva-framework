@@ -2,8 +2,7 @@
 
 #include <fstream>
 
-#include "../System/Exceptions.hpp"
-#include "../System/Logger.hpp"
+#include "../Exceptions.hpp"
 
 #include "../Util/ByteBuffer.hpp"
 #include "../Util/BinaryFileStreamWrapper.hpp"

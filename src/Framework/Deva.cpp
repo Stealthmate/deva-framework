@@ -1,6 +1,6 @@
 #include "Deva.hpp"
 
-#include "System/DevaLogger.hpp"
+#include "DevaLogger.hpp"
 namespace 
 {
 	using namespace DevaFramework;
