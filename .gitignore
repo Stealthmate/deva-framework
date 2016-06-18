@@ -1,3 +1,5 @@
+junk/**
+*~
 Win64/**
 bin/**
 !CMakeLists.txt
