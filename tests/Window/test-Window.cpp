@@ -21,6 +21,10 @@ namespace
 int main()
 {
 	DEVA_INIT();
+	for (auto i = 0; i <= GraphicsState::getPhysicalDeviceCount() - 1;i++)
+	{
+		DevaLogger::log.println(GraphicsState::getPhysicalDevice(i).to_string());
+	}
 
 	DevaLogger::log.println(TEST_DESCRIPTION);
 

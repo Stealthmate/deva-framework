@@ -25,6 +25,8 @@ set(DevaFramework_VERSION_MINOR 0)
 #Set include path
 include_directories("include/")
 link_directories("lib/" "bin/lib")
+set(DEVA_VERSION 0.2)
+add_definitions(-DDEVA_VERSION=${DEVA_VERSION})
 
 set(REQUIRED_COMPILER_VERSION_GCC "4.7")
 set(REQUIRED_COMPILER_VERSION_MSVC "19.0")
@@ -57,6 +59,7 @@ set(DEVA_FRAMEWORK_SYSTEM_DEP_OGL GLU glbinding GL X11 Xxf86vm Xrandr pthread Xi
 endif()
 
 #Provided dependencies
+set(DEVA_FRAMEWORK_PROV_DEP_VULKAN vulkan-1)
 set(DEVA_FRAMEWORK_PROV_DEP_GLBINDING glbinding)
 set(DEVA_FRAMEWORK_PROV_DEP_GLFW glfw3)
 set(DEVA_FRAMEWORK_PROV_DEP_LUA lua)
@@ -66,6 +69,7 @@ set(DEVA_FRAMEWORK_PROV_DEP_FREETYPE freetype263)
 #All dependencies
 set(
 	DEVA_FRAMEWORK_DEP 
+	${DEVA_FRAMEWORK_PROV_DEP_VULKAN}
 	${DEVA_FRAMEWORK_SYSTEM_DEP_OGL} 
 	${DEVA_FRAMEWORK_PROV_DEP_GLBINDING}
 	# ${DEVA_FRAMEWORK_PROV_DEP_GLFW} 
@@ -77,7 +81,7 @@ set(
 
 set(SHADERS_OUTPUT_DIR bin/shaders)
 
-set(DEVA_MASTER_DIR src)
+set(DEVA_MASTER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 #Framework Sources
 set(CURDIR ${DEVA_MASTER_DIR}/Framework)
