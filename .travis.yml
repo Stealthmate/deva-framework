@@ -2,7 +2,8 @@ language: c++
 sudo: required
 addons:
     apt:
-      sourceline: 'ppa:george-edison55/cmake-3.x'
+      sources:
+       - sourceline: 'ppa:george-edison55/cmake-3.x'
       packages: ['cmake']
 script: 
 - mkdir build
