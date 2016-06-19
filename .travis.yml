@@ -13,7 +13,7 @@ script:
 - pwd
 - mkdir build
 - cd build
-- ../cmake/ cmake-3.6.0-rc2-Linux-x86_64/bin/cmake ..
+- ../cmake/cmake-3.6.0-rc2-Linux-x86_64/bin/cmake ..
 - make deva-Framework
 - make deva-Engine
 - make test-all
