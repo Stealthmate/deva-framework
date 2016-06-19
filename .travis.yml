@@ -3,6 +3,8 @@ script:
 - mkdir build
 - cd build
 - cmake ..
+- make Deva
+- make test-all
 notifications:
   email:
     on_success: always
