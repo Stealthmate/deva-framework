@@ -28,8 +28,7 @@ DevaFramework::DevaProgrammerErrorException::DevaProgrammerErrorException(
 	const std::string &what_was_done,
 	const std::string &what_to_do,
 	const std::string &what_not_to_do)
-	: DevaException(DEVA_PROGRAMMER_ERROR_EXCEPTION, description, 
-		buildFullDescription(DEVA_PROGRAMMER_ERROR_EXCEPTION, description, what_was_done, what_to_do, what_not_to_do)),
+	: DevaException(description),
 	what_was_done(what_was_done),
 	what_to_do(what_to_do),
 	what_not_to_do(what_not_to_do) {}
