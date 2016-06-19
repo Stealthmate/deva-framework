@@ -1,6 +1,8 @@
 language: c++
 script: 
-- Win64.bat
+- mkdir build
+- cd build
+- cmake ..
 notifications:
   email:
     on_success: always
