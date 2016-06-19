@@ -1,6 +1,0 @@
-#ifndef DEVA_FRAMEWORK_SYSTEM_INIT_H
-#define DEVA_FRAMEWORK_SYSTEM_INIT_H
-
-#include "Config.hpp"
-
-#endif //DEVA_FRAMEWORK_SYSTEM_INIT_H
