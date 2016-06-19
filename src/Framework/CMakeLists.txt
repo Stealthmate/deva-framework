@@ -25,10 +25,10 @@ foreach(source IN LISTS SRCS)
 	endif()
 endforeach()
 
-set(HEADER_OUTPUT_DIR ../${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR}/)
+set(HEADER_OUTPUT_DIR ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR}/)
 
 foreach(header IN LISTS DEVA_FRAMEWORK_PUBLIC_HEADERS)
-	set(FORMATTED_PATH ../${header})
+	set(FORMATTED_PATH ${header})
 	string(REPLACE "/" "\\" FORMATTED_PATH ${FORMATTED_PATH})
 	
     string(REGEX REPLACE ".*\/Framework(.*)?\/.*" "${HEADER_OUTPUT_DIR}\/\\1\/" FORMATTED_OUTPUT_DIR "${header}")
@@ -38,7 +38,7 @@ foreach(header IN LISTS DEVA_FRAMEWORK_PUBLIC_HEADERS)
 	# message(${FORMATTED_PATH})
 	# message(${FORMATTED_OUTPUT_DIR})
 	
-	add_custom_command(TARGET deva-Framework 
+	add_custom_command(TARGET deva-Framework
 		COMMAND PRE_BUILD ${CMAKE_COMMAND} -E make_directory ${FORMATTED_OUTPUT_DIR}
 		COMMAND PRE_BUILD ${CMAKE_COMMAND} -E copy ${FORMATTED_PATH} ${FORMATTED_OUTPUT_DIR})
 endforeach()

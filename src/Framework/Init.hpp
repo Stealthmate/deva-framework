@@ -3,6 +3,4 @@
 
 #include "Config.hpp"
 
-
-
 #endif //DEVA_FRAMEWORK_SYSTEM_INIT_H

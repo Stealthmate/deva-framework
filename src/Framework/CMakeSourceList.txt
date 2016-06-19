@@ -6,8 +6,9 @@ set(
 	${CURDIR}/Deva.cpp
 	${CURDIR}/Deva.hpp
 	${CURDIR}/Platform.hpp
-	${CURDIR}/Exceptions.cpp
 	${CURDIR}/Exceptions.hpp
+	${CURDIR}/Exceptions/DevaException.hpp
+	${CURDIR}/Exceptions/DevaException.cpp
 	${CURDIR}/Exceptions/DevaFailureException.cpp
 	${CURDIR}/Exceptions/DevaFailureException.hpp
 	${CURDIR}/Exceptions/DevaExternalFailureException.cpp
@@ -32,6 +33,7 @@ set(
 	${CURDIR}/Deva.hpp
 	${CURDIR}/Platform.hpp
 	${CURDIR}/Exceptions.hpp
+	${CURDIR}/Exceptions/DevaException.hpp
 	${CURDIR}/Exceptions/DevaFailureException.hpp
 	${CURDIR}/Exceptions/DevaExternalFailureException.hpp
 	${CURDIR}/Exceptions/DevaProgrammerErrorException.hpp
@@ -78,6 +80,8 @@ set(
 	${CURDIR}/ShaderProgram.hpp
 	${CURDIR}/VertexBufferObject.cpp
 	${CURDIR}/VertexBufferObject.hpp
+	${CURDIR}/VulkanPhysicalDevice.cpp
+	${CURDIR}/VulkanPhysicalDevice.hpp
 )
 
 set(
@@ -99,6 +103,7 @@ set(
 	${CURDIR}/ShaderVariableDataType_int.hpp
 	${CURDIR}/ShaderVariable.hpp
 	${CURDIR}/VertexBufferObject.hpp
+	${CURDIR}/VulkanPhysicalDevice.hpp
 )
 
 
