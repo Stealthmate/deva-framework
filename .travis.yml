@@ -4,7 +4,7 @@ addons:
     apt:
       sources:
        - sourceline: 'ppa:george-edison55/cmake-3.x'
-      packages: ['cmake']
+      packages: ['cmake3', 'cmake-3']
 script: 
 - mkdir build
 - cd build
