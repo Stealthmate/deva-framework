@@ -7,7 +7,6 @@ install:
  - cd cmake-3.2.2
  - ./configure
  - sudo make install
-make
 script: 
 - mkdir build
 - cd build
