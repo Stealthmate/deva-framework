@@ -1,3 +1,5 @@
+src/framework_include/**
+src/engine_include/**
 *~
 junk/**
 Win64/**
