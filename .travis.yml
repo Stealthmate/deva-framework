@@ -1,4 +1,9 @@
 language: c++
+before-install:
+- apt-get install software-properties-common
+- add-apt-repository ppa:george-edison55/cmake-3.x
+- apt-get update
+- apt-get upgrade
 script: 
 - mkdir build
 - cd build
