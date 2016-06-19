@@ -1,23 +1,19 @@
 #ifndef DEVA_FRAMEWORK_SYSTEM_EXCEPTIONS_DEVA_EXTERNAL_FAILURE_EXCEPTION_H
 #define DEVA_FRAMEWORK_SYSTEM_EXCEPTIONS_DEVA_EXTERNAL_FAILURE_EXCEPTION_H
 
-#include "../Config.hpp"
-#include "../Exceptions.hpp"
+#include "DevaFailureException.hpp"
 
 namespace DevaFramework
 {
-	struct DevaExternalFailureException : public DevaException
+	struct DevaExternalFailureException : public DevaFailureException
 	{
-		const std::string failed_callee;
-		const std::string failed_caller;
-		const std::string failed_external;
+		const std::string external;
 
 		DEVA_FRAMEWORK_API DevaExternalFailureException(
 			const std::string &description,
-			const std::string &failed_callee,
-			const std::string &failed_caller,
-			const std::string &failed_external
-		);
+			const std::string &callee,
+			const std::string &caller,
+			const std::string &external);
 	};
 }
 
