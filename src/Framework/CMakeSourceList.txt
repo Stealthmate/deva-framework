@@ -80,8 +80,9 @@ set(
 	${CURDIR}/ShaderProgram.hpp
 	${CURDIR}/VertexBufferObject.cpp
 	${CURDIR}/VertexBufferObject.hpp
-	${CURDIR}/VulkanPhysicalDevice.cpp
-	${CURDIR}/VulkanPhysicalDevice.hpp
+	${CURDIR}/Vulkan/VulkanPhysicalDevice.cpp
+	${CURDIR}/Vulkan/VulkanPhysicalDevice.hpp
+	${CURDIR}/Vulkan/VulkanDevice.hpp
 )
 
 set(
@@ -103,7 +104,8 @@ set(
 	${CURDIR}/ShaderVariableDataType_int.hpp
 	${CURDIR}/ShaderVariable.hpp
 	${CURDIR}/VertexBufferObject.hpp
-	${CURDIR}/VulkanPhysicalDevice.hpp
+	${CURDIR}/Vulkan/Config.hpp
+	${CURDIR}/Vulkan/VulkanPhysicalDevice.hpp
 )
 
 
