@@ -128,7 +128,7 @@ void GraphicsState::initVulkan(const VkInstanceCreateInfo &vulkan_info)
 		queueFamilies.resize(queueFamilyCount);
 		vkGetPhysicalDeviceQueueFamilyProperties(deviceHandles[i], &queueFamilyCount, &queueFamilies[0]);
 
-		available_physical_devices.push_back(VulkanPhysicalDevice(deviceProperties, deviceFeatures, queueFamilies));
+		available_physical_devices.push_back(VulkanPhysicalDevice(deviceHandles[i], deviceProperties, deviceFeatures, queueFamilies));
 	}
 }
 

@@ -1,24 +1,43 @@
 #include "VulkanPhysicalDevice.hpp"
 
-#include "../Exceptions.hpp"
+#include "../../Exceptions.hpp"
 
 #include <iomanip>
 
 
 using namespace DevaFramework;
 
-VulkanPhysicalDevice::VulkanPhysicalDevice() : properties(), features() 
+namespace
 {
-	memset(&properties, 0, sizeof properties);
-	memset(&features, 0, sizeof features);
+	VkPhysicalDeviceProperties DEFAULT_PROPERTIES()
+	{
+		VkPhysicalDeviceProperties prop;
+		memset(&prop, 0, sizeof(prop));
+		return prop;
+	}
+
+	VkPhysicalDeviceFeatures DEFAULT_FEATURES()
+	{
+		VkPhysicalDeviceFeatures feat;
+		memset(&feat, 0, sizeof(feat));
+		return feat;
+	}
 }
 
+VulkanPhysicalDevice::VulkanPhysicalDevice() : properties(DEFAULT_PROPERTIES()), features(DEFAULT_FEATURES()), handle(0)
+{}
+
 VulkanPhysicalDevice::VulkanPhysicalDevice(
+	const VkPhysicalDevice &handle,
 	const VkPhysicalDeviceProperties &properties, 
 	const VkPhysicalDeviceFeatures&features,
 	const std::vector<VkQueueFamilyProperties> &queueFamilies)
-	: properties(properties), features(features), queueFamilies(queueFamilies) {}
+	: handle(handle), properties(properties), features(features), queueFamilies(queueFamilies) {}
 
+const VkPhysicalDevice VulkanPhysicalDevice::getHandle() const
+{
+	return handle;
+}
 
 const VkPhysicalDeviceProperties VulkanPhysicalDevice::getProperties() const
 {

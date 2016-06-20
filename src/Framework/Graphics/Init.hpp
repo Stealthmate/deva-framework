@@ -3,7 +3,7 @@
 
 #include "Config.hpp"
 
-#include "VulkanPhysicalDevice.hpp"
+#include "Vulkan/VulkanPhysicalDevice.hpp"
 
 #include <vector>
 
