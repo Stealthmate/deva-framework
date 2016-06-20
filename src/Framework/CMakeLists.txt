@@ -5,8 +5,9 @@ set(DEVA_BUILD_DEFINES DEVA_BUILD_SHARED)
 set(LIBTYPE SHARED)
 endif()
 
-include(${CURDIR}/CMakeSourceList.txt)
+message("Generating DevaFramework build files...")
 
+include(${CURDIR}/CMakeSourceList.txt)
 set(SRCS ${DEVA_FRAMEWORK_SOURCE_LIST})
 add_library(deva-Framework ${LIBTYPE} ${SRCS})
 
@@ -34,9 +35,6 @@ foreach(header IN LISTS DEVA_FRAMEWORK_PUBLIC_HEADERS)
     string(REGEX REPLACE ".*\/Framework(.*)?\/.*" "${HEADER_OUTPUT_DIR}\/\\1\/" FORMATTED_OUTPUT_DIR "${header}")
 	string(REGEX REPLACE "\/+" "\/" FORMATTED_OUTPUT_DIR ${FORMATTED_OUTPUT_DIR})
 	string(REPLACE "/" "\\" FORMATTED_OUTPUT_DIR ${FORMATTED_OUTPUT_DIR})
-	
-	# message(${FORMATTED_PATH})
-	# message(${FORMATTED_OUTPUT_DIR})
 	
 	add_custom_command(TARGET deva-Framework
 		COMMAND PRE_BUILD ${CMAKE_COMMAND} -E make_directory ${FORMATTED_OUTPUT_DIR}

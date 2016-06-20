@@ -82,6 +82,7 @@ set(
 	${CURDIR}/VertexBufferObject.hpp
 	${CURDIR}/Vulkan/VulkanPhysicalDevice.cpp
 	${CURDIR}/Vulkan/VulkanPhysicalDevice.hpp
+	${CURDIR}/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Vulkan/VulkanDevice.hpp
 )
 
@@ -106,6 +107,7 @@ set(
 	${CURDIR}/VertexBufferObject.hpp
 	${CURDIR}/Vulkan/Config.hpp
 	${CURDIR}/Vulkan/VulkanPhysicalDevice.hpp
+	${CURDIR}/Vulkan/VulkanDevice.hpp
 )
 
 

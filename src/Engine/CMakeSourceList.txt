@@ -4,9 +4,17 @@ set(
 	${DEVA_ENGINE_SOURCE_LIST}
 	${CURDIR}/Renderer.cpp
 	${CURDIR}/Renderer.hpp
+	${CURDIR}/Init.cpp
+	${CURDIR}/Init.hpp
+	${CURDIR}/DevaEngineInstance.cpp
+	${CURDIR}/DevaEngineInstance.hpp
+	${CURDIR}/Config.hpp
 )
 
 set(
 	DEVA_ENGINE_PUBLIC_HEADERS
 	${DEVA_ENGINE_PUBLIC_HEADERS}
+	${CURDIR}/Renderer.hpp
+	${CURDIR}/DevaEngineInstance.hpp
+	${CURDIR}/Config.hpp
 )
