@@ -14,7 +14,7 @@ ImplWindow::ImplWindow(Window &wnd, uint32_t width, uint32_t height, const std::
 }
 
 ImplWindow::ImplWindow(ImplWindow &&implwnd)
-	: wnd(std::move(implwnd.wnd)), surface_width(implwnd.surface_width), surface_height(implwnd.surface_height), name(implwnd.name), eventObserver(std::move(implwnd.eventObserver))
+	: wnd(implwnd.wnd), surface_width(implwnd.surface_width), surface_height(implwnd.surface_height), name(implwnd.name), eventObserver(std::move(implwnd.eventObserver))
 {
 	this->impl_move(std::move(implwnd));
 	implwnd.surface_width = 0;
