@@ -194,6 +194,8 @@ set(
 	${CURDIR}/Master.hpp
 	${CURDIR}/Window.cpp
 	${CURDIR}/Window.hpp
+	${CURDIR}/ImplWindow.cpp
+	${CURDIR}/ImplWindow.hpp
 	${CURDIR}/WindowEventInfo.hpp
 	${CURDIR}/WindowEventListener.cpp
 	${CURDIR}/WindowEventListener.hpp
