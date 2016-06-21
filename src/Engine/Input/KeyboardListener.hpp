@@ -3,8 +3,6 @@
 
 #include "../Config.hpp"
 
-#include <DevaFramework/Window/WindowEventListener.hpp>
-
 #include <unordered_map>
 #include <memory>
 

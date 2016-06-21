@@ -20,4 +20,7 @@ set(
 	${CURDIR}/Renderer.hpp
 	${CURDIR}/DevaEngineInstance.hpp
 	${CURDIR}/Config.hpp
+	${CURDIR}/Input/KeyboardListener.hpp
+	${CURDIR}/Input/MouseListener.hpp
+	${CURDIR}/Input/InputListener.hpp
 )

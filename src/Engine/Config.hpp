@@ -16,5 +16,6 @@
 #define DEVA_ENGINE_API
 #endif
 
+#include <DevaFramework/Deva.hpp>
 
 #endif // DEVA_ENGINE_CONFIG_H

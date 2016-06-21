@@ -11,11 +11,10 @@ namespace
 
 	class KeyboadInputListener : public WindowEventListener
 	{
-		
-
 		bool onKeyEvent(Window &wnd, WindowEventStruct_KeyEvent evtinfo)
 		{
-			if(wnd != this->wnd)
+			//if(wnd != this->wnd)
+			return true;
 		}
 	};
 
