@@ -78,11 +78,11 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 		break;
 	case WM_KEYUP:
 	{
-		current_wnd.eventObserver->fire(current_wnd.wnd, std::move(createWindowEventInfo_Key(WindowEvent::EVENT_KEY_UP, wParam, lParam)));
+		current_wnd.eventObserver->fire(std::move(createWindowEventInfo_Key(WindowEvent::EVENT_KEY_UP, wParam, lParam)));
 	}
 	case WM_KEYDOWN:
 	{
-		current_wnd.eventObserver->fire(current_wnd.wnd, std::move(createWindowEventInfo_Key(WindowEvent::EVENT_KEY_DOWN, wParam, lParam)));
+		current_wnd.eventObserver->fire(std::move(createWindowEventInfo_Key(WindowEvent::EVENT_KEY_DOWN, wParam, lParam)));
 	}
 	default:
 		break;

@@ -28,7 +28,7 @@ namespace DevaFramework
 			std::shared_ptr<WindowEventListener> &&evtlstnr);
 		DEVA_FRAMEWORK_API void attachListeners(WindowEvent evt, std::initializer_list<std::shared_ptr<WindowEventListener>&&> listeners);
 
-		DEVA_FRAMEWORK_API void fire(Window& wnd, std::shared_ptr<WindowEventStruct> evt);
+		DEVA_FRAMEWORK_API void fire(std::shared_ptr<WindowEventStruct> evt);
 	};
 }
 
