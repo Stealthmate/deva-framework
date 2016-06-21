@@ -6,6 +6,9 @@ set(
 	${CURDIR}/Renderer.hpp
 	${CURDIR}/Init.cpp
 	${CURDIR}/Init.hpp
+	${CURDIR}/Input/KeyboardListener.hpp
+	${CURDIR}/Input/MouseListener.hpp
+	${CURDIR}/Input/InputListener.hpp
 	${CURDIR}/DevaEngineInstance.cpp
 	${CURDIR}/DevaEngineInstance.hpp
 	${CURDIR}/Config.hpp

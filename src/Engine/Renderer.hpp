@@ -3,6 +3,8 @@
 
 #include "Config.hpp"
 
+#include <DevaFramework/Graphics/Vulkan/VulkanDevice.hpp>
+
 namespace DevaEngine
 {
 	class Renderer

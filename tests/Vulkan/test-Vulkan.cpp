@@ -1,27 +1,13 @@
-#include <Deva.hpp>
+#include <DevaEngine/DevaEngineInstance.hpp>
 
-using namespace DevaFramework;
-
-struct MyListener : public WindowEventListener
-{
-	virtual bool onKeyEvent(WindowEventStruct_KeyEvent info)
-	{
-		return true;
-	}
-};
+using namespace DevaEngine;
 
 int main()
 {
-	try
-	{
-		auto lstnr = std::shared_ptr<MyListener>(new MyListener());
-		Window &wnd = Window::openWindow(800, 600, "Deva: test-Window");
-		wnd.getEventObserver().attachListener(
-		{WindowEvent::EVENT_KEY_DOWN, WindowEvent::EVENT_KEY_UP}, std::move(lstnr));
-		while (wnd.update());
-	}
-	catch (DevaFailureException &ex)
-	{
-		DevaLogger::err.println(ex.what());
-	}
+	DevaEngineInstanceCreateInfo info;
+	info.window_height = 600;
+	info.window_width = 800;
+	info.window_name = "TEST!";
+
+	DevaEngineInstance& engine = DevaEngineInstance::createInstance(info);
 }
