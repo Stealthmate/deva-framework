@@ -5,8 +5,6 @@
 
 #include "WindowObserver.hpp"
 
-#include <memory>
-
 namespace DevaFramework
 {
 
@@ -15,7 +13,7 @@ namespace DevaFramework
 	public:
 		class ImplWindow;
 	private:
-		std::unique_ptr<ImplWindow> impl;
+		ImplWindow * impl;
 
 		DEVA_FRAMEWORK_API Window(uint32_t size_x, uint32_t size_y, const std::string &name);
 	public:
@@ -23,6 +21,7 @@ namespace DevaFramework
 	
 		Window(const Window &wnd) = delete;
 		DEVA_FRAMEWORK_API Window(Window &&wnd);
+		DEVA_FRAMEWORK_API ~Window();
 
 		DEVA_FRAMEWORK_API bool update();
 		DEVA_FRAMEWORK_API void close();

@@ -25,6 +25,11 @@ Window::Window(Window &&wnd)
 	:impl(std::move(wnd.impl))
 {}
 
+Window::~Window()
+{
+	delete this->impl;
+}
+
 WindowObserver& Window::getEventObserver()
 {
 	return this->impl->getEventObserver();
@@ -39,5 +44,3 @@ void Window::close()
 {
 	this->impl->close();
 }
-
-
