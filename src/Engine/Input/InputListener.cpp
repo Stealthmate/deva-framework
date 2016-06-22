@@ -13,17 +13,17 @@ namespace
 
 		virtual bool onKeyPress(Key k, uint8_t mods)
 		{
-			DevaLogger::log << "Pressed " << k << "\n";
+			//DevaLogger::log << "Pressed " << k << "\n";
 			return true;
 		}
 		virtual bool onKeyRepeat(Key k, uint8_t mods)
 		{
-			DevaLogger::log << "Held " << k << "\n";
+			//DevaLogger::log << "Held " << k << "\n";
 			return true;
 		}
 		virtual bool onKeyRelease(Key k, uint8_t mods)
 		{
-			DevaLogger::log << "Released " << k << "\n";
+			//DevaLogger::log << "Released " << k << "\n";
 			return true;
 		}
 	};
@@ -50,10 +50,14 @@ void InputListener::setKeyboardListener(const std::shared_ptr<KeyboardInputListe
 
 void InputListener::onKeyboardAction(Key k, KeyboardAction kact, uint8_t mods)
 {
+
 	switch (kact)
 	{
 	case KeyboardAction::KEY_PRESS:
-		this->keyboardListener->onKeyPress(k, mods);
+	{
+		auto i = keymap.find(k);
+		if (i != keymap.end() && !i->second()) this->keyboardListener->onKeyPress(k, mods);
+	}
 		break;
 	case KeyboardAction::KEY_REPEAT:
 		this->keyboardListener->onKeyRepeat(k, mods);

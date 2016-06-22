@@ -11,28 +11,21 @@ namespace
 
 	class _impl_KeyboardListener : public WindowEventListener
 	{
-		DevaEngineInstance* instance;
-
-		bool alt;
-		bool ctrl;
-		bool super;
+		bool alt = false;
+		bool ctrl = false;
+		bool super = false;
 
 	public:
-
-		_impl_KeyboardListener(DevaEngineInstance *inst) : instance(inst) 
-		{
-			DevaLogger::log << "wat " << (uintptr_t) inst << "\n";
-		}
-
 		virtual bool onKeyEvent(WindowEventStruct_KeyEvent evtinfo)
 		{
 			uint8_t mods = 0;
 			if (alt) mods += MOD_ALT;
 			if (ctrl) mods += MOD_CTRL;
 			if (super) mods += MOD_SUPER;
-			DevaLogger::log << "wat " << (uintptr_t)instance << "\n";
 
 			KeyboardAction act;
+
+			DevaEngineInstance *instance = static_cast<DevaEngineInstance*>(evtinfo.wnd->getUserData());
 
 			switch (evtinfo.evt)
 			{
@@ -79,13 +72,13 @@ DevaEngineInstance::DevaEngineInstance(const DevaEngineInstanceCreateInfo &info)
 {
 	wnd->getEventObserver().attachListener(WindowEvent::EVENT_KEY_DOWN, 
 		std::static_pointer_cast<WindowEventListener, _impl_KeyboardListener>(
-			std::shared_ptr<_impl_KeyboardListener>(new _impl_KeyboardListener(this))));
+			std::shared_ptr<_impl_KeyboardListener>(new _impl_KeyboardListener())));
 }
 
 DevaEngineInstance::DevaEngineInstance(DevaEngineInstance &&instance)
 	: wnd(std::move(instance.wnd)), renderer(std::move(instance.renderer)), inputlstnr(std::move(instance.inputlstnr))
 {
-
+	wnd->setUserData(static_cast<void*>(this));
 }
 
 bool DevaEngineInstance::update()
