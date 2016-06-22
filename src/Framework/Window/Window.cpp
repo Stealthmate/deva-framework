@@ -21,17 +21,11 @@ Window::Window(uint32_t width, uint32_t height, const std::string &name)
 	:impl(new ImplWindow(*this, width, height, name))
 {}
 
-Window::Window(Window &&wnd)
-	: impl(std::move(wnd.impl))
-{}
+Window::Window(Window &&wnd) = default;
 
 Window::~Window() = default;
 
-Window& Window::operator=(Window &&wnd)
-{
-	this->impl = std::move(wnd.impl);
-	return *this;
-}
+Window& Window::operator=(Window &&wnd) = default;
 
 WindowObserver& Window::getEventObserver()
 {
