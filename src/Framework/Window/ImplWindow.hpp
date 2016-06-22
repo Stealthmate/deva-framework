@@ -12,8 +12,6 @@ namespace DevaFramework
 {
 	class Window::ImplWindow
 	{
-		Window& wnd;
-
 		std::string name;
 		uint32_t surface_width;
 		uint32_t surface_height;
@@ -25,6 +23,7 @@ namespace DevaFramework
 	public:
 		ImplWindow(Window &wnd, uint32_t size_x, uint32_t size_y, const std::string &name);
 		ImplWindow(const ImplWindow &implwnd) = delete;
+		ImplWindow& operator=(const ImplWindow &wnd) = delete;
 		ImplWindow(ImplWindow &&implwnd);
 		~ImplWindow();
 	private:

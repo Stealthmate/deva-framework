@@ -22,14 +22,13 @@ Window::Window(uint32_t width, uint32_t height, const std::string &name)
 {}
 
 Window::Window(Window &&wnd)
-	:impl(wnd.impl)
-{
-	wnd.impl = nullptr;
-}
+	: impl(std::move(wnd.impl))
+{}
 
-Window::~Window()
+Window& Window::operator=(Window &&wnd)
 {
-	if(this->impl != nullptr) delete this->impl;
+	this->impl = std::move(wnd.impl);
+	return *this;
 }
 
 WindowObserver& Window::getEventObserver()

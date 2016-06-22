@@ -12,8 +12,6 @@
 
 namespace DevaFramework
 {
-	class Window;
-
 	class WindowObserver
 	{
 	private:

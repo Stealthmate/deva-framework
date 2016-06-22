@@ -13,7 +13,7 @@ namespace DevaFramework
 	public:
 		class ImplWindow;
 	private:
-		ImplWindow * impl;
+		std::unique_ptr<ImplWindow> impl;
 
 		DEVA_FRAMEWORK_API Window(uint32_t size_x, uint32_t size_y, const std::string &name);
 	public:
@@ -21,7 +21,8 @@ namespace DevaFramework
 	
 		Window(const Window &wnd) = delete;
 		DEVA_FRAMEWORK_API Window(Window &&wnd);
-		DEVA_FRAMEWORK_API ~Window();
+		Window& operator=(const Window &wnd) = delete;
+		DEVA_FRAMEWORK_API Window& operator=(Window &&wnd);
 
 		DEVA_FRAMEWORK_API bool update();
 		DEVA_FRAMEWORK_API void close();
