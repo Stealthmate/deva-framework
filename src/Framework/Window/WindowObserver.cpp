@@ -1,7 +1,5 @@
 #include "WindowObserver.hpp"
 
-#include "Window.hpp"
-
 using namespace DevaFramework;
 
 DevaFramework::WindowObserver::WindowObserver() : event_listeners() {}
