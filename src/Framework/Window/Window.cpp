@@ -25,6 +25,7 @@ Window::Window(Window &&wnd)
 	: impl(std::move(wnd.impl))
 {}
 
+Window::~Window() = default;
 
 Window& Window::operator=(Window &&wnd)
 {
