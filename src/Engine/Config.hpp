@@ -7,7 +7,7 @@
 #include <string>
 
 #ifdef _MSC_VER
-#ifdef DEVA_BUILD_SHARED
+#ifdef DEVA_ENGINE_BUILD_SHARED
 #define DEVA_ENGINE_API __declspec(dllexport)
 #else
 #define DEVA_ENGINE_API __declspec(dllimport)

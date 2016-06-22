@@ -8,13 +8,11 @@
 
 namespace DevaEngine
 {
-	typedef DevaFramework::Key Key;
-
 	struct KeyboardInputListener : private DevaFramework::WindowEventListener
 	{
-		DEVA_ENGINE_API virtual bool onKeyPress(Key k) = 0;
-		DEVA_ENGINE_API virtual bool onKeyRepeat(Key k) = 0;
-		DEVA_ENGINE_API virtual bool onKeyRelease(Key k) = 0;
+		DEVA_ENGINE_API virtual bool onKeyPress(DevaFramework::Key k, uint8_t mods) = 0;
+		DEVA_ENGINE_API virtual bool onKeyRepeat(DevaFramework::Key k, uint8_t mods) = 0;
+		DEVA_ENGINE_API virtual bool onKeyRelease(DevaFramework::Key k, uint8_t mods) = 0;
 	};
 }
 

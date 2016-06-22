@@ -9,11 +9,45 @@ namespace
 {
 	std::vector<DevaEngineInstance> instances(0);
 
-	class KeyboadInputListener : public WindowEventListener
+	class _impl_KeyboardListener : public WindowEventListener
 	{
-		bool onKeyEvent(Window &wnd, WindowEventStruct_KeyEvent evtinfo)
+		DevaEngineInstance* instance;
+
+		bool alt;
+		bool ctrl;
+		bool super;
+
+	public:
+
+		_impl_KeyboardListener(DevaEngineInstance *inst) : instance(inst) 
 		{
-			//if(wnd != this->wnd)
+			DevaLogger::log << "wat " << (uintptr_t) inst << "\n";
+		}
+
+		virtual bool onKeyEvent(WindowEventStruct_KeyEvent evtinfo)
+		{
+			uint8_t mods = 0;
+			if (alt) mods += MOD_ALT;
+			if (ctrl) mods += MOD_CTRL;
+			if (super) mods += MOD_SUPER;
+			DevaLogger::log << "wat " << (uintptr_t)instance << "\n";
+
+			KeyboardAction act;
+
+			switch (evtinfo.evt)
+			{
+			case WindowEvent::EVENT_KEY_DOWN:
+			{
+				if (evtinfo.wasPressed)
+					instance->getInputListener().onKeyboardAction(evtinfo.key, KeyboardAction::KEY_REPEAT, mods);
+				else instance->getInputListener().onKeyboardAction(evtinfo.key, KeyboardAction::KEY_PRESS, mods);
+			}
+			case WindowEvent::EVENT_KEY_UP:
+			{
+				instance->getInputListener().onKeyboardAction(evtinfo.key, KeyboardAction::KEY_RELEASE, mods);
+			}
+			}
+
 			return true;
 		}
 	};
@@ -35,23 +69,36 @@ DevaEngineInstance& DevaEngineInstance::createInstance(const DevaEngineInstanceC
 }
 
 DevaEngineInstance::DevaEngineInstance()
-	: wnd(nullptr), renderer()
+	: wnd(nullptr), renderer(), inputlstnr(new InputListener())
 {
 
 }
 
 DevaEngineInstance::DevaEngineInstance(const DevaEngineInstanceCreateInfo &info)
-	:wnd(&Window::openWindow(info.window_width, info.window_height, info.window_name))
+	:wnd(&Window::openWindow(info.window_width, info.window_height, info.window_name)), renderer(), inputlstnr(new InputListener())
+{
+	wnd->getEventObserver().attachListener(WindowEvent::EVENT_KEY_DOWN, 
+		std::static_pointer_cast<WindowEventListener, _impl_KeyboardListener>(
+			std::shared_ptr<_impl_KeyboardListener>(new _impl_KeyboardListener(this))));
+}
+
+DevaEngineInstance::DevaEngineInstance(DevaEngineInstance &&instance)
+	: wnd(std::move(instance.wnd)), renderer(std::move(instance.renderer)), inputlstnr(std::move(instance.inputlstnr))
 {
 
 }
 
-DevaEngineInstance::DevaEngineInstance(DevaEngineInstance &&instance)
-	: wnd(std::move(instance.wnd)), renderer(std::move(instance.renderer))
-{}
-
+bool DevaEngineInstance::update()
+{
+	return wnd->update();
+}
 
 Renderer& DevaEngineInstance::getRenderer()
 {
 	return renderer;
+}
+
+InputListener& DevaEngineInstance::getInputListener()
+{
+	return *inputlstnr;
 }

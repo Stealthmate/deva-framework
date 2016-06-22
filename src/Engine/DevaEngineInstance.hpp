@@ -5,7 +5,10 @@
 
 #include "Renderer.hpp"
 #include "Input/InputListener.hpp"
+
 #include <DevaFramework/Deva.hpp>
+
+#include <memory>
 
 namespace DevaEngine
 {
@@ -30,7 +33,6 @@ namespace DevaEngine
 	private:
 
 		Renderer renderer;
-
 		DevaEngineInstance(const DevaEngineInstanceCreateInfo &info);
 		
 
@@ -42,7 +44,9 @@ namespace DevaEngine
 		DEVA_ENGINE_API DevaEngineInstance(DevaEngineInstance &&instance);
 
 		DEVA_ENGINE_API Renderer& getRenderer();
+		DEVA_ENGINE_API InputListener& getInputListener();
 
+		DEVA_ENGINE_API bool update();
 	};
 
 }

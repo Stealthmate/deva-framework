@@ -4,7 +4,7 @@ using namespace DevaFramework;
 
 DevaFramework::WindowObserver::WindowObserver() : event_listeners() {}
 
-void DevaFramework::WindowObserver::attachListener(WindowEvent evt, std::shared_ptr<WindowEventListener>&& evtlstnr)
+void DevaFramework::WindowObserver::attachListener(WindowEvent evt, std::shared_ptr<WindowEventListener>& evtlstnr)
 {
 	auto evt_key = this->event_listeners.find(evt);
 	if (evt_key == this->event_listeners.end())

@@ -11,17 +11,17 @@ namespace
 	{
 	public:
 
-		virtual bool onKeyPress(Key k)
+		virtual bool onKeyPress(Key k, uint8_t mods)
 		{
 			DevaLogger::log << "Pressed " << k << "\n";
 			return true;
 		}
-		virtual bool onKeyRepeat(Key k)
+		virtual bool onKeyRepeat(Key k, uint8_t mods)
 		{
 			DevaLogger::log << "Held " << k << "\n";
 			return true;
 		}
-		virtual bool onKeyRelease(Key k)
+		virtual bool onKeyRelease(Key k, uint8_t mods)
 		{
 			DevaLogger::log << "Released " << k << "\n";
 			return true;
@@ -29,11 +29,47 @@ namespace
 	};
 }
 
-InputListener::InputListener() : keyboardListener(new DefaultKeyboardListener())
-{}
+InputListener::InputListener() : keyboardListener(
+	std::static_pointer_cast<KeyboardInputListener, DefaultKeyboardListener>
+	(std::shared_ptr<DefaultKeyboardListener>(new DefaultKeyboardListener()))), keymap()
+{
+	keymap = std::unordered_map<DevaFramework::Key, InputFunction>();
+}
+
+InputListener::InputListener(InputListener &&lstnr)
+	:keyboardListener(std::move(lstnr.keyboardListener)), keymap(std::move(lstnr.keymap))
+{
+
+}
 
 
 void InputListener::setKeyboardListener(const std::shared_ptr<KeyboardInputListener> &kblstnr)
 {
 	this->keyboardListener = kblstnr;
+}
+
+void InputListener::onKeyboardAction(Key k, KeyboardAction kact, uint8_t mods)
+{
+	switch (kact)
+	{
+	case KeyboardAction::KEY_PRESS:
+		this->keyboardListener->onKeyPress(k, mods);
+		break;
+	case KeyboardAction::KEY_REPEAT:
+		this->keyboardListener->onKeyRepeat(k, mods);
+		break;
+	case KeyboardAction::KEY_RELEASE:
+		this->keyboardListener->onKeyRelease(k, mods);
+		break;
+	}
+}
+
+void InputListener::bindKey(DevaFramework::Key k, const InputFunction & func)
+{
+	auto i = keymap.find(k);
+	if (i != keymap.end()) i->second = func;
+	else
+	{
+		keymap.insert({k, func});
+	}
 }

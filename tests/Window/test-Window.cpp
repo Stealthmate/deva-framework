@@ -7,11 +7,13 @@ namespace
 		R"description(Test Description:
 	This test should open an empty window. The window should close when Escape is pressed.)description";
 
+	Window* wnd;
+
 	struct MyListener : public WindowEventListener
 	{
-		virtual bool onKeyEvent(Window &wnd, WindowEventStruct_KeyEvent info)
+		virtual bool onKeyEvent(WindowEventStruct_KeyEvent info)
 		{
-			if(info.key == Key::KEY_ESCAPE) wnd.close();
+			if(info.key == Key::KEY_ESCAPE) wnd->close();
 			return true;
 		}
 	};
@@ -21,24 +23,24 @@ namespace
 int main()
 {
 	DEVA_INIT();
-	for (auto i = 0; i <= GraphicsState::getPhysicalDeviceCount() - 1;i++)
+	/*for (auto i = 0; i <= GraphicsState::getPhysicalDeviceCount() - 1;i++)
 	{
 		DevaLogger::log.println(GraphicsState::getPhysicalDevice(i).to_string());
 	}
 
 	DevaLogger::log.println(TEST_DESCRIPTION);
 
-	Window &wnd = Window::openWindow(800, 600, "Deva: test-Window");
+	wnd = &Window::openWindow(800, 600, "Deva: test-Window");
 	DevaLogger::log.println("Opened window.");
 
 	auto lstnr = std::shared_ptr<MyListener>(new MyListener());
-	wnd.getEventObserver().attachListener(WindowEvent::EVENT_KEY_DOWN, std::move(lstnr));
+	wnd->getEventObserver().attachListener(WindowEvent::EVENT_KEY_DOWN, std::move(lstnr));
 	DevaLogger::log.println("Attached listener.");
 
 
-	while (wnd.update());
+	while (wnd->update());
 
-	DevaLogger::log.println("Test successful.");
+	DevaLogger::log.println("Test successful.");*/
 }
 
 
