@@ -7,11 +7,6 @@
 using namespace DevaFramework;
 using ImplWindow = Window::ImplWindow;
 
-void Window::ImplWindowDeleter::operator()(ImplWindow *p)
-{
-	delete p;
-}
-
 ImplWindow::ImplWindow(Window &wnd, uint32_t width, uint32_t height, const std::string &name)
 	:surface_height(height), name(name), eventObserver(std::shared_ptr<WindowObserver>(new WindowObserver()))
 {

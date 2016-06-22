@@ -12,13 +12,9 @@ namespace DevaFramework
 	{
 	public:
 		class ImplWindow;
-		struct ImplWindowDeleter
-		{
-			DEVA_FRAMEWORK_API void operator()(ImplWindow *p);
-		};
 
 	private:
-		std::unique_ptr<ImplWindow, ImplWindowDeleter> impl;
+		std::unique_ptr<ImplWindow> impl;
 
 		Window(uint32_t size_x, uint32_t size_y, const std::string &name);
 	public:
