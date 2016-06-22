@@ -1,4 +1,4 @@
-#include "../Window.hpp"
+#include "../ImplWindow.hpp"
 
 #ifndef DEVA_OS_WIN32
 #error "Platform not supported."
@@ -15,11 +15,14 @@
 
 using namespace DevaFramework;
 
+using ImplWindow = Window::ImplWindow;
 
 namespace
 {
 
-	std::map<HWND, Window*>  hwnd_map;
+	typedef WindowEventStruct_KeyEvent KeyInfo;
+
+	std::map<HWND, ImplWindow*>  hwnd_map;
 
 	enum ExType
 	{
@@ -42,28 +45,29 @@ namespace
 		}
 	}
 
-	std::shared_ptr<WindowEventStruct_KeyEvent> createWindowEventInfo_Key(WindowEvent evt, WPARAM keycode, LPARAM options)
+	std::shared_ptr<KeyInfo> createKeyInfo(Window *wnd, WindowEvent evt, WPARAM keycode, LPARAM options)
 	{
-		std::shared_ptr<WindowEventStruct_KeyEvent> infostruct = std::shared_ptr<WindowEventStruct_KeyEvent>(new WindowEventStruct_KeyEvent);
+		std::shared_ptr<KeyInfo> infostruct = std::shared_ptr<KeyInfo>(new KeyInfo);
 		infostruct->evt = evt;
 		Key k = Key::KEY_UNKNOWN;
 		auto i = SUPPORTED_KEYS.find(keycode);
 		if (i != SUPPORTED_KEYS.end()) k = i->second;
 		infostruct->key = k;
+		infostruct->wnd = wnd;
 
 		if (infostruct->key == Key::KEY_UNKNOWN) return std::move(infostruct);
 
 		infostruct->scancode = (reinterpret_cast<int8_t*>(&options)[2] & 0xF0);
 		infostruct->wasPressed = (reinterpret_cast<int8_t*>(&options)[3] & 0b01000000) != 0;
 
-		return std::move(infostruct);
+		return infostruct;
 	}
 }
 
 LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (init_call) return DefWindowProc(hWnd, uMsg, wParam, lParam);
-	Window &current_wnd = *reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	ImplWindow &current_wnd = *reinterpret_cast<ImplWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 	switch (uMsg) {
 	case WM_CLOSE:
@@ -77,11 +81,11 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 		break;
 	case WM_KEYUP:
 	{
-		current_wnd.eventObserver->fire(current_wnd, std::move(createWindowEventInfo_Key(WindowEvent::EVENT_KEY_UP, wParam, lParam)));
+		current_wnd.eventObserver->fire(createKeyInfo(current_wnd.wnd, WindowEvent::EVENT_KEY_UP, wParam, lParam));
 	}
 	case WM_KEYDOWN:
 	{
-		current_wnd.eventObserver->fire(current_wnd, std::move(createWindowEventInfo_Key(WindowEvent::EVENT_KEY_DOWN, wParam, lParam)));
+		current_wnd.eventObserver->fire(createKeyInfo(current_wnd.wnd, WindowEvent::EVENT_KEY_DOWN, wParam, lParam));
 	}
 	default:
 		break;
@@ -90,9 +94,9 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-uint64_t Window::impl_win32_class_id_counter = 0;
+uint64_t ImplWindow::impl_win32_class_id_counter = 0;
 
-void Window::impl_init()
+void ImplWindow::impl_init()
 {
 	WNDCLASSEX win_class{};
 
@@ -120,7 +124,7 @@ void Window::impl_init()
 
 	// Register window class:
 	if (!RegisterClassEx(&win_class)) {
-		throw DevaExternalFailureException("Could not create window.", "Windows", "RegisterClassEx", "DevaFramework::Window::initOSWindow");
+		throw DevaExternalFailureException("Could not create window.", "Windows", "RegisterClassEx", "DevaFramework::ImplWindow::initOSWindow");
 	}
 
 	DWORD ex_style = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
@@ -147,7 +151,7 @@ void Window::impl_init()
 	init_call = false;
 
 	if (!this->impl_win32_window) {
-		throw DevaExternalFailureException("Could not create window.", "Windows", "CreateWindowEx", "DevaFramework::Window::initOSWindow");
+		throw DevaExternalFailureException("Could not create window.", "Windows", "CreateWindowEx", "DevaFramework::ImplWindow::initOSWindow");
 	}
 
 	hwnd_map.insert({this->impl_win32_window, this});
@@ -159,7 +163,7 @@ void Window::impl_init()
 	SetFocus(this->impl_win32_window);
 }
 
-void Window::impl_move(Window &&wnd)
+void ImplWindow::impl_move(ImplWindow &&wnd)
 {
 	this->impl_win32_class_id_counter = wnd.impl_win32_class_id_counter;
 	wnd.impl_win32_class_id_counter = NULL;
@@ -173,13 +177,14 @@ void Window::impl_move(Window &&wnd)
 	SetWindowLongPtr(this->impl_win32_window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 }
 
-void Window::impl_deInit()
+void ImplWindow::impl_deInit()
 {
+	if (this->impl_win32_instance == NULL) return;
 	DestroyWindow(this->impl_win32_window);
 	UnregisterClass(this->impl_win32_class_name.c_str(), this->impl_win32_instance);
 }
 
-void Window::impl_update()
+void ImplWindow::impl_update()
 {
 	if (ex.second) downcastExAndThrow(ex);
 

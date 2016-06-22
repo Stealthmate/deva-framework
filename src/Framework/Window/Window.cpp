@@ -1,4 +1,4 @@
-#include "Window.hpp"
+#include "ImplWindow.hpp"
 
 #include "../DevaLogger.hpp"
 
@@ -13,45 +13,43 @@ namespace
 
 Window& Window::openWindow(uint32_t width, uint32_t height, const std::string &name)
 {
-	Window wnd = Window(width, height, name);
-	window_list.push_back(std::move(wnd));
+	window_list.push_back(std::move(Window(width, height, name)));
+	DevaLogger::log << window_list[window_list.size() - 1].impl->surface_width << " \n";
 	return window_list[window_list.size() - 1];
 }
 
 Window::Window(uint32_t width, uint32_t height, const std::string &name)
-	: surface_width(width), surface_height(height), name(name), eventObserver(std::shared_ptr<WindowObserver>(new WindowObserver()))
-{
-	this->impl_init();
-}
+	:impl(new ImplWindow(this, width, height, name))
+{}
 
-Window::Window(Window &&wnd)
-	: surface_width(wnd.surface_width), surface_height(wnd.surface_height), name(wnd.name), eventObserver(std::move(wnd.eventObserver))
-{
-	this->impl_move(std::move(wnd));
-	wnd.surface_width = 0;
-	wnd.surface_height = 0;
-	wnd.name = "";
-}
+Window::Window(Window &&wnd) : impl(new ImplWindow(std::move(*wnd.impl), this))
+{}
+
+Window::~Window() = default;
+
+Window& Window::operator=(Window &&wnd) = default;
 
 WindowObserver& Window::getEventObserver()
 {
-	return *this->eventObserver;
+	return this->impl->getEventObserver();
 }
 
 bool Window::update()
 {
-	this->impl_update();
-	return window_should_run;
+	return this->impl->update();
 }
 
 void Window::close()
 {
-	this->window_should_run = false;
+	this->impl->close();
 }
 
-Window::~Window()
+void* Window::getUserData() const
 {
-	impl_deInit();
+	return this->impl->getUserData();
 }
 
-
+void Window::setUserData(void *userData)
+{
+	this->impl->setUserData(userData);
+}

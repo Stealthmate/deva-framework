@@ -6,6 +6,12 @@ set(
 	${CURDIR}/Renderer.hpp
 	${CURDIR}/Init.cpp
 	${CURDIR}/Init.hpp
+	${CURDIR}/Input/KeyboardListener.hpp
+	${CURDIR}/Input/MouseListener.hpp
+	${CURDIR}/Input/InputListener.cpp
+	${CURDIR}/Input/InputListener.hpp
+	${CURDIR}/Input/InputFunction.cpp
+	${CURDIR}/Input/InputFunction.hpp
 	${CURDIR}/DevaEngineInstance.cpp
 	${CURDIR}/DevaEngineInstance.hpp
 	${CURDIR}/Config.hpp
@@ -17,4 +23,8 @@ set(
 	${CURDIR}/Renderer.hpp
 	${CURDIR}/DevaEngineInstance.hpp
 	${CURDIR}/Config.hpp
+	${CURDIR}/Input/KeyboardListener.hpp
+	${CURDIR}/Input/MouseListener.hpp
+	${CURDIR}/Input/InputListener.hpp
+	${CURDIR}/Input/InputFunction.hpp
 )

@@ -1,12 +1,10 @@
 #include "WindowObserver.hpp"
 
-#include "Window.hpp"
-
 using namespace DevaFramework;
 
 DevaFramework::WindowObserver::WindowObserver() : event_listeners() {}
 
-void DevaFramework::WindowObserver::attachListener(WindowEvent evt, std::shared_ptr<WindowEventListener>&& evtlstnr)
+void DevaFramework::WindowObserver::attachListener(WindowEvent evt, std::shared_ptr<WindowEventListener>& evtlstnr)
 {
 	auto evt_key = this->event_listeners.find(evt);
 	if (evt_key == this->event_listeners.end())
@@ -35,7 +33,7 @@ void DevaFramework::WindowObserver::attachListener(
 	}
 }
 
-void DevaFramework::WindowObserver::fire(Window& wnd, std::shared_ptr<WindowEventStruct> evt)
+void DevaFramework::WindowObserver::fire(std::shared_ptr<WindowEventStruct> evt)
 {
 	WindowEvent evttype = evt->evt;
 	
@@ -51,7 +49,7 @@ void DevaFramework::WindowObserver::fire(Window& wnd, std::shared_ptr<WindowEven
 		{
 			for (std::shared_ptr<WindowEventListener> &lstnr : listener_list)
 			{
-				lstnr->onKeyEvent(wnd, *reinterpret_cast<WindowEventStruct_KeyEvent*>(evt.get()));
+				lstnr->onKeyEvent(*reinterpret_cast<WindowEventStruct_KeyEvent*>(evt.get()));
 			}
 		}
 	}

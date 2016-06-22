@@ -1,13 +1,14 @@
 option(BUILD_SHARED_LIBS "Build the shared library" ON)
 set(LIBTYPE STATIC)
 if(BUILD_SHARED_LIBS)
-set(DEVA_BUILD_DEFINES DEVA_BUILD_SHARED)
+set(DEVA_BUILD_DEFINES DEVA_BUILD_FRAMEWORK_SHARED)
 set(LIBTYPE SHARED)
 endif()
 
 message("Generating DevaFramework build files...")
 
 include(${CURDIR}/CMakeSourceList.txt)
+
 set(SRCS ${DEVA_FRAMEWORK_SOURCE_LIST})
 add_library(deva-Framework ${LIBTYPE} ${SRCS})
 

@@ -6,7 +6,7 @@
 namespace DevaFramework
 {
 	///These were copied from GLFW
-	enum Key
+	enum Key : int32_t
 	{
 		KEY_UNKNOWN = -1,
 		KEY_SPACE = 32,

@@ -12,8 +12,6 @@
 
 namespace DevaFramework
 {
-	class Window;
-
 	class WindowObserver
 	{
 	private:
@@ -22,13 +20,13 @@ namespace DevaFramework
 	public:
 		DEVA_FRAMEWORK_API WindowObserver();
 
-		DEVA_FRAMEWORK_API void attachListener(WindowEvent evt, std::shared_ptr<WindowEventListener> &&evtlstnr);
+		DEVA_FRAMEWORK_API void attachListener(WindowEvent evt, std::shared_ptr<WindowEventListener> &evtlstnr);
 		DEVA_FRAMEWORK_API void attachListener(
 			std::initializer_list<WindowEvent> evts, 
 			std::shared_ptr<WindowEventListener> &&evtlstnr);
 		DEVA_FRAMEWORK_API void attachListeners(WindowEvent evt, std::initializer_list<std::shared_ptr<WindowEventListener>&&> listeners);
 
-		DEVA_FRAMEWORK_API void fire(Window& wnd, std::shared_ptr<WindowEventStruct> evt);
+		DEVA_FRAMEWORK_API void fire(std::shared_ptr<WindowEventStruct> evt);
 	};
 }
 
