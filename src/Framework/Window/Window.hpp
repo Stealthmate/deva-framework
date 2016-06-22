@@ -12,10 +12,15 @@ namespace DevaFramework
 	{
 	public:
 		class ImplWindow;
-	private:
-		std::unique_ptr<ImplWindow> impl;
+		struct ImplWindowDeleter
+		{
+			DEVA_FRAMEWORK_API void operator()(ImplWindow *p);
+		};
 
-		DEVA_FRAMEWORK_API Window(uint32_t size_x, uint32_t size_y, const std::string &name);
+	private:
+		std::unique_ptr<ImplWindow, ImplWindowDeleter> impl;
+
+		Window(uint32_t size_x, uint32_t size_y, const std::string &name);
 	public:
 		DEVA_FRAMEWORK_API static Window& openWindow(uint32_t width, uint32_t height, const std::string &name);
 	
