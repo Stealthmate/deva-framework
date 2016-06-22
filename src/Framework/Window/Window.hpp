@@ -28,6 +28,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API Window(Window &&wnd);
 		Window& operator=(const Window &wnd) = delete;
 		DEVA_FRAMEWORK_API Window& operator=(Window &&wnd);
+		DEVA_FRAMEWORK_API ~Window();
 
 		DEVA_FRAMEWORK_API bool update();
 		DEVA_FRAMEWORK_API void close();
