@@ -32,6 +32,9 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API WindowObserver& getEventObserver();
 		DEVA_FRAMEWORK_API const WindowObserver& getEventObserver() const;
 		DEVA_FRAMEWORK_API void setWindowObserver();
+
+		DEVA_FRAMEWORK_API void* getUserData() const;
+		DEVA_FRAMEWORK_API void setUserData(void* data);
 	};
 }
 

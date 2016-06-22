@@ -5,10 +5,14 @@
 
 #include "Events.hpp"
 
+#include <memory>
+
 namespace DevaFramework
 {
+	class Window;
 	struct WindowEventStruct
 	{
+		Window* wnd;
 		WindowEvent evt;
 	};
 

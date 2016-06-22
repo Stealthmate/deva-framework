@@ -20,6 +20,8 @@ using ImplWindow = Window::ImplWindow;
 namespace
 {
 
+	typedef WindowEventStruct_KeyEvent KeyInfo;
+
 	std::map<HWND, ImplWindow*>  hwnd_map;
 
 	enum ExType
@@ -43,21 +45,22 @@ namespace
 		}
 	}
 
-	std::shared_ptr<WindowEventStruct_KeyEvent> createWindowEventInfo_Key(WindowEvent evt, WPARAM keycode, LPARAM options)
+	std::shared_ptr<KeyInfo> createKeyInfo(Window *wnd, WindowEvent evt, WPARAM keycode, LPARAM options)
 	{
-		std::shared_ptr<WindowEventStruct_KeyEvent> infostruct = std::shared_ptr<WindowEventStruct_KeyEvent>(new WindowEventStruct_KeyEvent);
+		std::shared_ptr<KeyInfo> infostruct = std::shared_ptr<KeyInfo>(new KeyInfo);
 		infostruct->evt = evt;
 		Key k = Key::KEY_UNKNOWN;
 		auto i = SUPPORTED_KEYS.find(keycode);
 		if (i != SUPPORTED_KEYS.end()) k = i->second;
 		infostruct->key = k;
+		infostruct->wnd = wnd;
 
 		if (infostruct->key == Key::KEY_UNKNOWN) return std::move(infostruct);
 
 		infostruct->scancode = (reinterpret_cast<int8_t*>(&options)[2] & 0xF0);
 		infostruct->wasPressed = (reinterpret_cast<int8_t*>(&options)[3] & 0b01000000) != 0;
 
-		return std::move(infostruct);
+		return infostruct;
 	}
 }
 
@@ -78,11 +81,11 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 		break;
 	case WM_KEYUP:
 	{
-		current_wnd.eventObserver->fire(std::move(createWindowEventInfo_Key(WindowEvent::EVENT_KEY_UP, wParam, lParam)));
+		current_wnd.eventObserver->fire(createKeyInfo(current_wnd.wnd, WindowEvent::EVENT_KEY_UP, wParam, lParam));
 	}
 	case WM_KEYDOWN:
 	{
-		current_wnd.eventObserver->fire(std::move(createWindowEventInfo_Key(WindowEvent::EVENT_KEY_DOWN, wParam, lParam)));
+		current_wnd.eventObserver->fire(createKeyInfo(current_wnd.wnd, WindowEvent::EVENT_KEY_DOWN, wParam, lParam));
 	}
 	default:
 		break;
@@ -176,6 +179,7 @@ void ImplWindow::impl_move(ImplWindow &&wnd)
 
 void ImplWindow::impl_deInit()
 {
+	if (this->impl_win32_instance == NULL) return;
 	DestroyWindow(this->impl_win32_window);
 	UnregisterClass(this->impl_win32_class_name.c_str(), this->impl_win32_instance);
 }
