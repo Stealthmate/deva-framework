@@ -33,7 +33,7 @@ void DevaFramework::WindowObserver::attachListener(
 	}
 }
 
-void DevaFramework::WindowObserver::fire(std::shared_ptr<WindowEventStruct> evt)
+void DevaFramework::WindowObserver::fire(std::shared_ptr<EventInfo> evt)
 {
 	WindowEvent evttype = evt->evt;
 	
@@ -49,8 +49,13 @@ void DevaFramework::WindowObserver::fire(std::shared_ptr<WindowEventStruct> evt)
 		{
 			for (std::shared_ptr<WindowEventListener> &lstnr : listener_list)
 			{
-				lstnr->onKeyEvent(*reinterpret_cast<WindowEventStruct_KeyEvent*>(evt.get()));
+				lstnr->onKeyEvent(*reinterpret_cast<KeyEventInfo*>(evt.get()));
 			}
 		}
 	}
+}
+
+void WindowObserver::addInputListener(std::shared_ptr<InputListener> inputlstnr)
+{
+	this->inputListeners.push_back(inputlstnr);
 }

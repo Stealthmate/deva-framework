@@ -35,6 +35,7 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API void* getUserData() const;
 		DEVA_FRAMEWORK_API void setUserData(void* data);
+
 	};
 }
 

@@ -1,23 +1,53 @@
+#ifndef DEVA_FRAMEWORK_WINDOW_WIN_IMPL_KEYCODE_MAPPING_INL
+#define DEVA_FRAMEWORK_WINDOW_WIN_IMPL_KEYCODE_MAPPING_INL
+
 #include "../Input.hpp"
 
 #include <map>
 #include <windows.h>
 
-const int IMPL_VK_0 = 0x30;
-const int IMPL_VK_1 = 0x31;
-const int IMPL_VK_2 = 0x32;
-const int IMPL_VK_3 = 0x33;
-const int IMPL_VK_4 = 0x34;
-const int IMPL_VK_5 = 0x35;
-const int IMPL_VK_6 = 0x36;
-const int IMPL_VK_7 = 0x37;
-const int IMPL_VK_8 = 0x38;
-const int IMPL_VK_9 = 0x39;
+const UINT IMPL_VK_0 = 0x30;
+const UINT IMPL_VK_1 = 0x31;
+const UINT IMPL_VK_2 = 0x32;
+const UINT IMPL_VK_3 = 0x33;
+const UINT IMPL_VK_4 = 0x34;
+const UINT IMPL_VK_5 = 0x35;
+const UINT IMPL_VK_6 = 0x36;
+const UINT IMPL_VK_7 = 0x37;
+const UINT IMPL_VK_8 = 0x38;
+const UINT IMPL_VK_9 = 0x39;
+
+const UINT IMPL_VK_A = 0x41;
+const UINT IMPL_VK_B = 0x42;
+const UINT IMPL_VK_C = 0x43;
+const UINT IMPL_VK_D = 0x44;
+const UINT IMPL_VK_E = 0x45;
+const UINT IMPL_VK_F = 0x46;
+const UINT IMPL_VK_G = 0x47;
+const UINT IMPL_VK_H = 0x48;
+const UINT IMPL_VK_I = 0x49;
+const UINT IMPL_VK_J = 0x4A;
+const UINT IMPL_VK_K = 0x4B;
+const UINT IMPL_VK_L = 0x4C;
+const UINT IMPL_VK_M = 0x4D;
+const UINT IMPL_VK_N = 0x4E;
+const UINT IMPL_VK_O = 0x4F;
+const UINT IMPL_VK_P = 0x50;
+const UINT IMPL_VK_Q = 0x51;
+const UINT IMPL_VK_R = 0x52;
+const UINT IMPL_VK_S = 0x53;
+const UINT IMPL_VK_T = 0x54;
+const UINT IMPL_VK_U = 0x55;
+const UINT IMPL_VK_V = 0x56;
+const UINT IMPL_VK_W = 0x57;
+const UINT IMPL_VK_X = 0x58;
+const UINT IMPL_VK_Y = 0x59;
+const UINT IMPL_VK_Z = 0x5A;
 
 namespace DevaFramework
 {
 
-	typedef WPARAM WinKey;
+	typedef UINT WinKey;
 	typedef DevaFramework::Key DevaKey;
 
 	std::map<WinKey, DevaKey> SUPPORTED_KEYS =
@@ -39,37 +69,36 @@ namespace DevaFramework
 		{ IMPL_VK_7, DevaKey::KEY_7 },
 		{ IMPL_VK_8, DevaKey::KEY_8 },
 		{ IMPL_VK_9, DevaKey::KEY_9 },
-
+		{ VK_OEM_PLUS, DevaKey::KEY_EQUAL },
+		{ VK_OEM_1, DevaKey::KEY_SEMICOLON },
+		{ IMPL_VK_A, DevaKey::KEY_A },
+		{ IMPL_VK_B, DevaKey::KEY_B },
+		{ IMPL_VK_C, DevaKey::KEY_C },
+		{ IMPL_VK_D, DevaKey::KEY_D },
+		{ IMPL_VK_E, DevaKey::KEY_E },
+		{ IMPL_VK_F, DevaKey::KEY_F },
+		{ IMPL_VK_G, DevaKey::KEY_G },
+		{ IMPL_VK_H, DevaKey::KEY_H },
+		{ IMPL_VK_I, DevaKey::KEY_I },
+		{ IMPL_VK_J, DevaKey::KEY_J },
+		{ IMPL_VK_K, DevaKey::KEY_K },
+		{ IMPL_VK_L, DevaKey::KEY_L },
+		{ IMPL_VK_M, DevaKey::KEY_M },
+		{ IMPL_VK_N, DevaKey::KEY_N },
+		{ IMPL_VK_O, DevaKey::KEY_O },
+		{ IMPL_VK_P, DevaKey::KEY_P },
+		{ IMPL_VK_Q, DevaKey::KEY_Q },
+		{ IMPL_VK_R, DevaKey::KEY_R },
+		{ IMPL_VK_S, DevaKey::KEY_S },
+		{ IMPL_VK_T, DevaKey::KEY_T },
+		{ IMPL_VK_U, DevaKey::KEY_U },
+		{ IMPL_VK_V, DevaKey::KEY_V },
+		{ IMPL_VK_W, DevaKey::KEY_W },
+		{ IMPL_VK_X, DevaKey::KEY_X },
+		{ IMPL_VK_Y, DevaKey::KEY_Y },
+		{ IMPL_VK_Z, DevaKey::KEY_Z },
 
 		/*
-		KEY_SEMICOLON = 59,
-		KEY_EQUAL = 61,
-		KEY_A = 65,
-		KEY_B = 66,
-		KEY_C = 67,
-		KEY_D = 68,
-		KEY_E = 69,
-		KEY_F = 70,
-		KEY_G = 71,
-		KEY_H = 72,
-		KEY_I = 73,
-		KEY_J = 74,
-		KEY_K = 75,
-		KEY_L = 76,
-		KEY_M = 77,
-		KEY_N = 78,
-		KEY_O = 79,
-		KEY_P = 80,
-		KEY_Q = 81,
-		KEY_R = 82,
-		KEY_S = 83,
-		KEY_T = 84,
-		KEY_U = 85,
-		KEY_V = 86,
-		KEY_W = 87,
-		KEY_X = 88,
-		KEY_Y = 89,
-		KEY_Z = 90,
 		KEY_LEFT_BRACKET = 91,
 		KEY_BACKSLASH = 92,
 		KEY_RIGHT_BRACKET = 93,
@@ -149,4 +178,13 @@ namespace DevaFramework
 		KEY_MENU = 348,
 		KEY_LAST = */
 	};
+
+	DevaKey getDevaKey(WinKey winkey)
+	{
+		auto i = SUPPORTED_KEYS.find(winkey);
+		if (i == SUPPORTED_KEYS.end()) return Key::KEY_UNKNOWN;
+		return i->second;
+	}
 }
+
+#endif //DEVA_FRAMEWORK_WINDOW_WIN_IMPL_KEYCODE_MAPPING_INL

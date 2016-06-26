@@ -9,7 +9,8 @@ namespace DevaFramework
 	enum WindowEvent
 	{
 		EVENT_KEY_UP = 0,
-		EVENT_KEY_DOWN = 1
+		EVENT_KEY_DOWN = 1,
+		EVENT_KEYBOARD = 2
 	};
 }
 

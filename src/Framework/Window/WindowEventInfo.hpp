@@ -9,18 +9,37 @@
 
 namespace DevaFramework
 {
+	struct InputEventInfo;
+
 	class Window;
-	struct WindowEventStruct
+
+	struct EventInfo
 	{
 		Window* wnd;
 		WindowEvent evt;
 	};
 
-	struct WindowEventStruct_KeyEvent : public WindowEventStruct
+	struct KeyboardEventInfo : public EventInfo
+	{
+		Key key;
+		bool repeat;
+	};
+
+	struct KeyEventInfo : public EventInfo
 	{
 		Key key;
 		uint8_t scancode;
 		bool wasPressed;
+	};
+
+	struct CharEventInfo : public EventInfo
+	{
+		uint32_t charcode;
+	};
+
+	struct WindowEventStruct_MouseButtonEvent
+	{
+
 	};
 
 }
