@@ -22,8 +22,6 @@ using ImplWindow = Window::ImplWindow;
 namespace
 {
 
-	typedef KeyEventInfo KeyInfo;
-
 	std::map<HWND, ImplWindow*>  hwnd_map;
 
 	enum ExType
@@ -98,9 +96,9 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 
 		// extract keyboard raw input data
 		RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(buffer);
-		InputEventInfo info;
+		WindowEventInfo info;
 		info.inputData = raw;
-		current_wnd.eventObserver->fire_InputEvent(info);
+		current_wnd.eventObserver->fire(info);
 	}
 	default:
 		break;

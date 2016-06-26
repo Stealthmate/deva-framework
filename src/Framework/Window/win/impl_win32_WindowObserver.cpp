@@ -2,11 +2,9 @@
 #include "impl_win32_EventInfo.hpp"
 #include "impl_keycode_mapping.inl"
 
-
 using namespace DevaFramework;
 
 #ifdef DEVA_OS_WIN32
-
 
 namespace
 {
@@ -133,13 +131,10 @@ namespace
 		}
 
 		return getDevaKey(virtualKey);
-
 	}
 }
 
-#include "../../DevaLogger.hpp"
-
-void WindowObserver::fire_InputEvent(const InputEventInfo &eventInfo)
+void WindowObserver::fire(const WindowEventInfo &eventInfo)
 {
 	//TODO: Implement OS-specific input parsing
 
@@ -166,8 +161,7 @@ void WindowObserver::fire_InputEvent(const InputEventInfo &eventInfo)
 		GetKeyNameText((LONG)key, buffer, 512);*/
 
 		Key key = mapDevaKey(virtualKey, scanCode, flags);
-		DevaLogger::log << "Pressed " << key << "\n";
-		for (auto &lstnr : this->inputListeners)
+		for (auto &lstnr : this->windowListeners)
 		{
 			if (release) lstnr->onKeyUp(key);
 			else lstnr->onKeyDown(key);

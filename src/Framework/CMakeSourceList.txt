@@ -187,7 +187,6 @@ set(
 	DEVA_FRAMEWORK_SOURCE_LIST
 	${DEVA_FRAMEWORK_SOURCE_LIST}
 	${CURDIR}/Config.hpp
-	${CURDIR}/Events.hpp
 	${CURDIR}/Init.cpp
 	${CURDIR}/Init.hpp
 	${CURDIR}/Input.hpp
@@ -196,28 +195,27 @@ set(
 	${CURDIR}/Window.hpp
 	${CURDIR}/ImplWindow.cpp
 	${CURDIR}/ImplWindow.hpp
-	${CURDIR}/InputDevice.hpp
-	${CURDIR}/WindowEventInfo.hpp
-	${CURDIR}/WindowEventListener.cpp
 	${CURDIR}/WindowEventListener.hpp
+	${CURDIR}/WindowEventInfo.hpp
 	${CURDIR}/WindowObserver.cpp
 	${CURDIR}/WindowObserver.hpp
 	${CURDIR}/win/impl_win32_Window.cpp
 	${CURDIR}/win/impl_keycode_mapping.inl
+	${CURDIR}/win/impl_win32_EventInfo.hpp
+	${CURDIR}/win/impl_win32_WindowObserver.cpp
 )
 
 set(
 	DEVA_FRAMEWORK_PUBLIC_HEADERS
 	${DEVA_FRAMEWORK_PUBLIC_HEADERS}
 	${CURDIR}/Config.hpp
-	${CURDIR}/Events.hpp
 	${CURDIR}/Init.hpp
 	${CURDIR}/Input.hpp
 	${CURDIR}/Master.hpp
 	${CURDIR}/Window.hpp
 	${CURDIR}/WindowObserver.hpp
-	${CURDIR}/WindowEventListener.hpp
 	${CURDIR}/WindowEventInfo.hpp
+	${CURDIR}/WindowEventListener.hpp
 )
 
 

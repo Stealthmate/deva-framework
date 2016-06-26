@@ -3,7 +3,6 @@
 #include <DevaFramework/DevaLogger.hpp>
 
 using namespace DevaEngine;
-using namespace DevaFramework;
 
 namespace
 {
@@ -11,17 +10,17 @@ namespace
 	{
 	public:
 
-		virtual bool onKeyPress(Key k, uint8_t mods)
+		virtual bool onKeyPress(DevaFramework::Key k, uint8_t mods)
 		{
 			//DevaLogger::log << "Pressed " << k << "\n";
 			return true;
 		}
-		virtual bool onKeyRepeat(Key k, uint8_t mods)
+		virtual bool onKeyRepeat(DevaFramework::Key k, uint8_t mods)
 		{
 			//DevaLogger::log << "Held " << k << "\n";
 			return true;
 		}
-		virtual bool onKeyRelease(Key k, uint8_t mods)
+		virtual bool onKeyRelease(DevaFramework::Key k, uint8_t mods)
 		{
 			//DevaLogger::log << "Released " << k << "\n";
 			return true;
@@ -48,7 +47,7 @@ void InputListener::setKeyboardListener(const std::shared_ptr<KeyboardInputListe
 	this->keyboardListener = kblstnr;
 }
 
-void InputListener::onKeyboardAction(Key k, KeyboardAction kact, uint8_t mods)
+void InputListener::onKeyboardAction(DevaFramework::Key k, KeyboardAction kact, uint8_t mods)
 {
 
 	switch (kact)

@@ -3,7 +3,6 @@
 
 #include "Config.hpp"
 #include "Window.hpp"
-#include "ImplInputDevice.hpp"
 
 #include <map>
 
@@ -35,8 +34,6 @@ namespace DevaFramework
 		bool window_should_run = true;
 
 		std::shared_ptr<WindowObserver> eventObserver;
-		std::map<DeviceHandle, ImplInputDevice> inputs;
-
 
 		void* userData;
 

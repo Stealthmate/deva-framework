@@ -38,7 +38,7 @@ namespace
 		// The name of the engine (e.g: Game engine name)
 		DEFAULT_APPLICATION_SETTINGS.pEngineName = "Deva Engine";
 		// The version of the engine
-		DEFAULT_APPLICATION_SETTINGS.engineVersion = DEVA_VERSION;
+		DEFAULT_APPLICATION_SETTINGS.engineVersion = *reinterpret_cast<const uint32_t*>(&DEVA_VERSION);
 		// The version of Vulkan we're using for this application
 		DEFAULT_APPLICATION_SETTINGS.apiVersion = VK_MAKE_VERSION(1, 0, 13);
 
@@ -132,7 +132,7 @@ void GraphicsState::initVulkan(const VkInstanceCreateInfo &vulkan_info)
 	}
 }
 
-uint32_t DevaFramework::GraphicsState::getPhysicalDeviceCount()
+size_t DevaFramework::GraphicsState::getPhysicalDeviceCount()
 {
 	return available_physical_devices.size();
 }

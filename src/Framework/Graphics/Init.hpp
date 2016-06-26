@@ -23,7 +23,7 @@ namespace DevaFramework {
 	public:
 
 		DEVA_FRAMEWORK_API static VkInstanceCreateInfo DEFAULT_INSTANCE_SETTINGS;
-		DEVA_FRAMEWORK_API static uint32_t getPhysicalDeviceCount();
+		DEVA_FRAMEWORK_API static size_t getPhysicalDeviceCount();
 
 		DEVA_FRAMEWORK_API static const VulkanPhysicalDevice& getPhysicalDevice(uint32_t i);
 	};

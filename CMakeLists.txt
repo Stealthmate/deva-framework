@@ -25,8 +25,8 @@ set(DevaFramework_VERSION_MINOR 0)
 #Set include path
 include_directories("include/")
 link_directories("lib/" "bin/lib")
-set(DEVA_VERSION 0.2)
-add_definitions(-DDEVA_VERSION=${DEVA_VERSION})
+set(DEVA_VERSION 0.2f)
+add_definitions(-DDEVA_VERSION_MACRO=${DEVA_VERSION})
 
 set(REQUIRED_COMPILER_VERSION_GCC "4.8")
 set(REQUIRED_COMPILER_VERSION_MSVC "19.0")
