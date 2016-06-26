@@ -28,7 +28,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API const VkPhysicalDevice getHandle() const;
 		DEVA_FRAMEWORK_API const VkPhysicalDeviceProperties getProperties() const;
 		DEVA_FRAMEWORK_API const VkPhysicalDeviceFeatures getFeatures() const;
-		DEVA_FRAMEWORK_API int getQueueFamiliyCount() const;
+		DEVA_FRAMEWORK_API size_t getQueueFamiliyCount() const;
 		DEVA_FRAMEWORK_API const VkQueueFamilyProperties& getQueueFamiliy(int i) const;
 
 		DEVA_FRAMEWORK_API std::string to_string() const;

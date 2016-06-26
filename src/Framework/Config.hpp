@@ -42,11 +42,14 @@ namespace DevaFramework
 	typedef uint32_t TextureID;
 
 	typedef uint8_t byte_t;
-}
 
+	const float DEVA_VERSION = DEVA_VERSION_MACRO;
+}
 
 #ifdef DEVA_DEBUG
 #include "DevaLogger.hpp"
 #endif
+
+
 
 #endif // DEVA_FRAMEWORK_CONFIG_H

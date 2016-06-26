@@ -48,7 +48,7 @@ const VkPhysicalDeviceFeatures VulkanPhysicalDevice::getFeatures() const
 	return features;
 }
 
-int DevaFramework::VulkanPhysicalDevice::getQueueFamiliyCount() const
+size_t DevaFramework::VulkanPhysicalDevice::getQueueFamiliyCount() const
 {
 	return queueFamilies.size();
 }
