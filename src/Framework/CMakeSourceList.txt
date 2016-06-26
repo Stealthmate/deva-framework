@@ -197,6 +197,7 @@ set(
 	${CURDIR}/ImplWindow.cpp
 	${CURDIR}/ImplWindow.hpp
 	${CURDIR}/InputDevice.hpp
+	${CURDIR}/InputListener.hpp
 	${CURDIR}/WindowEventInfo.hpp
 	${CURDIR}/WindowEventListener.cpp
 	${CURDIR}/WindowEventListener.hpp
@@ -204,6 +205,8 @@ set(
 	${CURDIR}/WindowObserver.hpp
 	${CURDIR}/win/impl_win32_Window.cpp
 	${CURDIR}/win/impl_keycode_mapping.inl
+	${CURDIR}/win/impl_win32_EventInfo.hpp
+	${CURDIR}/win/impl_win32_WindowObserver.cpp
 )
 
 set(
@@ -218,6 +221,7 @@ set(
 	${CURDIR}/WindowObserver.hpp
 	${CURDIR}/WindowEventListener.hpp
 	${CURDIR}/WindowEventInfo.hpp
+	${CURDIR}/InputListener.hpp
 )
 
 

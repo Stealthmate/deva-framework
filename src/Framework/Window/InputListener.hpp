@@ -11,7 +11,6 @@ namespace DevaFramework
 	struct InputListener
 	{
 		DEVA_FRAMEWORK_API virtual bool onKeyDown(Key k);
-		DEVA_FRAMEWORK_API virtual bool onKeyRepeat(Key k);
 		DEVA_FRAMEWORK_API virtual bool onKeyUp(Key k);
 
 		DEVA_FRAMEWORK_API virtual bool onMouseMove();

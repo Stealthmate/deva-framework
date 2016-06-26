@@ -129,11 +129,7 @@ namespace DevaFramework
 		KEY_RIGHT_CONTROL = 345,
 		KEY_RIGHT_ALT = 346,
 		KEY_RIGHT_SUPER = 347,
-		KEY_MENU = 348,
-		KEY_ARBITRARY_ALT = 349,
-		KEY_ARBITRARY_CTRL = 350,
-		KEY_ARBITRARY_SUPER = 351,
-		//KEY_LAST = KEY_MENU
+		KEY_MENU = 348
 	};
 
 	/*! @brief If this bit is set one or more Shift keys were held down.

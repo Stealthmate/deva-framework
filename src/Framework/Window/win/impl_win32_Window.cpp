@@ -22,8 +22,6 @@ using ImplWindow = Window::ImplWindow;
 namespace
 {
 
-	typedef KeyEventInfo KeyInfo;
-
 	std::map<HWND, ImplWindow*>  hwnd_map;
 
 	enum ExType
