@@ -4,4 +4,4 @@
 
 using namespace DevaFramework;
 
-bool WindowEventListener::onKeyEvent(WindowEventStruct_KeyEvent evtinfo) { return false; }
+bool WindowEventListener::onKeyEvent(KeyEventInfo evtinfo) { return false; }

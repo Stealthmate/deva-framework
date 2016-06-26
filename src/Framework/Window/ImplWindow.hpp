@@ -3,6 +3,9 @@
 
 #include "Config.hpp"
 #include "Window.hpp"
+#include "ImplInputDevice.hpp"
+
+#include <map>
 
 #ifdef DEVA_OS_WIN32
 #include <windows.h>
@@ -12,6 +15,15 @@ namespace DevaFramework
 {
 	class Window::ImplWindow
 	{
+#ifdef DEVA_OS_WIN32
+		friend LRESULT CALLBACK WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+		HINSTANCE		impl_win32_instance;
+		HWND			impl_win32_window;
+		std::string		impl_win32_class_name;
+		static uint64_t	impl_win32_class_id_counter;
+		typedef HANDLE DeviceHandle;
+#endif
 		friend class Window;
 
 		Window * wnd;
@@ -23,18 +35,11 @@ namespace DevaFramework
 		bool window_should_run = true;
 
 		std::shared_ptr<WindowObserver> eventObserver;
+		std::map<DeviceHandle, ImplInputDevice> inputs;
+
 
 		void* userData;
 
-
-#ifdef DEVA_OS_WIN32
-		friend LRESULT CALLBACK WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-		HINSTANCE		impl_win32_instance;
-		HWND			impl_win32_window;
-		std::string		impl_win32_class_name;
-		static uint64_t	impl_win32_class_id_counter;
-#endif
 
 		void impl_init();
 		void impl_move(ImplWindow &&wnd);

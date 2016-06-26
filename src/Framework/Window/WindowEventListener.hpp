@@ -15,7 +15,7 @@ namespace DevaFramework
 	{
 	public:
 		//Method declarations for supported events
-		DEVA_FRAMEWORK_API virtual bool onKeyEvent(WindowEventStruct_KeyEvent evtinfo);
+		DEVA_FRAMEWORK_API virtual bool onKeyEvent(KeyEventInfo evtinfo);
 	};
 }
 

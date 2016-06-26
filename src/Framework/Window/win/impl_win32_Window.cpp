@@ -8,7 +8,9 @@
 
 #include "../../DevaLogger.hpp"
 
-#include "impl_keycode_mapping.inl"
+//#include "impl_keycode_mapping.inl"
+#include "impl_win32_EventInfo.hpp"
+
 
 #include <map>
 #include <memory>
@@ -20,7 +22,7 @@ using ImplWindow = Window::ImplWindow;
 namespace
 {
 
-	typedef WindowEventStruct_KeyEvent KeyInfo;
+	typedef KeyEventInfo KeyInfo;
 
 	std::map<HWND, ImplWindow*>  hwnd_map;
 
@@ -45,7 +47,7 @@ namespace
 		}
 	}
 
-	std::shared_ptr<KeyInfo> createKeyInfo(Window *wnd, WindowEvent evt, WPARAM keycode, LPARAM options)
+	/*std::shared_ptr<KeyInfo> createKeyInfo(Window *wnd, WindowEvent evt, WPARAM keycode, LPARAM options)
 	{
 		std::shared_ptr<KeyInfo> infostruct = std::shared_ptr<KeyInfo>(new KeyInfo);
 		infostruct->evt = evt;
@@ -55,13 +57,14 @@ namespace
 		infostruct->key = k;
 		infostruct->wnd = wnd;
 
+
 		if (infostruct->key == Key::KEY_UNKNOWN) return std::move(infostruct);
 
 		infostruct->scancode = (reinterpret_cast<int8_t*>(&options)[2] & 0xF0);
 		infostruct->wasPressed = (reinterpret_cast<int8_t*>(&options)[3] & 0b01000000) != 0;
 
 		return infostruct;
-	}
+	}*/
 }
 
 LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -79,13 +82,25 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 		// of our window resources before rendering to this window again.
 		// ( no need for this because our window sizing by hand is disabled )
 		break;
-	case WM_KEYUP:
+	/*case WM_KEYUP:
 	{
 		current_wnd.eventObserver->fire(createKeyInfo(current_wnd.wnd, WindowEvent::EVENT_KEY_UP, wParam, lParam));
 	}
 	case WM_KEYDOWN:
 	{
 		current_wnd.eventObserver->fire(createKeyInfo(current_wnd.wnd, WindowEvent::EVENT_KEY_DOWN, wParam, lParam));
+	}*/
+	case WM_INPUT:
+	{
+		char buffer[sizeof(RAWINPUT)] = {};
+		UINT size = sizeof(RAWINPUT);
+		GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, buffer, &size, sizeof(RAWINPUTHEADER));
+
+		// extract keyboard raw input data
+		RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(buffer);
+		InputEventInfo info;
+		info.inputData = raw;
+		current_wnd.eventObserver->fire_InputEvent(info);
 	}
 	default:
 		break;
@@ -190,7 +205,7 @@ void ImplWindow::impl_update()
 
 	MSG msg;
 	if (PeekMessage(&msg, this->impl_win32_window, 0, 0, PM_REMOVE)) {
-		TranslateMessage(&msg);
+		//TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 }
