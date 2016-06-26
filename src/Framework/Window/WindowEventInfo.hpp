@@ -3,13 +3,11 @@
 
 #include "Config.hpp"
 
-#include "Events.hpp"
-
 #include <memory>
 
 namespace DevaFramework
 {
-	struct InputEventInfo;
+	struct WindowEventInfo;
 }
 
 #endif // DEVA_FRAMEWORK_WINDOW_WINDOW_EVENT_INFO_H

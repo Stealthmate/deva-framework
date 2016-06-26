@@ -9,7 +9,7 @@
 
 namespace DevaFramework
 {
-	struct InputEventInfo
+	struct WindowEventInfo
 	{
 #ifdef DEVA_OS_WIN32
 		RAWINPUT *inputData;

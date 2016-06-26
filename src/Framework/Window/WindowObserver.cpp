@@ -2,9 +2,9 @@
 
 using namespace DevaFramework;
 
-DevaFramework::WindowObserver::WindowObserver() : inputListeners() {}
+DevaFramework::WindowObserver::WindowObserver() : windowListeners() {}
 
-void WindowObserver::attachInputListener(std::shared_ptr<InputListener> inputlstnr)
+void WindowObserver::attachListener(std::shared_ptr<WindowEventListener> inputlstnr)
 {
-	this->inputListeners.push_back(inputlstnr);
+	this->windowListeners.push_back(inputlstnr);
 }

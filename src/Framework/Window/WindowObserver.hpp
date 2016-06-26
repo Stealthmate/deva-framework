@@ -3,9 +3,8 @@
 
 #include "Config.hpp"
 
-#include "Events.hpp"
 #include "WindowEventListener.hpp"
-#include "InputListener.hpp"
+#include "WindowEventInfo.hpp"
 
 #include <unordered_map>
 #include <vector>
@@ -17,14 +16,14 @@ namespace DevaFramework
 	class WindowObserver
 	{
 	private:
-		std::vector<std::shared_ptr<InputListener>> inputListeners;
+		std::vector<std::shared_ptr<WindowEventListener>> windowListeners;
 
 	public:
 		DEVA_FRAMEWORK_API WindowObserver();
 
-		DEVA_FRAMEWORK_API void fire_InputEvent(const InputEventInfo &info);
+		DEVA_FRAMEWORK_API void fire(const WindowEventInfo &info);
 		
-		DEVA_FRAMEWORK_API void attachInputListener(std::shared_ptr<InputListener> inputlstnr);
+		DEVA_FRAMEWORK_API void attachListener(std::shared_ptr<WindowEventListener> inputlstnr);
 	};
 }
 
