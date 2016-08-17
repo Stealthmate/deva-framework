@@ -8,7 +8,7 @@ namespace DevaEngine
 	class Renderer
 	{
 	public:
-		/*Renderer();
+		Renderer();
 		~Renderer();
 
 		//private:
@@ -35,7 +35,7 @@ namespace DevaEngine
 		std::vector<const char*>	_device_extensions;
 
 		VkDebugReportCallbackEXT	_debug_report = nullptr;
-		VkDebugReportCallbackCreateInfoEXT		debug_callback_create_info = {};*/
+		VkDebugReportCallbackCreateInfoEXT		debug_callback_create_info = {};
 	};
 }
 
