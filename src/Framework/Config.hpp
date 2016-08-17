@@ -43,7 +43,9 @@ namespace DevaFramework
 
 	typedef uint8_t byte_t;
 
-	const float DEVA_VERSION = DEVA_VERSION_MACRO;
+	const uint32_t DEVA_VERSION_MAJOR = DEVA_VERSION_MACRO_MAJOR;
+	const uint32_t DEVA_VERSION_MINOR = DEVA_VERSION_MACRO_MINOR;
+	const uint32_t DEVA_VERSION_PATCH = DEVA_VERSION_MACRO_PATCH;
 }
 
 #ifdef DEVA_DEBUG

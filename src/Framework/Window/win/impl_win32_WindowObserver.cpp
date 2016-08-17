@@ -2,6 +2,8 @@
 #include "impl_win32_EventInfo.hpp"
 #include "impl_keycode_mapping.inl"
 
+
+#include "../../DevaLogger.hpp"
 using namespace DevaFramework;
 
 #ifdef DEVA_OS_WIN32
@@ -73,7 +75,7 @@ namespace
 			// corresponding keys on the NUMPAD will not.
 		case VK_INSERT:
 			if (!isE0)
-				virtualKey =  VK_NUMPAD0;
+				virtualKey = VK_NUMPAD0;
 			break;
 
 		case VK_DELETE:
@@ -132,6 +134,24 @@ namespace
 
 		return getDevaKey(virtualKey);
 	}
+
+	std::pair<MouseButton, bool> mapDevaMouseButton(USHORT mb_state)
+	{
+		if (mb_state & RI_MOUSE_BUTTON_1_DOWN) return{ MouseButton::MOUSE_BUTTON_1, true };
+		else if (mb_state & RI_MOUSE_BUTTON_1_UP) return{ MouseButton::MOUSE_BUTTON_1, false };
+
+		if (mb_state & RI_MOUSE_BUTTON_2_DOWN) return{ MouseButton::MOUSE_BUTTON_2, true };
+		else if (mb_state & RI_MOUSE_BUTTON_2_UP) return{ MouseButton::MOUSE_BUTTON_2, false };
+
+		if (mb_state & RI_MOUSE_BUTTON_3_DOWN) return{ MouseButton::MOUSE_BUTTON_3, true };
+		else if (mb_state & RI_MOUSE_BUTTON_3_UP) return{ MouseButton::MOUSE_BUTTON_3, false };
+
+		if (mb_state & RI_MOUSE_BUTTON_4_DOWN) return{ MouseButton::MOUSE_BUTTON_4, true };
+		else if (mb_state & RI_MOUSE_BUTTON_4_UP) return{ MouseButton::MOUSE_BUTTON_4, false };
+
+		if (mb_state & RI_MOUSE_BUTTON_5_DOWN) return{ MouseButton::MOUSE_BUTTON_5, true };
+		else if (mb_state & RI_MOUSE_BUTTON_5_UP) return{ MouseButton::MOUSE_BUTTON_5, false };
+	}
 }
 
 void WindowObserver::fire(const WindowEventInfo &eventInfo)
@@ -145,28 +165,43 @@ void WindowObserver::fire(const WindowEventInfo &eventInfo)
 	case RIM_TYPEKEYBOARD:
 	{
 		RAWKEYBOARD rawKB = input->data.keyboard;
-
-		UINT virtualKey = rawKB.VKey;
-		UINT scanCode = rawKB.MakeCode;
-		UINT flags = rawKB.Flags;
-
-		// a key can either produce a "make" or "break" scancode. this is used to differentiate between down-presses and releases
-		// see http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
-		const bool release = ((flags & RI_KEY_BREAK) != 0);
-
-		// getting a human-readable string
-		/*const bool isE0 = ((flags & RI_KEY_E0) != 0);
-		UINT key = (scanCode << 16) | (isE0 << 24);
-		char buffer[512] = {};
-		GetKeyNameText((LONG)key, buffer, 512);*/
-
-		Key key = mapDevaKey(virtualKey, scanCode, flags);
+		const bool release = ((rawKB.Flags & RI_KEY_BREAK) != 0);
+		DevaKey key = mapDevaKey(rawKB.VKey, rawKB.MakeCode, rawKB.Flags);
 		for (auto &lstnr : this->windowListeners)
 		{
 			if (release) lstnr->onKeyUp(key);
 			else lstnr->onKeyDown(key);
 		}
-	}
+	}break;
+	case RIM_TYPEMOUSE:
+	{
+		USHORT flags = input->data.mouse.usFlags;
+		USHORT button_state = input->data.mouse.usButtonFlags;
+		SHORT wheel_data = reinterpret_cast<SHORT &>(input->data.mouse.usButtonData);
+		ULONG raw_buttons = input->data.mouse.ulRawButtons;
+		LONG motion_x = input->data.mouse.lLastX;
+		LONG motion_y = input->data.mouse.lLastY;
+		ULONG device_info = input->data.mouse.ulExtraInformation;
+
+		for (auto &lstnr : this->windowListeners)
+		{
+			if(motion_x != 0 || motion_y != 0) lstnr->onMouseMove(static_cast<signed int>(motion_x), static_cast<signed int>(motion_y));
+
+			if (button_state == RI_MOUSE_WHEEL)
+			{
+				lstnr->onMouseWheelMove(static_cast<signed int>(wheel_data));
+			}
+
+			else if (button_state != 0)
+			{
+				auto button_event = mapDevaMouseButton(button_state);
+				if (button_event.second) lstnr->onMouseButtonDown(button_event.first);
+				else lstnr->onMouseButtonUp(button_event.first);
+			}
+
+		}
+
+	}break;
 	}
 
 }
