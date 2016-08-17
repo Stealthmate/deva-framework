@@ -22,6 +22,15 @@ using ImplWindow = Window::ImplWindow;
 namespace
 {
 
+	RAWINPUTDEVICE ACCEPTED_INPUT_DEVICES[] = 
+	{
+		{0x01, 0x02, 0, 0}, //Mouse
+		{0x01, 0x06, 0, 0}, //Keyboard
+		{0x01, 0x05, 0, 0}, //DirectInput Joystick
+	};
+
+
+
 	std::map<HWND, ImplWindow*>  hwnd_map;
 
 	enum ExType
@@ -45,24 +54,6 @@ namespace
 		}
 	}
 
-	/*std::shared_ptr<KeyInfo> createKeyInfo(Window *wnd, WindowEvent evt, WPARAM keycode, LPARAM options)
-	{
-		std::shared_ptr<KeyInfo> infostruct = std::shared_ptr<KeyInfo>(new KeyInfo);
-		infostruct->evt = evt;
-		Key k = Key::KEY_UNKNOWN;
-		auto i = SUPPORTED_KEYS.find(keycode);
-		if (i != SUPPORTED_KEYS.end()) k = i->second;
-		infostruct->key = k;
-		infostruct->wnd = wnd;
-
-
-		if (infostruct->key == Key::KEY_UNKNOWN) return std::move(infostruct);
-
-		infostruct->scancode = (reinterpret_cast<int8_t*>(&options)[2] & 0xF0);
-		infostruct->wasPressed = (reinterpret_cast<int8_t*>(&options)[3] & 0b01000000) != 0;
-
-		return infostruct;
-	}*/
 }
 
 LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -80,14 +71,6 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 		// of our window resources before rendering to this window again.
 		// ( no need for this because our window sizing by hand is disabled )
 		break;
-	/*case WM_KEYUP:
-	{
-		current_wnd.eventObserver->fire(createKeyInfo(current_wnd.wnd, WindowEvent::EVENT_KEY_UP, wParam, lParam));
-	}
-	case WM_KEYDOWN:
-	{
-		current_wnd.eventObserver->fire(createKeyInfo(current_wnd.wnd, WindowEvent::EVENT_KEY_DOWN, wParam, lParam));
-	}*/
 	case WM_INPUT:
 	{
 		char buffer[sizeof(RAWINPUT)] = {};
@@ -127,7 +110,7 @@ void ImplWindow::impl_init()
 	win_class.lpfnWndProc = WindowsEventHandler;
 	win_class.cbClsExtra = 0;
 	win_class.cbWndExtra = 0;
-	win_class.hInstance = impl_win32_instance; // hInstance
+	win_class.hInstance = impl_win32_instance;
 	win_class.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	win_class.hCursor = LoadCursor(NULL, IDC_ARROW);
 	win_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
@@ -145,10 +128,20 @@ void ImplWindow::impl_init()
 
 	// Create window with the registered class:
 	RECT wr = { 0, 0, LONG(this->surface_width), LONG(this->surface_height) };
-	AdjustWindowRectEx(&wr, style, FALSE, ex_style);
+	AdjustWindowRectEx(&wr, style, FALSE, style);
+
+
+	if (!RegisterRawInputDevices(
+			ACCEPTED_INPUT_DEVICES, 
+			sizeof(ACCEPTED_INPUT_DEVICES) / sizeof(ACCEPTED_INPUT_DEVICES[0]), //Number of elements 
+			sizeof(ACCEPTED_INPUT_DEVICES[0]))) {                               //Size of single element
+		throw DevaExternalFailureException(
+			"Could not register for raw input.", "Windows", "RegisterRawInputDevies", "DevaFramework::ImplWindow::initOSWindow");
+	}
+	
+
 
 	init_call = true;
-
 	impl_win32_window = CreateWindowEx(0,
 		impl_win32_class_name.c_str(),		// class name
 		this->name.c_str(),			// app name
@@ -203,7 +196,7 @@ void ImplWindow::impl_update()
 
 	MSG msg;
 	if (PeekMessage(&msg, this->impl_win32_window, 0, 0, PM_REMOVE)) {
-		//TranslateMessage(&msg);
+		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 }

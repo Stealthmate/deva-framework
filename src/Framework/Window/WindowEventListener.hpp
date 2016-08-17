@@ -13,10 +13,11 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API virtual bool onKeyDown(Key k);
 		DEVA_FRAMEWORK_API virtual bool onKeyUp(Key k);
 
-		DEVA_FRAMEWORK_API virtual bool onMouseMove();
-		DEVA_FRAMEWORK_API virtual bool onMouseButtonDown();
-		DEVA_FRAMEWORK_API virtual bool onMouseButtonClick();
-		DEVA_FRAMEWORK_API virtual bool onMouseButtonUp();
+		DEVA_FRAMEWORK_API virtual bool onMouseMove(signed int x, signed int y);
+		DEVA_FRAMEWORK_API virtual bool onMouseWheelMove(signed int motion);
+		DEVA_FRAMEWORK_API virtual bool onMouseButtonDown(MouseButton mb);
+		DEVA_FRAMEWORK_API virtual bool onMouseButtonClick(MouseButton mb);
+		DEVA_FRAMEWORK_API virtual bool onMouseButtonUp(MouseButton mb);
 	};
 }
 
