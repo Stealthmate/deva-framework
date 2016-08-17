@@ -11,11 +11,11 @@ namespace
 
 	struct MyListener : public WindowEventListener
 	{
-		virtual bool onKeyEvent(WindowEventStruct_KeyEvent info)
+		/*virtual bool onKeyEvent(WindowEventStruct_KeyEvent info)
 		{
 			if(info.key == Key::KEY_ESCAPE) wnd->close();
 			return true;
-		}
+		}*/
 	};
 }
 

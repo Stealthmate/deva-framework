@@ -22,8 +22,8 @@ int main()
 	info.window_name = "TEST!";
 
 	DevaEngineInstance& engine = DevaEngineInstance::createInstance(info);
-	engine.getInputListener().bindKey(DevaFramework::Key::KEY_ESCAPE, asd);
-	engine.getInputListener().bindKey(DevaFramework::Key::KEY_0, troll);
+	//engine.getInputListener().bindKey(DevaFramework::Key::KEY_ESCAPE, asd);
+	//engine.getInputListener().bindKey(DevaFramework::Key::KEY_0, troll);
 
 	while (engine.update());
 }
