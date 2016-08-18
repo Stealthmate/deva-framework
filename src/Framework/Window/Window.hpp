@@ -22,7 +22,7 @@ namespace DevaFramework
 		Window(uint32_t size_x, uint32_t size_y, const std::string &name);
 
 	public:
-		DEVA_FRAMEWORK_API static Window& openWindow(uint32_t width, uint32_t height, const std::string &name);
+		DEVA_FRAMEWORK_API static std::shared_ptr<Window> openWindow(uint32_t width, uint32_t height, const std::string &name);
 	
 		Window(const Window &wnd) = delete;
 		DEVA_FRAMEWORK_API Window(Window &&wnd);
