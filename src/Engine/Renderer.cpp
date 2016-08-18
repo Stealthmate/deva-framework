@@ -5,6 +5,11 @@
 using namespace DevaEngine;
 using namespace DevaFramework;
 
-/*Renderer::Renderer()
+Renderer::Renderer()
 {
-}*/
+}
+
+Renderer::~Renderer()
+{
+
+}
