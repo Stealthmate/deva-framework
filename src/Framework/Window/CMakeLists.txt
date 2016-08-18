@@ -7,6 +7,8 @@ set(
 	${CURDIR}/Master.hpp
 	${CURDIR}/Window.cpp
 	${CURDIR}/Window.hpp
+	${CURDIR}/WindowEventListener.hpp
+	${CURDIR}/WindowEventListener.cpp
 )
 
 set(
@@ -16,4 +18,5 @@ set(
 	${CURDIR}/Init.hpp
 	${CURDIR}/Master.hpp
 	${CURDIR}/Window.hpp
+	${CURDIR}/WindowEventListener.hpp
 )

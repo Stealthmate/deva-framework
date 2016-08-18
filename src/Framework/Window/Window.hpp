@@ -7,9 +7,12 @@
 
 namespace DevaFramework
 {
+	class VulkanInstance; 
 
 	class Window
 	{
+		friend class Surface;
+
 	public:
 		class ImplWindow;
 
@@ -17,6 +20,7 @@ namespace DevaFramework
 		std::unique_ptr<ImplWindow> impl;
 
 		Window(uint32_t size_x, uint32_t size_y, const std::string &name);
+
 	public:
 		DEVA_FRAMEWORK_API static Window& openWindow(uint32_t width, uint32_t height, const std::string &name);
 	
@@ -36,6 +40,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API void* getUserData() const;
 		DEVA_FRAMEWORK_API void setUserData(void* data);
 
+		DEVA_FRAMEWORK_API void bindSurface(VulkanInstance &vkinstance);
 	};
 }
 
