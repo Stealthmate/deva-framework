@@ -84,6 +84,9 @@ set(
 	${CURDIR}/Vulkan/VulkanPhysicalDevice.hpp
 	${CURDIR}/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Vulkan/VulkanDevice.hpp
+	${CURDIR}/Vulkan/Config.hpp
+	${CURDIR}/Vulkan/VulkanInstance.hpp
+	${CURDIR}/Vulkan/VulkanInstance.cpp
 )
 
 set(
@@ -108,6 +111,7 @@ set(
 	${CURDIR}/Vulkan/Config.hpp
 	${CURDIR}/Vulkan/VulkanPhysicalDevice.hpp
 	${CURDIR}/Vulkan/VulkanDevice.hpp
+	${CURDIR}/Vulkan/VulkanInstance.hpp
 )
 
 
@@ -196,6 +200,7 @@ set(
 	${CURDIR}/ImplWindow.cpp
 	${CURDIR}/ImplWindow.hpp
 	${CURDIR}/WindowEventListener.hpp
+	${CURDIR}/WindowEventListener.cpp
 	${CURDIR}/WindowEventInfo.hpp
 	${CURDIR}/WindowObserver.cpp
 	${CURDIR}/WindowObserver.hpp

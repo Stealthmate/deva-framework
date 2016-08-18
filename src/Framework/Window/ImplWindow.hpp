@@ -20,8 +20,6 @@ namespace DevaFramework
 		HINSTANCE		impl_win32_instance;
 		HWND			impl_win32_window;
 		std::string		impl_win32_class_name;
-		static uint64_t	impl_win32_class_id_counter;
-		typedef HANDLE DeviceHandle;
 #endif
 		friend class Window;
 
@@ -42,7 +40,6 @@ namespace DevaFramework
 		void impl_move(ImplWindow &&wnd);
 		void impl_deInit();
 		void impl_update();
-		void initOSSurface();
 
 	public:
 		ImplWindow(Window *wnd, uint32_t size_x, uint32_t size_y, const std::string &name);
@@ -62,6 +59,8 @@ namespace DevaFramework
 
 		void* getUserData() const;
 		void setUserData(void *userData);
+
+		void bindSurface(VulkanInstance &vkinstance);
 	};
 }
 

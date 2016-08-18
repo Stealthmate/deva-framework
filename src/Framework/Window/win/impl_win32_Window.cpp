@@ -1,3 +1,5 @@
+#define VK_USE_PLATFORM_WIN32_KHR
+
 #include "../ImplWindow.hpp"
 
 #ifndef DEVA_OS_WIN32
@@ -7,6 +9,8 @@
 #include "../../Exceptions.hpp"
 
 #include "../../DevaLogger.hpp"
+
+#include "../../Graphics/Vulkan/VulkanInstance.hpp"
 
 //#include "impl_keycode_mapping.inl"
 #include "impl_win32_EventInfo.hpp"
@@ -22,16 +26,14 @@ using ImplWindow = Window::ImplWindow;
 namespace
 {
 
+	uint64_t impl_win32_class_id_counter = 0;
+
 	RAWINPUTDEVICE ACCEPTED_INPUT_DEVICES[] = 
 	{
 		{0x01, 0x02, 0, 0}, //Mouse
 		{0x01, 0x06, 0, 0}, //Keyboard
 		{0x01, 0x05, 0, 0}, //DirectInput Joystick
 	};
-
-
-
-	std::map<HWND, ImplWindow*>  hwnd_map;
 
 	enum ExType
 	{
@@ -65,7 +67,7 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 	case WM_CLOSE:
 		//window->sendCloseMsg();
 		current_wnd.window_should_run = false;
-		return 0;
+		break;
 	case WM_SIZE:
 		// we get here if the window has changed size, we should rebuild most
 		// of our window resources before rendering to this window again.
@@ -90,7 +92,6 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-uint64_t ImplWindow::impl_win32_class_id_counter = 0;
 
 void ImplWindow::impl_init()
 {
@@ -160,8 +161,6 @@ void ImplWindow::impl_init()
 		throw DevaExternalFailureException("Could not create window.", "Windows", "CreateWindowEx", "DevaFramework::ImplWindow::initOSWindow");
 	}
 
-	hwnd_map.insert({this->impl_win32_window, this});
-
 	SetWindowLongPtr(this->impl_win32_window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
 	ShowWindow(this->impl_win32_window, SW_SHOW);
@@ -171,8 +170,6 @@ void ImplWindow::impl_init()
 
 void ImplWindow::impl_move(ImplWindow &&wnd)
 {
-	this->impl_win32_class_id_counter = wnd.impl_win32_class_id_counter;
-	wnd.impl_win32_class_id_counter = NULL;
 	this->impl_win32_class_name = wnd.impl_win32_class_name;
 	wnd.impl_win32_class_name = "";
 	this->impl_win32_instance = wnd.impl_win32_instance;
@@ -201,4 +198,20 @@ void ImplWindow::impl_update()
 	}
 }
 
+void ImplWindow::bindSurface(VulkanInstance &vkinstance)
+{
+	VkWin32SurfaceCreateInfoKHR info;
+	info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	info.hinstance = this->impl_win32_instance;
+	info.hwnd = this->impl_win32_window;
+
+	VkSurfaceKHR surface;
+
+	VkResult result = vkCreateWin32SurfaceKHR(vkinstance.handle, &info, NULL, &surface);
+	if (result != VK_SUCCESS)
+		throw DevaExternalFailureException("Could not create Vulkan surface.", "vkCreateWin32SurfaceKHR", "ImplWindow::createSurface", "Vulkan");
+	
+	vkinstance.surface = surface;
+
+}
 #endif

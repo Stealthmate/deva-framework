@@ -8,9 +8,12 @@
 
 
 using namespace DevaFramework;
-
+/*
 namespace
 {
+
+	bool INIT = false;
+
 	int loadFreeType() {
 		FT_Library ft;
 
@@ -38,7 +41,7 @@ namespace
 		// The name of the engine (e.g: Game engine name)
 		DEFAULT_APPLICATION_SETTINGS.pEngineName = "Deva Engine";
 		// The version of the engine
-		DEFAULT_APPLICATION_SETTINGS.engineVersion = *reinterpret_cast<const uint32_t*>(&DEVA_VERSION);
+		//DEFAULT_APPLICATION_SETTINGS.engineVersion = *reinterpret_cast<const uint32_t*>(&DEVA_VERSION);
 		// The version of Vulkan we're using for this application
 		DEFAULT_APPLICATION_SETTINGS.apiVersion = VK_MAKE_VERSION(1, 0, 13);
 
@@ -65,14 +68,17 @@ namespace
 
 int DevaFramework::DEVA_INIT_GRAPHICS(const VkInstanceCreateInfo &vulkan_info)
 {
+	if (INIT) return 0;
+
 	if (loadFreeType() != 0) return -1;
 
 	GraphicsState::initVulkan(vulkan_info);
 
+	INIT = true;
 	return 0;
 }
 
-VkInstanceCreateInfo GraphicsState::DEFAULT_INSTANCE_SETTINGS = make_default_instance_settings();
+VkInstanceCreateInfo DEFAULT_INSTANCE_SETTINGS = make_default_instance_settings();
 std::vector<VulkanPhysicalDevice> GraphicsState::available_physical_devices = std::vector<VulkanPhysicalDevice>(0);
 
 
@@ -144,3 +150,4 @@ const VulkanPhysicalDevice& GraphicsState::getPhysicalDevice(uint32_t i)
 
 	return available_physical_devices[i];
 }
+*/

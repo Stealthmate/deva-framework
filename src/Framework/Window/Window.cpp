@@ -53,3 +53,8 @@ void Window::setUserData(void *userData)
 {
 	this->impl->setUserData(userData);
 }
+
+void Window::bindSurface(VulkanInstance &vkinstance)
+{
+	this->impl->bindSurface(vkinstance);
+}
