@@ -1,31 +1,34 @@
 #include "VulkanInstance.hpp"
 #include "../../Exceptions.hpp"
 
-
 using namespace DevaFramework;
 
-const VkApplicationInfo DEFAULT_APPLICATION_INFO =
+namespace
 {
-	VK_STRUCTURE_TYPE_APPLICATION_INFO,
-	NULL,
-	"Vulkan Application",
-	VK_MAKE_VERSION(1, 0, 0),
-	"Deva Engine",
-	VK_MAKE_VERSION(1, 0, 0),
-	VK_MAKE_VERSION(1, 0, 13)
-};
+	const VkApplicationInfo DEFAULT_APPLICATION_INFO =
+	{
+		VK_STRUCTURE_TYPE_APPLICATION_INFO,
+		NULL,
+		"Vulkan Application",
+		VK_MAKE_VERSION(1, 0, 0),
+		"Deva Engine",
+		VK_MAKE_VERSION(1, 0, 0),
+		VK_MAKE_VERSION(1, 0, 13)
+	};
 
-const VkInstanceCreateInfo DEFAULT_INSTANCE_CREATE_INFO =
-{
-	VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-	NULL,
-	0,
-	&DEFAULT_APPLICATION_INFO,
-	0,
-	NULL,
-	0,
-	NULL
-};
+	const VkInstanceCreateInfo DEFAULT_INSTANCE_CREATE_INFO =
+	{
+		VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+		NULL,
+		0,
+		&DEFAULT_APPLICATION_INFO,
+		0,
+		NULL,
+		0,
+		NULL
+	};
+}
+
 
 VulkanInstance VulkanInstance::create()
 {
@@ -94,6 +97,16 @@ VulkanInstance::VulkanInstance(const VkInstanceCreateInfo &info)
 		this->physical_devices.push_back(VulkanPhysicalDevice(deviceHandles[i], deviceProperties, deviceFeatures, queueFamilies));
 	}
 }
+
+VulkanInstance::VulkanInstance() : handle(VK_NULL_HANDLE), surface(VK_NULL_HANDLE) {}
+
+VulkanInstance::~VulkanInstance()
+{
+	if (surface != VK_NULL_HANDLE) vkDestroySurfaceKHR(handle, surface, NULL);
+	if (handle != VK_NULL_HANDLE) vkDestroyInstance(handle, NULL);
+}
+
+
 
 VkInstance VulkanInstance::getInstance() const
 {

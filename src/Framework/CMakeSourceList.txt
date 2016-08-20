@@ -85,8 +85,10 @@ set(
 	${CURDIR}/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Vulkan/VulkanDevice.hpp
 	${CURDIR}/Vulkan/Config.hpp
+	${CURDIR}/Vulkan/Config.cpp
 	${CURDIR}/Vulkan/VulkanInstance.hpp
 	${CURDIR}/Vulkan/VulkanInstance.cpp
+	${CURDIR}/Vulkan/VulkanFunctions.inl
 )
 
 set(
@@ -112,6 +114,7 @@ set(
 	${CURDIR}/Vulkan/VulkanPhysicalDevice.hpp
 	${CURDIR}/Vulkan/VulkanDevice.hpp
 	${CURDIR}/Vulkan/VulkanInstance.hpp
+	${CURDIR}/Vulkan/VulkanFunctions.inl
 )
 
 

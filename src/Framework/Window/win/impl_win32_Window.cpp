@@ -1,5 +1,3 @@
-#define VK_USE_PLATFORM_WIN32_KHR
-
 #include "../ImplWindow.hpp"
 
 #ifndef DEVA_OS_WIN32

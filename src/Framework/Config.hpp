@@ -11,10 +11,6 @@
 		#define DEVA_FRAMEWORK_API __declspec(dllexport)
 	#else
 		#define DEVA_FRAMEWORK_API __declspec(dllimport)
-
-		#ifndef DEVA_FRAMEWORK_MASTER_H
-			#error "DO NOT INCLUDE THESE HEADERS MANUALLY! USE Deva.hpp INSTEAD!"
-		#endif
 	#endif
 #include <ostream>
 #include <sstream>

@@ -3,8 +3,6 @@
 
 #include "../Config.hpp"
 
-#include <vulkan/vulkan.h>
-
 namespace DevaFramework
 {
 	///The number of bits per pixel used in all internal representations of an image
