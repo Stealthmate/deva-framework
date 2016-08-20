@@ -27,4 +27,5 @@ set(
 	${CURDIR}/Input/MouseListener.hpp
 	${CURDIR}/Input/InputListener.hpp
 	${CURDIR}/Input/InputFunction.hpp
+	${CURDIR}/VulkanRenderer.hpp
 )

@@ -1,4 +1,5 @@
 #include <DevaEngine/DevaEngineInstance.hpp>
+#include <DevaFramework\Graphics\Vulkan\Config.hpp>
 
 using namespace DevaEngine;
 using namespace DevaFramework;
@@ -16,6 +17,9 @@ bool troll()
 
 int main()
 {
+	DevaFramework::LoadVulkan();
+
+
 	DevaEngineInstanceCreateInfo info;
 	info.window_height = 600;
 	info.window_width = 800;

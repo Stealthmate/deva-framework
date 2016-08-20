@@ -8,9 +8,9 @@
 
 namespace DevaEngine
 {
-	const uint8_t MOD_ALT = 0x01;
-	const uint8_t MOD_CTRL = 0x02;
-	const uint8_t MOD_SUPER = 0x03;
+	const uint8_t MODKEY_ALT = 0x01;
+	const uint8_t MODKEY_CTRL = 0x02;
+	const uint8_t MODKEY_SUPER = 0x03;
 
 	class InputListener
 	{

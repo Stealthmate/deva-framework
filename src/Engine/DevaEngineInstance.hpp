@@ -3,7 +3,7 @@
 
 #include "Config.hpp"
 
-#include "Renderer.hpp"
+#include "VulkanRenderer.hpp"
 #include "Input/InputListener.hpp"
 
 #include <DevaFramework/Deva.hpp>
@@ -32,7 +32,7 @@ namespace DevaEngine
 		DEVA_ENGINE_API static DevaEngineInstance& createInstance(const DevaEngineInstanceCreateInfo &info);
 	private:
 
-		Renderer renderer;
+		VulkanRenderer renderer;
 		DevaEngineInstance(const DevaEngineInstanceCreateInfo &info);
 		
 

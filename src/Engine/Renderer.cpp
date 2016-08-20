@@ -7,6 +7,7 @@ using namespace DevaFramework;
 
 Renderer::Renderer()
 {
+
 }
 
 Renderer::~Renderer()
