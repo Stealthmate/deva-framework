@@ -38,7 +38,7 @@ namespace
 
 #define CHECK(a) \
 if(!a) \
-	throw new DevaExternalFailureException(std::string("Could not get PFN ") + #a, "DevaFramework::LoadVulkan", "GetProcAddress", "Windows/Vulkan"); \
+	throw new DevaExternalFailureException("Could not get PFN " #a, "DevaFramework::LoadVulkan", "GetProcAddress", "Windows/Vulkan"); \
 else \
 { \
 	std::string msg = "Load PFN "; \
