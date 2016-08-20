@@ -12,11 +12,12 @@ namespace DevaFramework
 	{
 	protected:
 		std::string stampstr;
+		bool enabled;
 	public:
 
 		DEVA_FRAMEWORK_API static const std::string endl;
 
-		DEVA_FRAMEWORK_API Logger(const std::string &stampstr);
+		DEVA_FRAMEWORK_API Logger(const std::string &stampstr, bool enabled);
 
 		DEVA_FRAMEWORK_API virtual const Logger& println(const std::string &msg) const;
 
@@ -40,13 +41,13 @@ namespace DevaFramework
 		INSERTION_FOR_TYPE(bool);
 #undef INSERTION_FOR_TYPE
 
+
+		DEVA_FRAMEWORK_API void toggle(bool enabled);
+		DEVA_FRAMEWORK_API bool isEnabled() const;
+
 	protected:
 		DEVA_FRAMEWORK_API virtual const Logger& print(const std::string &msg) const = 0;
 	};
-
-	extern const Logger& __deva_log;
-	extern const Logger& __deva_warn;
-	extern const Logger& __deva_err;
 }
 
 #endif // DEVA_FRAMEWORK_LOGGER_H

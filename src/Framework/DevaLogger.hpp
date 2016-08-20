@@ -35,7 +35,7 @@ namespace DevaFramework
 		mutable NumberFormat numformat;
 
 	public:
-		DEVA_FRAMEWORK_API DevaLogger(const std::string &stamp, LogLevel loglvl);
+		DEVA_FRAMEWORK_API DevaLogger(const std::string &stamp, LogLevel loglvl, bool enabled);
 
 		DEVA_FRAMEWORK_API virtual const Logger& operator<<(const std::string &msg) const;
 		DEVA_FRAMEWORK_API virtual const Logger& operator<<(const char *msg) const;
@@ -53,6 +53,7 @@ namespace DevaFramework
 		inline virtual std::string stamp() const { return this->stampstr; }
 
 		DEVA_FRAMEWORK_API void setNumberFormat(NumberFormat numformat);
+
 
 	protected:
 		DEVA_FRAMEWORK_API virtual const Logger& print(const std::string &msg) const;

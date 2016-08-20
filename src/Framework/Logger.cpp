@@ -30,6 +30,21 @@ std::string timestamp()
 
 const std::string Logger::endl = "\n";
 
-Logger::Logger(const std::string &stampstr) : stampstr(stampstr) {}
+Logger::Logger(const std::string &stampstr, bool enabled) : stampstr(stampstr), enabled(enabled) {}
 
-const Logger& Logger::println(const std::string &msg) const { return *this << stampstr << msg << endl; }
+const Logger& Logger::println(const std::string &msg) const {
+
+	if (!enabled) return *this; 
+
+	return *this << stampstr << msg << endl; 
+}
+
+void Logger::toggle(bool enabled)
+{
+	this->enabled = enabled;
+}
+
+bool Logger::isEnabled() const
+{
+	return enabled;
+}

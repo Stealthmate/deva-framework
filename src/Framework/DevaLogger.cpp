@@ -15,14 +15,16 @@ namespace
 	using namespace DevaFramework;
 }
 
-const DevaLogger DevaLogger::log = DevaLogger(STAMP_MESSAGE, DevaLogger::LogLevel::LOG_MESSAGE);
-const DevaLogger DevaLogger::warn = DevaLogger(STAMP_WARNING, DevaLogger::LogLevel::LOG_WARNING);
-const DevaLogger DevaLogger::err = DevaLogger(STAMP_ERROR, DevaLogger::LogLevel::LOG_ERROR);
+const DevaLogger DevaLogger::log = DevaLogger(STAMP_MESSAGE, DevaLogger::LogLevel::LOG_MESSAGE, true);
+const DevaLogger DevaLogger::warn = DevaLogger(STAMP_WARNING, DevaLogger::LogLevel::LOG_WARNING, true);
+const DevaLogger DevaLogger::err = DevaLogger(STAMP_ERROR, DevaLogger::LogLevel::LOG_ERROR, true);
 
-DevaLogger::DevaLogger(const std::string &stampstr, LogLevel loglvl) : Logger(stampstr), loglvl(loglvl) {}
+DevaLogger::DevaLogger(const std::string &stampstr, LogLevel loglvl, bool enabled) : Logger(stampstr, enabled), loglvl(loglvl) {}
 
 const Logger& DevaLogger::print(const std::string &msg) const
 {
+	if (!enabled) return *this;
+
 	switch (this->loglvl)
 	{
 	case DevaLogger::LogLevel::LOG_MESSAGE:
