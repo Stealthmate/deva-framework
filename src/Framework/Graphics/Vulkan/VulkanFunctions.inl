@@ -1,4 +1,5 @@
-extern PFN_vkCreateInstance                                vkCreateInstance;
+
+/*
 extern PFN_vkDestroyInstance                               vkDestroyInstance;
 										                   
 extern PFN_vkCreateDevice                                  vkCreateDevice;
@@ -19,3 +20,7 @@ extern PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR  vkGetPhysicalDeviceWi
 #endif
 
 extern PFN_vkDestroySurfaceKHR                             vkDestroySurfaceKHR;
+
+extern PFN_vkGetPhysicalDeviceSurfaceSupportKHR            vkGetPhysicalDeviceSurfaceSupportKHR;
+extern PFN_vkAcquireNextImageKHR                           vkAcquireNextImageKHR;
+*/

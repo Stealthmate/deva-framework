@@ -4,12 +4,7 @@
 
 using namespace DevaFramework;
 
-VulkanDevice::VulkanDevice(const VulkanPhysicalDevice &physicalDevice, const VkDeviceCreateInfo &deviceInfo)
+VulkanDevice::VulkanDevice(VkDevice dev) : handle(dev)
 {
-	auto err = vkCreateDevice(physicalDevice.getHandle(), &deviceInfo, NULL, &handle);
-	if (err != VK_SUCCESS)
-		throw DevaFailureException(
-			"Could not create Vulkan device",
-			"vkCreateDevice(physicalDevice.getHandle(), &deviceInfo, NULL, &handle)",
-			"VulkanDevice::VulkanDevice(const VulkanPhysicalDevice &physicalDevice, const VkDeviceCreateInfo &deviceInfo)");
+
 }

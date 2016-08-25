@@ -9,8 +9,3 @@ Renderer::Renderer()
 {
 
 }
-
-Renderer::~Renderer()
-{
-
-}

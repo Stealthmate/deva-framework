@@ -3,8 +3,6 @@
 
 #include "Config.hpp"
 
-#include <DevaFramework\Graphics\Vulkan\VulkanInstance.hpp>
-
 namespace DevaEngine
 {
 	class Renderer
@@ -14,7 +12,7 @@ namespace DevaEngine
 
 		virtual void renderExample() = 0;
 
-		virtual ~Renderer();
+		~Renderer() {}
 	};
 }
 

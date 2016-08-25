@@ -22,47 +22,7 @@ namespace
 		memset(&feat, 0, sizeof(feat));
 		return feat;
 	}
-}
 
-VulkanPhysicalDevice::VulkanPhysicalDevice() : properties(DEFAULT_PROPERTIES()), features(DEFAULT_FEATURES()), handle(0)
-{}
-
-VulkanPhysicalDevice::VulkanPhysicalDevice(
-	const VkPhysicalDevice &handle,
-	const VkPhysicalDeviceProperties &properties, 
-	const VkPhysicalDeviceFeatures&features,
-	const std::vector<VkQueueFamilyProperties> &queueFamilies)
-	: handle(handle), properties(properties), features(features), queueFamilies(queueFamilies) {}
-
-const VkPhysicalDevice VulkanPhysicalDevice::getHandle() const
-{
-	return handle;
-}
-
-const VkPhysicalDeviceProperties VulkanPhysicalDevice::getProperties() const
-{
-	return properties;
-}
-const VkPhysicalDeviceFeatures VulkanPhysicalDevice::getFeatures() const
-{
-	return features;
-}
-
-size_t DevaFramework::VulkanPhysicalDevice::getQueueFamiliyCount() const
-{
-	return queueFamilies.size();
-}
-
-const VkQueueFamilyProperties & DevaFramework::VulkanPhysicalDevice::getQueueFamiliy(int i) const
-{
-	if (i >= queueFamilies.size()) throw DevaInvalidInputException("Invalid index");
-	return queueFamilies[i];
-}
-
-
-
-namespace
-{
 	std::string parseVKVersion(uint32_t version)
 	{
 		return ""

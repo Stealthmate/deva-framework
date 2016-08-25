@@ -2,9 +2,13 @@
 #define DEVA_FRAMEWORK_GRAPHICS_VULKAN_VULKAN_INSTANCE
 
 #include "Config.hpp"
+
 #include "VulkanPhysicalDevice.hpp"
+#include "InstanceFunctionSet.hpp"
 
 #include "../../Window/Window.hpp"
+
+
 
 namespace DevaFramework
 {
@@ -12,9 +16,8 @@ namespace DevaFramework
 	{
 		friend class Window::ImplWindow;
 
-	private:
-
 		VkInstance handle;
+		InstanceFunctionSet vk;
 		VkSurfaceKHR surface;
 
 		std::vector<VulkanPhysicalDevice> physical_devices;
@@ -28,15 +31,20 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API VulkanInstance(); //This does NOT create a valid VkInstance. This only creates an empty object.
 		DEVA_FRAMEWORK_API VulkanInstance(const VulkanInstance &vkinstance)             = delete;
-		DEVA_FRAMEWORK_API VulkanInstance(VulkanInstance &&vkinstance)                  = default;
+		DEVA_FRAMEWORK_API VulkanInstance(VulkanInstance &&vkinstance);
 		DEVA_FRAMEWORK_API VulkanInstance& operator=(const VulkanInstance &vkinstance)  = delete;
-		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance)       = default;
+		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance);
 		DEVA_FRAMEWORK_API ~VulkanInstance();
 
+		DEVA_FRAMEWORK_API std::vector<VkPhysicalDevice> getPhysicalDevices() const;
+
+		DEVA_FRAMEWORK_API InstanceFunctionSet getFunctionSet() const;
+
 		DEVA_FRAMEWORK_API VkInstance getInstance() const;
-		DEVA_FRAMEWORK_API const std::vector<VulkanPhysicalDevice> & getPhysicalDevices() const;
 		DEVA_FRAMEWORK_API VkSurfaceKHR getSurface();
 		DEVA_FRAMEWORK_API const VkSurfaceKHR getSurface() const;
+
+		DEVA_FRAMEWORK_API void destroy();
 	};
 }
 

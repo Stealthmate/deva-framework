@@ -17,8 +17,6 @@ bool troll()
 
 int main()
 {
-	DevaFramework::LoadVulkan();
-
 
 	DevaEngineInstanceCreateInfo info;
 	info.window_height = 600;

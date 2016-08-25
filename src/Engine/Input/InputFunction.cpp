@@ -6,20 +6,20 @@ bool dummy() { return false; }
 
 InputFunction::InputFunction()
 {
-	this->f = dummy;
+	this->vk = dummy;
 }
 
-InputFunction::InputFunction(rawfunc f)
+InputFunction::InputFunction(rawfunc vk)
 {
-	this->f = f;
+	this->vk = vk;
 }
 
 InputFunction::InputFunction(lambdafunc &lambda)
 {
-	this->f = lambda.target<bool()>();
+	this->vk = lambda.target<bool()>();
 }
 
 bool InputFunction::operator()()
 {
-	return f();
+	return vk();
 }

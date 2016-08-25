@@ -10,12 +10,17 @@ namespace DevaFramework
 
 	class VulkanDevice
 	{
+	public:
+
+#include "DeviceFunctionSet.inl"
+
+	private:
 
 		VkDevice handle;
 
 	public:
 
-		DEVA_FRAMEWORK_API VulkanDevice(const VulkanPhysicalDevice &physicalDevice, const VkDeviceCreateInfo &info);
+		DEVA_FRAMEWORK_API VulkanDevice(VkDevice handle);
 
 	};
 

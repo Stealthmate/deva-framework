@@ -12,13 +12,13 @@ namespace DevaEngine
 		typedef std::function<bool()> lambdafunc;
 
 	private:
-		rawfunc f;
+		rawfunc vk;
 
 	public:
 
 		DEVA_ENGINE_API InputFunction();
-		DEVA_ENGINE_API InputFunction(rawfunc f);
-		DEVA_ENGINE_API InputFunction(lambdafunc& f);
+		DEVA_ENGINE_API InputFunction(rawfunc vk);
+		DEVA_ENGINE_API InputFunction(lambdafunc& vk);
 
 		DEVA_ENGINE_API virtual bool operator()();
 	};

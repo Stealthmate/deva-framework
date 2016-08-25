@@ -10,26 +10,20 @@ namespace DevaFramework
 	struct VulkanPhysicalDevice
 	{
 
-	private:
-
 		const VkPhysicalDevice handle;
 		const VkPhysicalDeviceProperties properties;
 		const VkPhysicalDeviceFeatures features;
 		const std::vector<VkQueueFamilyProperties> queueFamilies;
 
-	public:
-		DEVA_FRAMEWORK_API VulkanPhysicalDevice();
 		DEVA_FRAMEWORK_API VulkanPhysicalDevice(
-			const VkPhysicalDevice &handle,
-			const VkPhysicalDeviceProperties &props, 
-			const VkPhysicalDeviceFeatures &feats,
-			const std::vector<VkQueueFamilyProperties> &queueFamilies);
-
-		DEVA_FRAMEWORK_API const VkPhysicalDevice getHandle() const;
-		DEVA_FRAMEWORK_API const VkPhysicalDeviceProperties getProperties() const;
-		DEVA_FRAMEWORK_API const VkPhysicalDeviceFeatures getFeatures() const;
-		DEVA_FRAMEWORK_API size_t getQueueFamiliyCount() const;
-		DEVA_FRAMEWORK_API const VkQueueFamilyProperties& getQueueFamiliy(int i) const;
+			VkPhysicalDevice handle,
+			const VkPhysicalDeviceProperties &properties,
+			const VkPhysicalDeviceFeatures &features,
+			const std::vector<VkQueueFamilyProperties> &queueFamilies) 
+			: handle(handle), 
+			properties(properties), 
+			features(features), 
+			queueFamilies(queueFamilies) {}
 
 		DEVA_FRAMEWORK_API std::string to_string() const;
 	};

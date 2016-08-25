@@ -205,7 +205,7 @@ void ImplWindow::bindSurface(VulkanInstance &vkinstance)
 
 	VkSurfaceKHR surface;
 
-	VkResult result = vkCreateWin32SurfaceKHR(vkinstance.handle, &info, NULL, &surface);
+	VkResult result = vkinstance.vk.vkCreateWin32SurfaceKHR(vkinstance.handle, &info, NULL, &surface);
 	if (result != VK_SUCCESS)
 		throw DevaExternalFailureException("Could not create Vulkan surface.", "vkCreateWin32SurfaceKHR", "ImplWindow::createSurface", "Vulkan");
 	

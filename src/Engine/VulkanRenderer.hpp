@@ -11,13 +11,13 @@ namespace DevaEngine
 	class VulkanRenderer : public Renderer
 	{
 
-		//VulkanSurface surface;
+		DevaFramework::VulkanInstance instance;
 
 	public:
 
-		VulkanRenderer() {}
+		DEVA_ENGINE_API VulkanRenderer();
 
-		virtual void renderExample() {}
+		DEVA_ENGINE_API virtual void renderExample();
 
 	};
 }

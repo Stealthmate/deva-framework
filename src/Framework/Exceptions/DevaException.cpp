@@ -8,7 +8,10 @@ namespace
 }
 
 DevaException::DevaException(const std::string &description)
-	: stamp(DEVA_EXCEPTION), description(description), full_description(stamp + ": " + description) {}
+	: stamp(DEVA_EXCEPTION), description(description)
+{
+	full_description = stamp + " " + description;
+}
 
 const char* DevaException::what() const
 {
