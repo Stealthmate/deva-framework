@@ -60,7 +60,91 @@ namespace
 
 		return str;
 	}
+
+#define STRF(FNAME) feature = #FNAME; \
+str += "\t" + feature; \
+str.append(50 - feature.length(), ' '); \
+str += " - "; \
+if(features.##FNAME) str += "TRUE"; \
+else str += "FALSE"; \
+str += "\n";
+
+	std::string parseFeatures(const VkPhysicalDeviceFeatures &features)
+	{
+		std::string str = "\tSupported features:\n";
+		std::string feature = "";
+		STRF(robustBufferAccess);
+		STRF(fullDrawIndexUint32);
+		STRF(imageCubeArray);
+		STRF(independentBlend);
+		STRF(geometryShader);
+		STRF(tessellationShader);
+		STRF(sampleRateShading);
+		STRF(dualSrcBlend);
+		STRF(logicOp);
+		STRF(multiDrawIndirect);
+		STRF(drawIndirectFirstInstance);
+		STRF(depthClamp);
+		STRF(depthBiasClamp);
+		STRF(fillModeNonSolid);
+		STRF(depthBounds);
+		STRF(wideLines);
+		STRF(largePoints);
+		STRF(alphaToOne);
+		STRF(multiViewport);
+		STRF(samplerAnisotropy);
+		STRF(textureCompressionETC2);
+		STRF(textureCompressionASTC_LDR);
+		STRF(textureCompressionBC);
+		STRF(occlusionQueryPrecise);
+		STRF(pipelineStatisticsQuery);
+		STRF(vertexPipelineStoresAndAtomics);
+		STRF(fragmentStoresAndAtomics);
+		STRF(shaderTessellationAndGeometryPointSize);
+		STRF(shaderImageGatherExtended);
+		STRF(shaderStorageImageExtendedFormats);
+		STRF(shaderStorageImageMultisample);
+		STRF(shaderStorageImageReadWithoutFormat);
+		STRF(shaderStorageImageWriteWithoutFormat);
+		STRF(shaderUniformBufferArrayDynamicIndexing);
+		STRF(shaderSampledImageArrayDynamicIndexing);
+		STRF(shaderStorageBufferArrayDynamicIndexing);
+		STRF(shaderStorageImageArrayDynamicIndexing);
+		STRF(shaderClipDistance);
+		STRF(shaderCullDistance);
+		STRF(shaderFloat64);
+		STRF(shaderInt64);
+		STRF(shaderInt16);
+		STRF(shaderResourceResidency);
+		STRF(shaderResourceMinLod);
+		STRF(sparseBinding);
+		STRF(sparseResidencyBuffer);
+		STRF(sparseResidencyImage2D);
+		STRF(sparseResidencyImage3D);
+		STRF(sparseResidency2Samples);
+		STRF(sparseResidency4Samples);
+		STRF(sparseResidency8Samples);
+		STRF(sparseResidency16Samples);
+		STRF(sparseResidencyAliased);
+		STRF(variableMultisampleRate);
+		STRF(inheritedQueries);
+
+		return str;
+	}
+
 }
+
+
+VulkanPhysicalDevice::VulkanPhysicalDevice() = default;
+VulkanPhysicalDevice::VulkanPhysicalDevice(const VulkanPhysicalDevice &pdev) = default;
+VulkanPhysicalDevice::VulkanPhysicalDevice(VulkanPhysicalDevice &&pdev) = default;
+
+VulkanPhysicalDevice& VulkanPhysicalDevice::operator=(const VulkanPhysicalDevice &pdev) = default;
+VulkanPhysicalDevice& VulkanPhysicalDevice::operator=(VulkanPhysicalDevice &&pdev) = default;
+
+VulkanPhysicalDevice::~VulkanPhysicalDevice() = default;
+
+
 
 /*
 VkQueueFlags    queueFlags;
@@ -82,10 +166,16 @@ VkPhysicalDeviceLimits              limits;
 VkPhysicalDeviceSparseProperties    sparseProperties;
 */
 
+/*
+
+
+
+*/
+
 std::string VulkanPhysicalDevice::to_string() const
 {
 	std::stringstream strs;
-	strs << "\nVulkan Physical Device:";
+	strs << "Vulkan Physical Device:";
 	strs << "\n\tSupported API:         " << parseVKVersion(properties.apiVersion);
 	strs << "\n\tDriver Version:        " << properties.driverVersion;
 	strs << "\n\tVendor ID:             " << properties.vendorID;
@@ -96,6 +186,8 @@ std::string VulkanPhysicalDevice::to_string() const
 	//TODO: Implement pipelineCacheUUID, limits and sparse properties
 
 	for (auto &i : queueFamilies) strs << "\n" << parseQueueFamilyProperties(i);
+
+	strs << "\n" << parseFeatures(features);
 
 	strs << "\n";
 	return strs.str();

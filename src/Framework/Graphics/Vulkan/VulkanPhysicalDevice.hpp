@@ -10,10 +10,10 @@ namespace DevaFramework
 	struct VulkanPhysicalDevice
 	{
 
-		const VkPhysicalDevice handle;
-		const VkPhysicalDeviceProperties properties;
-		const VkPhysicalDeviceFeatures features;
-		const std::vector<VkQueueFamilyProperties> queueFamilies;
+		VkPhysicalDevice handle;
+		VkPhysicalDeviceProperties properties;
+		VkPhysicalDeviceFeatures features;
+		std::vector<VkQueueFamilyProperties> queueFamilies;
 
 		DEVA_FRAMEWORK_API VulkanPhysicalDevice(
 			VkPhysicalDevice handle,
@@ -24,6 +24,15 @@ namespace DevaFramework
 			properties(properties), 
 			features(features), 
 			queueFamilies(queueFamilies) {}
+
+		DEVA_FRAMEWORK_API VulkanPhysicalDevice();
+		DEVA_FRAMEWORK_API VulkanPhysicalDevice(const VulkanPhysicalDevice &pdev);
+
+		DEVA_FRAMEWORK_API VulkanPhysicalDevice(VulkanPhysicalDevice &&pdev);
+		DEVA_FRAMEWORK_API VulkanPhysicalDevice& operator=(const VulkanPhysicalDevice &pdev);
+		DEVA_FRAMEWORK_API VulkanPhysicalDevice& operator=(VulkanPhysicalDevice &&pdev);
+
+		DEVA_FRAMEWORK_API ~VulkanPhysicalDevice();
 
 		DEVA_FRAMEWORK_API std::string to_string() const;
 	};

@@ -36,7 +36,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance);
 		DEVA_FRAMEWORK_API ~VulkanInstance();
 
-		DEVA_FRAMEWORK_API std::vector<VkPhysicalDevice> getPhysicalDevices() const;
+		DEVA_FRAMEWORK_API std::vector<VulkanPhysicalDevice> getPhysicalDevices() const;
 
 		DEVA_FRAMEWORK_API InstanceFunctionSet getFunctionSet() const;
 

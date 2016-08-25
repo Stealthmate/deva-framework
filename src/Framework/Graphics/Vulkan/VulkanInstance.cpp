@@ -110,10 +110,12 @@ VulkanInstance::VulkanInstance(const VkInstanceCreateInfo &info) : handle(VK_NUL
 
 VulkanInstance::VulkanInstance() : handle(VK_NULL_HANDLE), surface(VK_NULL_HANDLE) {}
 
-VulkanInstance::VulkanInstance(VulkanInstance &&instance) : handle(instance.handle), surface(instance.surface), vk(instance.vk)
+VulkanInstance::VulkanInstance(VulkanInstance &&instance) 
+	: handle(instance.handle), surface(instance.surface), vk(instance.vk), physical_devices(instance.physical_devices)
 {
 	instance.handle = VK_NULL_HANDLE;
 	instance.surface = VK_NULL_HANDLE;
+	instance.physical_devices.clear();
 }
 
 VulkanInstance& VulkanInstance::operator=(VulkanInstance &&instance)
@@ -123,6 +125,9 @@ VulkanInstance& VulkanInstance::operator=(VulkanInstance &&instance)
 
 	this->surface = instance.surface;
 	instance.surface = VK_NULL_HANDLE;
+
+	this->physical_devices = instance.physical_devices;
+	instance.physical_devices.clear();
 
 	this->vk = instance.vk;
 
@@ -138,6 +143,12 @@ VulkanInstance::~VulkanInstance()
 VkInstance VulkanInstance::getInstance() const
 {
 	return this->handle;
+}
+
+
+std::vector<VulkanPhysicalDevice> VulkanInstance::getPhysicalDevices() const
+{
+	return physical_devices;
 }
 
 void VulkanInstance::destroy()

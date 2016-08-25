@@ -55,6 +55,7 @@ VulkanRenderer::VulkanRenderer() : instance()
 	}
 
 	this->instance = VulkanInstance::create(INSTANCE_CREATE_INFO);
+	DevaLogger::log.println(instance.getPhysicalDevices()[0].to_string());
 
 
 }
