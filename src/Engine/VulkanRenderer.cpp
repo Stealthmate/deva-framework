@@ -13,7 +13,7 @@ namespace
 		VK_MAKE_VERSION(1, 0, 0),           //applicationVersion
 		"Deva Engine",                      //pEngineName
 		VK_MAKE_VERSION(1, 0, 0),           //engineVersion
-		VK_MAKE_VERSION(1, 0, 13)           //apiVersion
+		0                                   //apiVersion
 	};
 
 	size_t N_EXTENSIONS = 3;
@@ -45,19 +45,52 @@ VulkanRenderer::VulkanRenderer() : instance()
 {
 	if (!VULKAN_LOADED) LoadVulkan();
 
-	for (int i = 0; i <= N_EXTENSIONS - 1;i++)
+	this->instance = VulkanInstance::create(INSTANCE_CREATE_INFO);
+	auto vk = instance.getFunctionSet();
+	auto pdevs = instance.getPhysicalDevices();
+
+	std::vector<float> priorities = { 1.0f };
+
+	for (auto &i : pdevs)
 	{
-		std::string extname = EXTENSIONS[i];
-		if (!vulkanExtensionAvailable(extname))
+		for (int q = 0; q <= i.queueFamilies.size() - 1; q++)
 		{
-			throw DevaException("Vulkan extension " + extname + " not supported on system.");
+			if (i.queueFamilies[q].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+			{
+				VkDeviceQueueCreateInfo q_cinfo =
+				{
+					VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+					nullptr,
+					0,
+					q,
+					static_cast<uint32_t>(priorities.size()),
+					priorities.data()
+				};
+
+				VkDeviceCreateInfo dev_cinfo = 
+				{
+					VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+					nullptr,
+					0,
+					1,
+					&q_cinfo,
+					0,
+					nullptr,
+					0,
+					nullptr,
+					nullptr
+				};
+
+				VkDevice dev;
+				vk.vkCreateDevice(i.handle, &dev_cinfo, nullptr, &dev);
+				this->main_device = VulkanDevice(dev, instance);
+				goto end_seek_device; //exits double loop
+			}
 		}
 	}
 
-	this->instance = VulkanInstance::create(INSTANCE_CREATE_INFO);
-	DevaLogger::log.println(instance.getPhysicalDevices()[0].to_string());
-
-
+	end_seek_device:
+	;
 }
 
 void VulkanRenderer::renderExample()

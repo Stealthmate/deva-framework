@@ -29,7 +29,7 @@ namespace
 	};
 }
 
-#define ERRCHK() if( result != VK_SUCCESS ) throw ex;
+#define ERRCHK if( result != VK_SUCCESS ) throw DevaException("DevaFramework::VulkanInstance failed because of Vulkan. Check logs for more info.");
 
 VulkanInstance VulkanInstance::create()
 {
@@ -38,52 +38,55 @@ VulkanInstance VulkanInstance::create()
 
 VulkanInstance VulkanInstance::create(const VkInstanceCreateInfo &info)
 {
-	return VulkanInstance(info);
-}
-
-VulkanInstance::VulkanInstance(const VkInstanceCreateInfo &info) : handle(VK_NULL_HANDLE), surface(VK_NULL_HANDLE)
-{
+	VULKAN_LOG.println("Creating VulkanInstance...");
 	VkInstance instance_handle;
 
 	if (!vkCreateInstance)
-		throw DevaProgrammerErrorException(
-			"Vulkan not initialized", 
-			"DevaFramework::loadVulkan() not called?", 
-			"Call DevaFramework::loadVulkan() before using the Vulkan wrappers", 
+		throw DevaProgrammerErrorException(//l
+			"Vulkan not initialized",
+			"DevaFramework::loadVulkan() not called?",
+			"Call DevaFramework::loadVulkan() before using the Vulkan wrappers",
 			"-");
 
-	DevaException ex("DevaFramework::VulkanInstance failed because of Vulkan. Check logs for more info.");
+	std::vector<std::string> extensions;
+	for (int i = 0;i <= info.enabledExtensionCount - 1;i++)
+	{
+		extensions.push_back(*(info.ppEnabledExtensionNames + i));
+		if (!vulkanInstanceExtensionAvailable(extensions[i]))
+			throw DevaException("Could not create VkInstance - extension " + extensions[i] + " not supported by system.");
+	}
 
 	VULKAN_LOG.println("Getting VkInstance handle...");
 	auto result = vkCreateInstance(&info, NULL, &instance_handle);
-	ERRCHK();
+	ERRCHK;
 
-	this->handle = instance_handle;
+	return VulkanInstance(instance_handle);
+}
 
-	VULKAN_LOG.println("Loading instance-local functions...");
-	this->vk.load(this->handle);
+void VulkanInstance::populatePDeviceList()
+{
+	VkResult result;
 
 	VULKAN_LOG.println("Enumerating physical devices (count)...");
 	uint32_t device_count = 0;
-	result = vk.vkEnumeratePhysicalDevices(instance_handle, &device_count, NULL);
-	ERRCHK();
+	result = vk.vkEnumeratePhysicalDevices(handle, &device_count, NULL);
+	ERRCHK;
 
 	if (device_count == 0) {
-		throw DevaException(
-			"No physical devices available.");
+		throw DevaException(std::string("No physical devices available."));
 	}
 
 	VULKAN_LOG.println("System has " + strm(device_count) + " devices.");
 
 	VULKAN_LOG.println("Enumerating physical devices (handles)...");
 	std::vector<VkPhysicalDevice> deviceHandles(device_count);
-	result = vk.vkEnumeratePhysicalDevices(instance_handle, &device_count, &deviceHandles[0]);
-	ERRCHK();
+	result = vk.vkEnumeratePhysicalDevices(handle, &device_count, &deviceHandles[0]);
+	ERRCHK;
 
 	VkPhysicalDeviceProperties deviceProperties;
 	VkPhysicalDeviceFeatures deviceFeatures;
 	std::vector<VkQueueFamilyProperties> queueFamilies;
-	for (uint32_t i = 0; i <= device_count - 1; i++) 
+	for (uint32_t i = 0; i <= device_count - 1; i++)
 	{
 
 		VULKAN_LOG.println("Querying VkPhysicalDeviceProperties for device " + strm(i) + "...");
@@ -104,6 +107,15 @@ VulkanInstance::VulkanInstance(const VkInstanceCreateInfo &info) : handle(VK_NUL
 		VULKAN_LOG.println("Adding device to list");
 		this->physical_devices.push_back(VulkanPhysicalDevice(deviceHandles[i], deviceProperties, deviceFeatures, queueFamilies));
 	}
+}
+
+
+VulkanInstance::VulkanInstance(VkInstance handle) : handle(handle), surface(VK_NULL_HANDLE)
+{
+	VULKAN_LOG.println("Loading instance-local functions...");
+	this->vk.load(this->handle);
+
+	populatePDeviceList();
 
 	VULKAN_LOG.println("Successfully initialized VulkanInstance");
 }
@@ -145,6 +157,10 @@ VkInstance VulkanInstance::getInstance() const
 	return this->handle;
 }
 
+InstanceFunctionSet VulkanInstance::getFunctionSet() const
+{
+	return vk;
+}
 
 std::vector<VulkanPhysicalDevice> VulkanInstance::getPhysicalDevices() const
 {

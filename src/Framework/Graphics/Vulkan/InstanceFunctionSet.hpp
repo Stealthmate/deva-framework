@@ -13,12 +13,13 @@ namespace DevaFramework
 		PFN_vkGetPhysicalDeviceFeatures                     vkGetPhysicalDeviceFeatures;
 		PFN_vkGetPhysicalDeviceProperties                   vkGetPhysicalDeviceProperties;
 		PFN_vkGetPhysicalDeviceQueueFamilyProperties        vkGetPhysicalDeviceQueueFamilyProperties;
-		PFN_vkGetPhysicalDeviceSurfaceSupportKHR            vkGetPhysicalDeviceSurfaceSupportKHR;
 
 		PFN_vkCreateDevice                                  vkCreateDevice;
 		PFN_vkDestroyDevice                                 vkDestroyDevice;
 		PFN_vkGetDeviceProcAddr                             vkGetDeviceProcAddr;
 
+
+		PFN_vkGetPhysicalDeviceSurfaceSupportKHR            vkGetPhysicalDeviceSurfaceSupportKHR;
 #ifdef VK_USE_PLATFORM_WIN32_KHR		                   
 
 		PFN_vkCreateWin32SurfaceKHR                         vkCreateWin32SurfaceKHR;
@@ -29,16 +30,16 @@ namespace DevaFramework
 		PFN_vkDestroySurfaceKHR                             vkDestroySurfaceKHR;
 		PFN_vkAcquireNextImageKHR                           vkAcquireNextImageKHR;
 
-		InstanceFunctionSet();
-		InstanceFunctionSet(const InstanceFunctionSet &fset);
-		InstanceFunctionSet(InstanceFunctionSet &&fset);
+		DEVA_FRAMEWORK_API InstanceFunctionSet();
+		DEVA_FRAMEWORK_API InstanceFunctionSet(const InstanceFunctionSet &fset);
+		DEVA_FRAMEWORK_API InstanceFunctionSet(InstanceFunctionSet &&fset);
 
-		InstanceFunctionSet& operator=(const InstanceFunctionSet &fset);
-		InstanceFunctionSet& operator=(InstanceFunctionSet &&fset);
+		DEVA_FRAMEWORK_API InstanceFunctionSet& operator=(const InstanceFunctionSet &fset);
+		DEVA_FRAMEWORK_API InstanceFunctionSet& operator=(InstanceFunctionSet &&fset);
 
-		~InstanceFunctionSet();
+		DEVA_FRAMEWORK_API ~InstanceFunctionSet();
 
-		void load(VkInstance vkInstance);
+		DEVA_FRAMEWORK_API void load(VkInstance vkInstance);
 
 	};
 }

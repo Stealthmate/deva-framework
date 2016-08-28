@@ -3,24 +3,23 @@
 
 #include "Config.hpp"
 
-#include "VulkanPhysicalDevice.hpp"
+#include "VulkanInstance.hpp"
+#include "VulkanDeviceFunctionSet.hpp"
 
 namespace DevaFramework
 {
 
 	class VulkanDevice
 	{
-	public:
-
-#include "DeviceFunctionSet.inl"
-
 	private:
 
 		VkDevice handle;
+		VulkanDeviceFunctionSet vk;
 
 	public:
 
-		DEVA_FRAMEWORK_API VulkanDevice(VkDevice handle);
+		DEVA_FRAMEWORK_API VulkanDevice();
+		DEVA_FRAMEWORK_API VulkanDevice(VkDevice handle, const VulkanInstance &vkInstance);
 
 	};
 

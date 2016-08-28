@@ -14,6 +14,8 @@ PFN_vkEnumerateInstanceLayerProperties              vkEnumerateInstanceLayerProp
 PFN_vkEnumerateInstanceExtensionProperties          vkEnumerateInstanceExtensionProperties = nullptr;
 
 DevaLogger DevaFramework::VULKAN_LOG = DevaLogger("[Vulkan] Log: ", DevaLogger::LogLevel::LOG_MESSAGE, true);
+DevaLogger DevaFramework::VULKAN_WARN = DevaLogger("[Vulkan] Warning: ", DevaLogger::LogLevel::LOG_WARNING, true);
+DevaLogger DevaFramework::VULKAN_ERR = DevaLogger("[Vulkan] Error: ", DevaLogger::LogLevel::LOG_ERROR, true);
 
 namespace
 {
@@ -26,7 +28,7 @@ if(!PFNNAME) \
 	throw DevaExternalFailureException("Could not get PFN_"#PFNNAME, "DevaFramework::internal::getVulkanGlobalFunctions", "vkGetInstanceProcAddr", "Windows/Vulkan"); \
 else \
 { \
-	std::string msg = "Get PFN "; \
+	std::string msg = "Getting PFN "; \
 	msg += #PFNNAME; \
 	msg.append(70 - msg.length(), ' '); \
 	VULKAN_LOG.println(msg + " - SUCCESS"); \
@@ -55,9 +57,9 @@ void DevaFramework::LoadVulkan(const std::string &dllpath)
 	VULKAN_LOG.println("Successfully enumerated extensions");
 }
 
-bool DevaFramework::vulkanExtensionAvailable(const std::string & extensionName)
+bool DevaFramework::vulkanInstanceExtensionAvailable(const std::string & extensionName)
 {
-	VULKAN_LOG << "Querying extension " + extensionName << "...";
+	VULKAN_LOG << VULKAN_LOG.stamp() << "Querying instance extension " + extensionName << "...";
 	for (auto &i : EXTENSIONS_AVAILABLE)
 	{
 		if (extensionName == i.extensionName) 

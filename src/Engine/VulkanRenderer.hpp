@@ -5,6 +5,7 @@
 
 #include "Renderer.hpp"
 #include <DevaFramework\Graphics/Vulkan/VulkanInstance.hpp>
+#include <DevaFramework\Graphics/Vulkan/VulkanDevice.hpp>
 
 namespace DevaEngine
 {
@@ -12,6 +13,7 @@ namespace DevaEngine
 	{
 
 		DevaFramework::VulkanInstance instance;
+		DevaFramework::VulkanDevice main_device;
 
 	public:
 

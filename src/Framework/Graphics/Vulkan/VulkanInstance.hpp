@@ -22,6 +22,8 @@ namespace DevaFramework
 
 		std::vector<VulkanPhysicalDevice> physical_devices;
 
+		void populatePDeviceList();
+
 		VulkanInstance(const VkInstanceCreateInfo &info);
 
 	public: 
@@ -29,6 +31,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API static VulkanInstance create(); //This DOES create a valid VkInstance, with implementation-defined default createinfo
 		DEVA_FRAMEWORK_API static VulkanInstance create(const VkInstanceCreateInfo &info);
 
+		DEVA_FRAMEWORK_API VulkanInstance(VkInstance handle); //Wraps the handle
 		DEVA_FRAMEWORK_API VulkanInstance(); //This does NOT create a valid VkInstance. This only creates an empty object.
 		DEVA_FRAMEWORK_API VulkanInstance(const VulkanInstance &vkinstance)             = delete;
 		DEVA_FRAMEWORK_API VulkanInstance(VulkanInstance &&vkinstance);

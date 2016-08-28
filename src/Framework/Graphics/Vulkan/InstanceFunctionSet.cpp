@@ -1,15 +1,21 @@
 #include "InstanceFunctionSet.hpp"
+#include "ImplDefaultVulkanInstanceFunctionSet.hpp"
+#include "ImplDefaultVulkanDeviceFunctionSet.hpp"
 
 using namespace DevaFramework;
 
 #define LOAD(PFNNAME) \
-VULKAN_LOG.println("Getting PFN_" #PFNNAME "..."); \
-this->PFNNAME = (PFN_##PFNNAME) vkGetInstanceProcAddr(vkinstance, #PFNNAME);
+VULKAN_LOG.println("Getting Instance PFN_" #PFNNAME "..."); \
+this->PFNNAME = (PFN_##PFNNAME) vkGetInstanceProcAddr(vkinstance, #PFNNAME); \
+if(this->PFNNAME == NULL) \
+{ \
+	VULKAN_WARN.println("Instance PFN_" #PFNNAME " not available (Extension not specified in VkInstanceCreateInfo?)"); \
+	this->PFNNAME = (PFN_##PFNNAME) internal::impldef_##PFNNAME; \
+}
 
 void InstanceFunctionSet::load(VkInstance vkinstance)
 {
 	LOAD(vkDestroyInstance);
-
 	LOAD(vkEnumeratePhysicalDevices);
 	LOAD(vkGetPhysicalDeviceFeatures);
 	LOAD(vkGetPhysicalDeviceProperties);

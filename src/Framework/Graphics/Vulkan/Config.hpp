@@ -27,8 +27,10 @@ namespace DevaFramework
 	}
 
 	DEVA_FRAMEWORK_API extern DevaLogger VULKAN_LOG;
+	DEVA_FRAMEWORK_API extern DevaLogger VULKAN_WARN;
+	DEVA_FRAMEWORK_API extern DevaLogger VULKAN_ERR;
 	DEVA_FRAMEWORK_API void LoadVulkan(const std::string &dllpath = "");
-	DEVA_FRAMEWORK_API bool vulkanExtensionAvailable(const std::string & extensionName);
+	DEVA_FRAMEWORK_API bool vulkanInstanceExtensionAvailable(const std::string & extensionName);
 }
 
 #endif //DEVA_FRAMEWORK_GRAPHICS_VULKAN_CONFIG_HPP

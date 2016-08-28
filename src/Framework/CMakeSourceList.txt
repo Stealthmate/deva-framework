@@ -90,8 +90,13 @@ set(
 	${CURDIR}/Vulkan/VulkanInstance.hpp
 	${CURDIR}/Vulkan/InstanceFunctionSet.cpp
 	${CURDIR}/Vulkan/InstanceFunctionSet.hpp
+	${CURDIR}/Vulkan/ImplDefaultVulkanDeviceFunctionSet.cpp
+	${CURDIR}/Vulkan/ImplDefaultVulkanDeviceFunctionSet.hpp
+	${CURDIR}/Vulkan/ImplDefaultVulkanInstanceFunctionSet.cpp
+	${CURDIR}/Vulkan/ImplDefaultVulkanInstanceFunctionSet.hpp
+	${CURDIR}/Vulkan/VulkanDeviceFunctionSet.cpp
+	${CURDIR}/Vulkan/VulkanDeviceFunctionSet.hpp
 	${CURDIR}/Vulkan/VulkanInstance.cpp
-	${CURDIR}/Vulkan/VulkanFunctions.inl
 )
 
 set(
@@ -118,7 +123,7 @@ set(
 	${CURDIR}/Vulkan/VulkanDevice.hpp
 	${CURDIR}/Vulkan/VulkanInstance.hpp
 	${CURDIR}/Vulkan/InstanceFunctionSet.hpp
-	${CURDIR}/Vulkan/VulkanFunctions.inl
+	${CURDIR}/Vulkan/VulkanDeviceFunctionSet.hpp
 )
 
 
