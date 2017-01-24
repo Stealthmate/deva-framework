@@ -14,16 +14,22 @@ namespace DevaFramework
 		VkPhysicalDeviceProperties properties;
 		VkPhysicalDeviceFeatures features;
 		std::vector<VkQueueFamilyProperties> queueFamilies;
+		std::vector<VkExtensionProperties> extensions;
+		std::vector<VkLayerProperties> layers;
 
 		DEVA_FRAMEWORK_API VulkanPhysicalDevice(
 			VkPhysicalDevice handle,
 			const VkPhysicalDeviceProperties &properties,
 			const VkPhysicalDeviceFeatures &features,
-			const std::vector<VkQueueFamilyProperties> &queueFamilies) 
+			const std::vector<VkQueueFamilyProperties> &queueFamilies,
+			const std::vector<VkExtensionProperties> & extensions,
+			const std::vector<VkLayerProperties> & layers) 
 			: handle(handle), 
 			properties(properties), 
 			features(features), 
-			queueFamilies(queueFamilies) {}
+			queueFamilies(queueFamilies),
+			extensions(extensions),
+			layers(layers) {}
 
 		DEVA_FRAMEWORK_API VulkanPhysicalDevice();
 		DEVA_FRAMEWORK_API VulkanPhysicalDevice(const VulkanPhysicalDevice &pdev);

@@ -16,7 +16,8 @@ namespace
 }
 
 //vec2
-void DevaFramework::setShaderUniform(gl::GLuint uniformid, const vec2 &value, GLsizei count, GLboolean transpose)
+void DevaFramework::setShaderUniform(
+	gl::GLuint uniformid, const vec2 &value, GLsizei count, GLboolean transpose)
 {
 	glUniform2f(uniformid, value[0], value[1]);
 }

@@ -132,10 +132,54 @@ str += "\n";
 		return str;
 	}
 
+#undef STRF
+
+	std::string parseExtensions(const std::vector<VkExtensionProperties> &extensions)
+	{
+		std::string str = "Supported Extensions:\n";
+		
+		for (auto &ex : extensions)
+		{
+			int major = VK_VERSION_MAJOR(ex.specVersion);
+			int minor = VK_VERSION_MINOR(ex.specVersion);
+			int patch = VK_VERSION_PATCH(ex.specVersion);
+			str += "\t" + strm(ex.extensionName) + " - " + strm(major) + "." + strm(minor) + "." + strm(patch) + "\n";
+		}
+		return str;
+	}
+
+
+	std::string parseLayers(const std::vector<VkLayerProperties> &layers)
+	{
+		std::string str = "Supported Layers:\n";
+
+		for (auto &l : layers)
+		{
+			std::string name = l.layerName;
+			int specMajor = VK_VERSION_MAJOR(l.specVersion);
+			int specMinor = VK_VERSION_MINOR(l.specVersion);
+			int specPatch = VK_VERSION_PATCH(l.specVersion);
+
+			int implMajor = VK_VERSION_MAJOR(l.implementationVersion);
+			int implMinor = VK_VERSION_MINOR(l.implementationVersion);
+			int implPatch = VK_VERSION_PATCH(l.implementationVersion);
+
+			std::string desc = l.description;
+
+			str += "\t" + name + "\n\t\tSpec Version: " + strm(specMajor) + "." + strm(specMinor) + "." + strm(specPatch) + "\n";
+			str += "\t\tImpl Version: " + strm(implMajor) + "." + strm(implMinor) + "." + strm(implPatch) + "\n";
+			str += "\t\t" + desc + "\n";
+		}
+
+		return str;
+	}
 }
 
 
-VulkanPhysicalDevice::VulkanPhysicalDevice() = default;
+VulkanPhysicalDevice::VulkanPhysicalDevice()
+{
+	this->handle = VK_NULL_HANDLE;
+}
 VulkanPhysicalDevice::VulkanPhysicalDevice(const VulkanPhysicalDevice &pdev) = default;
 VulkanPhysicalDevice::VulkanPhysicalDevice(VulkanPhysicalDevice &&pdev) = default;
 
@@ -188,6 +232,8 @@ std::string VulkanPhysicalDevice::to_string() const
 	for (auto &i : queueFamilies) strs << "\n" << parseQueueFamilyProperties(i);
 
 	strs << "\n" << parseFeatures(features);
+	strs << "\n" << parseExtensions(extensions);
+	strs << "\n" << parseLayers(layers);
 
 	strs << "\n";
 	return strs.str();

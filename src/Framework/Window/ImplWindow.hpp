@@ -17,8 +17,8 @@ namespace DevaFramework
 #ifdef DEVA_OS_WIN32
 		friend LRESULT CALLBACK WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-		HINSTANCE		impl_win32_instance;
-		HWND			impl_win32_window;
+		HINSTANCE		impl_win32_hinstance;
+		HWND			impl_win32_hwnd;
 		std::string		impl_win32_class_name;
 #endif
 		friend class Window;
@@ -50,6 +50,9 @@ namespace DevaFramework
 		ImplWindow(ImplWindow &&implwnd, Window* new_wnd);
 		~ImplWindow();
 
+		unsigned int getWidth() const;
+		unsigned int getHeight() const;
+
 		bool update();
 		void close();
 
@@ -60,7 +63,7 @@ namespace DevaFramework
 		void* getUserData() const;
 		void setUserData(void *userData);
 
-		void bindSurface(VulkanInstance &vkinstance);
+		std::unique_ptr<OSHandles> getOSHandles() const;
 	};
 }
 

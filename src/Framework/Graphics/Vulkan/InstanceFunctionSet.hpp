@@ -5,14 +5,18 @@
 
 namespace DevaFramework
 {
-	struct InstanceFunctionSet
+	struct VulkanInstanceFunctionSet
 	{
+		DEVA_FRAMEWORK_API static VulkanInstanceFunctionSet load(VkInstance vkInstance);
+
 		PFN_vkDestroyInstance                               vkDestroyInstance;
 
 		PFN_vkEnumeratePhysicalDevices                      vkEnumeratePhysicalDevices;
 		PFN_vkGetPhysicalDeviceFeatures                     vkGetPhysicalDeviceFeatures;
 		PFN_vkGetPhysicalDeviceProperties                   vkGetPhysicalDeviceProperties;
 		PFN_vkGetPhysicalDeviceQueueFamilyProperties        vkGetPhysicalDeviceQueueFamilyProperties;
+		PFN_vkEnumerateDeviceExtensionProperties            vkEnumerateDeviceExtensionProperties;
+		PFN_vkEnumerateDeviceLayerProperties                vkEnumerateDeviceLayerProperties;
 
 		PFN_vkCreateDevice                                  vkCreateDevice;
 		PFN_vkDestroyDevice                                 vkDestroyDevice;
@@ -20,6 +24,10 @@ namespace DevaFramework
 
 
 		PFN_vkGetPhysicalDeviceSurfaceSupportKHR            vkGetPhysicalDeviceSurfaceSupportKHR;
+		PFN_vkGetPhysicalDeviceSurfaceFormatsKHR            vkGetPhysicalDeviceSurfaceFormatsKHR;
+		PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR       vkGetPhysicalDeviceSurfaceCapabilitiesKHR;
+		PFN_vkGetPhysicalDeviceSurfacePresentModesKHR       vkGetPhysicalDeviceSurfacePresentModesKHR;
+
 #ifdef VK_USE_PLATFORM_WIN32_KHR		                   
 
 		PFN_vkCreateWin32SurfaceKHR                         vkCreateWin32SurfaceKHR;
@@ -28,18 +36,16 @@ namespace DevaFramework
 #endif
 
 		PFN_vkDestroySurfaceKHR                             vkDestroySurfaceKHR;
-		PFN_vkAcquireNextImageKHR                           vkAcquireNextImageKHR;
+		PFN_vkCreateDebugReportCallbackEXT                  vkCreateDebugReportCallbackEXT;
 
-		DEVA_FRAMEWORK_API InstanceFunctionSet();
-		DEVA_FRAMEWORK_API InstanceFunctionSet(const InstanceFunctionSet &fset);
-		DEVA_FRAMEWORK_API InstanceFunctionSet(InstanceFunctionSet &&fset);
+		DEVA_FRAMEWORK_API VulkanInstanceFunctionSet();
+		DEVA_FRAMEWORK_API VulkanInstanceFunctionSet(const VulkanInstanceFunctionSet &fset);
+		DEVA_FRAMEWORK_API VulkanInstanceFunctionSet(VulkanInstanceFunctionSet &&fset);
 
-		DEVA_FRAMEWORK_API InstanceFunctionSet& operator=(const InstanceFunctionSet &fset);
-		DEVA_FRAMEWORK_API InstanceFunctionSet& operator=(InstanceFunctionSet &&fset);
+		DEVA_FRAMEWORK_API VulkanInstanceFunctionSet& operator=(const VulkanInstanceFunctionSet &fset);
+		DEVA_FRAMEWORK_API VulkanInstanceFunctionSet& operator=(VulkanInstanceFunctionSet &&fset);
 
-		DEVA_FRAMEWORK_API ~InstanceFunctionSet();
-
-		DEVA_FRAMEWORK_API void load(VkInstance vkInstance);
+		DEVA_FRAMEWORK_API ~VulkanInstanceFunctionSet();
 
 	};
 }

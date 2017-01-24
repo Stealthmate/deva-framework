@@ -25,6 +25,18 @@ void DevaFramework::internal::impldef_vkGetPhysicalDeviceQueueFamilyProperties(V
 	VULKAN_ERR.println("Called vkGetPhysicalDeviceQueueFamilyProperties without proper driver PFN");
 }
 
+VkResult DevaFramework::internal::impldef_vkEnumerateDeviceExtensionProperties(VkPhysicalDevice physicalDevice, const char* pLayerName, uint32_t* pPropertyCount, VkExtensionProperties* pProperties)
+{
+	VULKAN_ERR.println("Called vkEnumerateDeviceExtensionProperties without proper driver PFN");
+	return VK_SUCCESS;
+}
+
+VkResult DevaFramework::internal::impldef_vkEnumerateDeviceLayerProperties(VkPhysicalDevice physicalDevice, uint32_t* pPropertyCount, VkLayerProperties* pProperties)
+{
+	VULKAN_ERR.println("Called vkEnumerateDeviceLayerProperties without proper driver PFN");
+	return VK_SUCCESS;
+}
+
 VkResult DevaFramework::internal::impldef_vkCreateDevice(VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDevice* pDevice)
 {
 	VULKAN_ERR.println("Called vkCreateDevice without proper driver PFN");
@@ -78,28 +90,8 @@ void DevaFramework::internal::impldef_vkDestroySurfaceKHR(VkInstance instance, V
 {
 	VULKAN_ERR.println("Called vkDestroySurfaceKHR without proper driver PFN");
 }
-
-VkResult DevaFramework::internal::impldef_vkCreateSwapchainKHR(VkDevice device, const VkSwapchainCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSwapchainKHR* pSwapchain)
+VkResult DevaFramework::internal::impldef_vkCreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback)
 {
-	VULKAN_ERR.println("Called vkCreateSwapchainKHR without proper driver PFN");
+	VULKAN_ERR.println("Called vkCreateDebugReportCallbackEXT without proper driver PFN");
 	return VK_SUCCESS;
-}
-VkResult DevaFramework::internal::impldef_vkGetSwapchainImagesKHR(VkDevice device, VkSwapchainKHR swapchain, uint32_t* pSwapchainImageCount, VkImage* pSwapchainImages)
-{
-	VULKAN_ERR.println("Called vkGetSwapchainImagesKHR without proper driver PFN");
-	return VK_SUCCESS;
-}
-VkResult DevaFramework::internal::impldef_vkAcquireNextImageKHR(VkDevice device, VkSwapchainKHR swapchain, uint64_t timeout, VkSemaphore semaphore, VkFence fence, uint32_t* pImageIndex)
-{
-	VULKAN_ERR.println("Called vkAcquireNextImageKHR without proper driver PFN");
-	return VK_SUCCESS;
-}
-VkResult DevaFramework::internal::impldef_vkQueuePresentKHR(VkQueue queue, const VkPresentInfoKHR* pPresentInfo)
-{
-	VULKAN_ERR.println("Called vkQueuePresentKHR without proper driver PFN");
-	return VK_SUCCESS;
-}
-void DevaFramework::internal::impldef_vkDestroySwapchainKHR(VkDevice device, VkSwapchainKHR swapchain, const VkAllocationCallbacks* pAllocator)
-{
-	VULKAN_ERR.println("Called vkDestroySwapchainKHR without proper driver PFN");
 }

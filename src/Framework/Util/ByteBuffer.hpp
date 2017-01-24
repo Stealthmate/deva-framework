@@ -28,9 +28,12 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API void setPosition(size_t new_pos);
 		DEVA_FRAMEWORK_API size_t getPosition() const;
 
+		DEVA_FRAMEWORK_API size_t size() const;
+
 		DEVA_FRAMEWORK_API void resize(size_t new_size);
 
-		DEVA_FRAMEWORK_API const std::vector<char>& getBuffer() const;
+		DEVA_FRAMEWORK_API const std::vector<char>& buf() const;
+		DEVA_FRAMEWORK_API std::vector<char>& buf();
 
 	};
 }

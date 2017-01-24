@@ -39,6 +39,16 @@ WindowObserver& ImplWindow::getEventObserver()
 	return *this->eventObserver;
 }
 
+unsigned int ImplWindow::getWidth() const
+{
+	return this->surface_width;
+}
+
+unsigned int ImplWindow::getHeight() const
+{
+	return this->surface_height;
+}
+
 bool ImplWindow::update()
 {
 	this->impl_update();

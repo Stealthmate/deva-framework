@@ -6,21 +6,27 @@ using namespace DevaFramework;
 
 #define LOAD(PFNNAME) \
 VULKAN_LOG.println("Getting Instance PFN_" #PFNNAME "..."); \
-this->PFNNAME = (PFN_##PFNNAME) vkGetInstanceProcAddr(vkinstance, #PFNNAME); \
-if(this->PFNNAME == NULL) \
+vinstf.PFNNAME = (PFN_##PFNNAME) vkGetInstanceProcAddr(vkinstance, #PFNNAME); \
+if(vinstf.PFNNAME == NULL) \
 { \
 	VULKAN_WARN.println("Instance PFN_" #PFNNAME " not available (Extension not specified in VkInstanceCreateInfo?)"); \
-	this->PFNNAME = (PFN_##PFNNAME) internal::impldef_##PFNNAME; \
+	vinstf.PFNNAME = (PFN_##PFNNAME) internal::impldef_##PFNNAME; \
 }
 
-void InstanceFunctionSet::load(VkInstance vkinstance)
+VulkanInstanceFunctionSet VulkanInstanceFunctionSet::load(VkInstance vkinstance)
 {
+	VulkanInstanceFunctionSet vinstf;
 	LOAD(vkDestroyInstance);
 	LOAD(vkEnumeratePhysicalDevices);
 	LOAD(vkGetPhysicalDeviceFeatures);
 	LOAD(vkGetPhysicalDeviceProperties);
 	LOAD(vkGetPhysicalDeviceQueueFamilyProperties);
 	LOAD(vkGetPhysicalDeviceSurfaceSupportKHR);
+	LOAD(vkGetPhysicalDeviceSurfaceFormatsKHR);
+	LOAD(vkGetPhysicalDeviceSurfaceCapabilitiesKHR);
+	LOAD(vkGetPhysicalDeviceSurfacePresentModesKHR);
+	LOAD(vkEnumerateDeviceExtensionProperties);
+	LOAD(vkEnumerateDeviceLayerProperties);
 
 	LOAD(vkCreateDevice);
 	LOAD(vkDestroyDevice);
@@ -32,14 +38,16 @@ void InstanceFunctionSet::load(VkInstance vkinstance)
 #endif //VK_USE_PLATFORM_WIN32_KHR
 
 	LOAD(vkDestroySurfaceKHR);
-	LOAD(vkAcquireNextImageKHR);
+	LOAD(vkCreateDebugReportCallbackEXT);
+
+	return vinstf;
 }
 
-InstanceFunctionSet::InstanceFunctionSet() = default;
-InstanceFunctionSet::InstanceFunctionSet(const InstanceFunctionSet &fset) = default;
-InstanceFunctionSet::InstanceFunctionSet(InstanceFunctionSet &&fset) = default;
+VulkanInstanceFunctionSet::VulkanInstanceFunctionSet() = default;
+VulkanInstanceFunctionSet::VulkanInstanceFunctionSet(const VulkanInstanceFunctionSet &fset) = default;
+VulkanInstanceFunctionSet::VulkanInstanceFunctionSet(VulkanInstanceFunctionSet &&fset) = default;
 
-InstanceFunctionSet& InstanceFunctionSet::operator=(const InstanceFunctionSet &fset) = default;
-InstanceFunctionSet& InstanceFunctionSet::operator=(InstanceFunctionSet &&fset) = default;
+VulkanInstanceFunctionSet& VulkanInstanceFunctionSet::operator=(const VulkanInstanceFunctionSet &fset) = default;
+VulkanInstanceFunctionSet& VulkanInstanceFunctionSet::operator=(VulkanInstanceFunctionSet &&fset) = default;
 
-InstanceFunctionSet::~InstanceFunctionSet() = default;
+VulkanInstanceFunctionSet::~VulkanInstanceFunctionSet() = default;

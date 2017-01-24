@@ -99,7 +99,7 @@ void ImplWindow::impl_init()
 		throw DevaInvalidArgumentException(
 			"Invalid window dimensions. (width: " + strm(surface_width) + " ; height: " + strm(surface_height) + ")");
 
-	impl_win32_instance = GetModuleHandle(nullptr);
+	impl_win32_hinstance = GetModuleHandle(nullptr);
 	impl_win32_class_name = this->name + "_" + strm(impl_win32_class_id_counter);
 	impl_win32_class_id_counter++;
 
@@ -109,7 +109,7 @@ void ImplWindow::impl_init()
 	win_class.lpfnWndProc = WindowsEventHandler;
 	win_class.cbClsExtra = 0;
 	win_class.cbWndExtra = 0;
-	win_class.hInstance = impl_win32_instance;
+	win_class.hInstance = impl_win32_hinstance;
 	win_class.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	win_class.hCursor = LoadCursor(NULL, IDC_ARROW);
 	win_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
@@ -141,7 +141,7 @@ void ImplWindow::impl_init()
 
 
 	init_call = true;
-	impl_win32_window = CreateWindowEx(0,
+	impl_win32_hwnd = CreateWindowEx(0,
 		impl_win32_class_name.c_str(),		// class name
 		this->name.c_str(),			// app name
 		style,							// window style
@@ -150,39 +150,39 @@ void ImplWindow::impl_init()
 		wr.bottom - wr.top,				// height
 		NULL,							// handle to parent
 		NULL,							// handle to menu
-		this->impl_win32_instance,				// hInstance
+		this->impl_win32_hinstance,				// hInstance
 		NULL);							// no extra parameters
 
 	init_call = false;
 
-	if (!this->impl_win32_window) {
+	if (!this->impl_win32_hwnd) {
 		throw DevaExternalFailureException("Could not create window.", "Windows", "CreateWindowEx", "DevaFramework::ImplWindow::initOSWindow");
 	}
 
-	SetWindowLongPtr(this->impl_win32_window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+	SetWindowLongPtr(this->impl_win32_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-	ShowWindow(this->impl_win32_window, SW_SHOW);
-	SetForegroundWindow(this->impl_win32_window);
-	SetFocus(this->impl_win32_window);
+	ShowWindow(this->impl_win32_hwnd, SW_SHOW);
+	SetForegroundWindow(this->impl_win32_hwnd);
+	SetFocus(this->impl_win32_hwnd);
 }
 
 void ImplWindow::impl_move(ImplWindow &&wnd)
 {
 	this->impl_win32_class_name = wnd.impl_win32_class_name;
 	wnd.impl_win32_class_name = "";
-	this->impl_win32_instance = wnd.impl_win32_instance;
-	wnd.impl_win32_instance = NULL;
-	this->impl_win32_window = wnd.impl_win32_window;
-	wnd.impl_win32_window = NULL;
+	this->impl_win32_hinstance = wnd.impl_win32_hinstance;
+	wnd.impl_win32_hinstance = NULL;
+	this->impl_win32_hwnd = wnd.impl_win32_hwnd;
+	wnd.impl_win32_hwnd = NULL;
 
-	SetWindowLongPtr(this->impl_win32_window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+	SetWindowLongPtr(this->impl_win32_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 }
 
 void ImplWindow::impl_deInit()
 {
-	if (this->impl_win32_instance == NULL) return;
-	DestroyWindow(this->impl_win32_window);
-	UnregisterClass(this->impl_win32_class_name.c_str(), this->impl_win32_instance);
+	if (this->impl_win32_hinstance == NULL) return;
+	DestroyWindow(this->impl_win32_hwnd);
+	UnregisterClass(this->impl_win32_class_name.c_str(), this->impl_win32_hinstance);
 }
 
 void ImplWindow::impl_update()
@@ -190,26 +190,34 @@ void ImplWindow::impl_update()
 	if (ex.second) downcastExAndThrow(ex);
 
 	MSG msg;
-	if (PeekMessage(&msg, this->impl_win32_window, 0, 0, PM_REMOVE)) {
+	if (PeekMessage(&msg, this->impl_win32_hwnd, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 }
 
-void ImplWindow::bindSurface(VulkanInstance &vkinstance)
+
+struct OSHandles_win32 : public OSHandles
 {
-	VkWin32SurfaceCreateInfoKHR info;
-	info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-	info.hinstance = this->impl_win32_instance;
-	info.hwnd = this->impl_win32_window;
+	HWND _hwnd;
+	HINSTANCE _hinstance;
 
-	VkSurfaceKHR surface;
+	OSHandles_win32(HWND _hwnd, HINSTANCE _hinstance) : _hwnd(_hwnd), _hinstance(_hinstance) {}
 
-	VkResult result = vkinstance.vk.vkCreateWin32SurfaceKHR(vkinstance.handle, &info, NULL, &surface);
-	if (result != VK_SUCCESS)
-		throw DevaExternalFailureException("Could not create Vulkan surface.", "vkCreateWin32SurfaceKHR", "ImplWindow::createSurface", "Vulkan");
-	
-	vkinstance.surface = surface;
+	DEVA_FRAMEWORK_API virtual void* win32_hwnd() const
+	{
+		return _hwnd;
+	}
 
+	DEVA_FRAMEWORK_API virtual void* win32_hinstance() const
+	{
+		return _hinstance;
+	}
+};
+
+
+std::unique_ptr<OSHandles> ImplWindow::getOSHandles() const
+{
+	return std::move(std::unique_ptr<OSHandles>(new OSHandles_win32(this->impl_win32_hwnd, this->impl_win32_hinstance)));
 }
 #endif

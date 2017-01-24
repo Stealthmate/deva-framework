@@ -1,5 +1,6 @@
 //Float
-void DevaFramework::setShaderUniform(gl::GLuint uniformid, float value, GLsizei count, GLboolean transpose)
+void DevaFramework::setShaderUniform(
+	gl::GLuint uniformid, float value, GLsizei count, GLboolean transpose)
 {
 	glUniform1f(uniformid, value);
 }

@@ -16,6 +16,10 @@ set(
 	${CURDIR}/DevaEngineInstance.hpp
 	${CURDIR}/VulkanRenderer.hpp
 	${CURDIR}/VulkanRenderer.cpp
+	${CURDIR}/VulkanSwapchain.hpp
+	${CURDIR}/VulkanPipelineBuilder.hpp
+	${CURDIR}/VulkanPipelineBuilder.cpp
+	${CURDIR}/VulkanSwapchain.cpp
 	${CURDIR}/Config.hpp
 )
 
@@ -29,5 +33,6 @@ set(
 	${CURDIR}/Input/MouseListener.hpp
 	${CURDIR}/Input/InputListener.hpp
 	${CURDIR}/Input/InputFunction.hpp
+	${CURDIR}/VulkanSwapchain.hpp
 	${CURDIR}/VulkanRenderer.hpp
 )

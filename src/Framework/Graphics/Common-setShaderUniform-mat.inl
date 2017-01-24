@@ -37,7 +37,8 @@ namespace
 	}
 }
 
-void DevaFramework::setShaderUniform(gl::GLuint uniformid, const std::vector<mat2> &value, GLsizei count, GLboolean transpose)
+void DevaFramework::setShaderUniform(
+	gl::GLuint uniformid, const std::vector<mat2> &value, GLsizei count, GLboolean transpose)
 {
 	auto buf = packmat<float, 2, 2>(value, transpose == GL_TRUE);
 	glUniformMatrix2fv(uniformid, count, transpose, &buf[0]);

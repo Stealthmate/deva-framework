@@ -14,11 +14,8 @@ namespace DevaFramework
 {
 	class VulkanInstance
 	{
-		friend class Window::ImplWindow;
-
 		VkInstance handle;
-		InstanceFunctionSet vk;
-		VkSurfaceKHR surface;
+		VulkanInstanceFunctionSet vk;
 
 		std::vector<VulkanPhysicalDevice> physical_devices;
 
@@ -41,11 +38,9 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API std::vector<VulkanPhysicalDevice> getPhysicalDevices() const;
 
-		DEVA_FRAMEWORK_API InstanceFunctionSet getFunctionSet() const;
+		DEVA_FRAMEWORK_API VulkanInstanceFunctionSet getFunctionSet() const;
 
-		DEVA_FRAMEWORK_API VkInstance getInstance() const;
-		DEVA_FRAMEWORK_API VkSurfaceKHR getSurface();
-		DEVA_FRAMEWORK_API const VkSurfaceKHR getSurface() const;
+		DEVA_FRAMEWORK_API VkInstance getHandle() const;
 
 		DEVA_FRAMEWORK_API void destroy();
 	};

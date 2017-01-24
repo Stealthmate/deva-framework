@@ -185,7 +185,7 @@ std::vector<char> Model::exportBinary(const Model &model)
 	buffer << index_arr_size / ((index_type & DATA_SIZE_MASK)*INDICES_PER_ELEMENT);
 	buffer << (int8_t)index_type;
 	buffer.write(&model.indices[0], model.indices.size());
-	return buffer.getBuffer();
+	return buffer.buf();
 }
 
 Model::Model() : vbo(), index_type(gl::GL_INT), indices() {}

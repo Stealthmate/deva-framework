@@ -48,11 +48,12 @@ DevaEngineInstance::DevaEngineInstance()
 }
 
 DevaEngineInstance::DevaEngineInstance(const DevaEngineInstanceCreateInfo &info)
-	:wnd(std::move(Window::openWindow(info.window_width, info.window_height, info.window_name))), renderer(), inputlstnr(new InputListener())
+	:wnd(std::move(Window::openWindow(info.window_width, info.window_height, info.window_name))), inputlstnr(new InputListener())
 {
 	wnd->getEventObserver().attachListener(
 		std::static_pointer_cast<WindowEventListener, impl_WindowListener>(
 			std::shared_ptr<impl_WindowListener>(new impl_WindowListener())));
+	renderer = VulkanRenderer(*wnd);
 }
 
 DevaEngineInstance::DevaEngineInstance(DevaEngineInstance &&instance)
@@ -63,6 +64,7 @@ DevaEngineInstance::DevaEngineInstance(DevaEngineInstance &&instance)
 
 bool DevaEngineInstance::update()
 {
+	renderer.renderExample();
 	return wnd->update();
 }
 

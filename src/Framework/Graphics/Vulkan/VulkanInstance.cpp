@@ -58,6 +58,7 @@ VulkanInstance VulkanInstance::create(const VkInstanceCreateInfo &info)
 
 	VULKAN_LOG.println("Getting VkInstance handle...");
 	auto result = vkCreateInstance(&info, NULL, &instance_handle);
+	VULKAN_LOG.println(strm(instance_handle));
 	ERRCHK;
 
 	return VulkanInstance(instance_handle);
@@ -86,6 +87,8 @@ void VulkanInstance::populatePDeviceList()
 	VkPhysicalDeviceProperties deviceProperties;
 	VkPhysicalDeviceFeatures deviceFeatures;
 	std::vector<VkQueueFamilyProperties> queueFamilies;
+	std::vector<VkExtensionProperties> deviceExtensions;
+	std::vector<VkLayerProperties> deviceLayers;
 	for (uint32_t i = 0; i <= device_count - 1; i++)
 	{
 
@@ -104,29 +107,44 @@ void VulkanInstance::populatePDeviceList()
 		queueFamilies.resize(queueFamilyCount);
 		vk.vkGetPhysicalDeviceQueueFamilyProperties(deviceHandles[i], &queueFamilyCount, &queueFamilies[0]);
 
+		VULKAN_LOG.println("Querying VkExtensionProperties (count) for device " + strm(i) + "...");
+		uint32_t ext_count = 0;
+		vk.vkEnumerateDeviceExtensionProperties(deviceHandles[i], NULL, &ext_count, NULL);
+		deviceExtensions.clear();
+		deviceExtensions.resize(ext_count);
+		VULKAN_LOG.println("Querying VkExtensionProperties (handles) for device " + strm(i) + "...");
+		vk.vkEnumerateDeviceExtensionProperties(deviceHandles[i], NULL, &ext_count, deviceExtensions.data());
+
+		VULKAN_LOG.println("Querying VkLayerProperties (count) for device " + strm(i) + "...");
+		uint32_t layer_count = 0;
+		vk.vkEnumerateDeviceLayerProperties(deviceHandles[i], &layer_count, NULL);
+		deviceLayers.clear();
+		deviceLayers.resize(layer_count);
+		VULKAN_LOG.println("Querying VkLayerProperties (handles) for device " + strm(i) + "...");
+		vk.vkEnumerateDeviceLayerProperties(deviceHandles[i], &layer_count, deviceLayers.data());
+
 		VULKAN_LOG.println("Adding device to list");
-		this->physical_devices.push_back(VulkanPhysicalDevice(deviceHandles[i], deviceProperties, deviceFeatures, queueFamilies));
+		this->physical_devices.push_back(VulkanPhysicalDevice(deviceHandles[i], deviceProperties, deviceFeatures, queueFamilies, deviceExtensions, deviceLayers));
 	}
 }
 
 
-VulkanInstance::VulkanInstance(VkInstance handle) : handle(handle), surface(VK_NULL_HANDLE)
+VulkanInstance::VulkanInstance(VkInstance handle) : handle(handle)
 {
 	VULKAN_LOG.println("Loading instance-local functions...");
-	this->vk.load(this->handle);
+	this->vk = VulkanInstanceFunctionSet::load(this->handle);
 
 	populatePDeviceList();
 
 	VULKAN_LOG.println("Successfully initialized VulkanInstance");
 }
 
-VulkanInstance::VulkanInstance() : handle(VK_NULL_HANDLE), surface(VK_NULL_HANDLE) {}
+VulkanInstance::VulkanInstance() : handle(VK_NULL_HANDLE) {}
 
 VulkanInstance::VulkanInstance(VulkanInstance &&instance) 
-	: handle(instance.handle), surface(instance.surface), vk(instance.vk), physical_devices(instance.physical_devices)
+	: handle(instance.handle), vk(instance.vk), physical_devices(instance.physical_devices)
 {
 	instance.handle = VK_NULL_HANDLE;
-	instance.surface = VK_NULL_HANDLE;
 	instance.physical_devices.clear();
 }
 
@@ -134,9 +152,6 @@ VulkanInstance& VulkanInstance::operator=(VulkanInstance &&instance)
 {
 	this->handle = instance.handle;
 	instance.handle = VK_NULL_HANDLE;
-
-	this->surface = instance.surface;
-	instance.surface = VK_NULL_HANDLE;
 
 	this->physical_devices = instance.physical_devices;
 	instance.physical_devices.clear();
@@ -152,12 +167,12 @@ VulkanInstance::~VulkanInstance()
 	destroy();
 }
 
-VkInstance VulkanInstance::getInstance() const
+VkInstance VulkanInstance::getHandle() const
 {
 	return this->handle;
 }
 
-InstanceFunctionSet VulkanInstance::getFunctionSet() const
+VulkanInstanceFunctionSet VulkanInstance::getFunctionSet() const
 {
 	return vk;
 }
@@ -169,6 +184,5 @@ std::vector<VulkanPhysicalDevice> VulkanInstance::getPhysicalDevices() const
 
 void VulkanInstance::destroy()
 {
-	if (surface != VK_NULL_HANDLE) vk.vkDestroySurfaceKHR(handle, surface, NULL);
 	if (handle != VK_NULL_HANDLE) vk.vkDestroyInstance(handle, NULL);
 }

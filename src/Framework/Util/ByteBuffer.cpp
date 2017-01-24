@@ -22,6 +22,11 @@ size_t ByteBuffer::getPosition() const
 	return this->position;
 }
 
+size_t ByteBuffer::size() const
+{
+	return this->buffer.size();
+}
+
 ByteBuffer& ByteBuffer::write(const char* data, size_t count)
 {
 	if (count + position > buffer.size() - 1)
@@ -59,7 +64,11 @@ void ByteBuffer::resize(size_t new_size)
 	buffer.resize(new_size);
 }
 
-const std::vector<char>& ByteBuffer::getBuffer() const
+const std::vector<char>& ByteBuffer::buf() const
+{
+	return buffer;
+}
+std::vector<char>& ByteBuffer::buf()
 {
 	return buffer;
 }

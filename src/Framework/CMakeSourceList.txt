@@ -80,12 +80,15 @@ set(
 	${CURDIR}/ShaderProgram.hpp
 	${CURDIR}/VertexBufferObject.cpp
 	${CURDIR}/VertexBufferObject.hpp
+	${CURDIR}/Vulkan/VulkanDeleter.hpp
 	${CURDIR}/Vulkan/VulkanPhysicalDevice.cpp
 	${CURDIR}/Vulkan/VulkanPhysicalDevice.hpp
 	${CURDIR}/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Vulkan/VulkanDevice.hpp
 	${CURDIR}/Vulkan/Config.hpp
 	${CURDIR}/Vulkan/Config.cpp
+	${CURDIR}/Vulkan/Common.hpp
+	${CURDIR}/Vulkan/Common.cpp
 	${CURDIR}/Vulkan/win32_LoadVulkan.cpp
 	${CURDIR}/Vulkan/VulkanInstance.hpp
 	${CURDIR}/Vulkan/InstanceFunctionSet.cpp
@@ -119,6 +122,8 @@ set(
 	${CURDIR}/ShaderVariable.hpp
 	${CURDIR}/VertexBufferObject.hpp
 	${CURDIR}/Vulkan/Config.hpp
+	${CURDIR}/Vulkan/Common.hpp
+	${CURDIR}/Vulkan/VulkanDeleter.hpp
 	${CURDIR}/Vulkan/VulkanPhysicalDevice.hpp
 	${CURDIR}/Vulkan/VulkanDevice.hpp
 	${CURDIR}/Vulkan/VulkanInstance.hpp
@@ -175,6 +180,8 @@ set(
 	${CURDIR}/BinaryWriter.hpp
 	${CURDIR}/ByteBuffer.cpp
 	${CURDIR}/ByteBuffer.hpp
+	${CURDIR}/CStructDeleter.hpp
+	${CURDIR}/CStructDeleter.cpp
 	${CURDIR}/Common.cpp
 	${CURDIR}/Common.hpp
 	${CURDIR}/Config.hpp
@@ -190,6 +197,7 @@ set(
 	${CURDIR}/BinaryReader.hpp
 	${CURDIR}/BinaryWriter.hpp
 	${CURDIR}/ByteBuffer.hpp
+	${CURDIR}/CStructDeleter.hpp
 	${CURDIR}/Common.hpp
 	${CURDIR}/Config.hpp
 	${CURDIR}/Init.hpp

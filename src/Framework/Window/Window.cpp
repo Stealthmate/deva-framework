@@ -11,6 +11,43 @@ namespace
 	static std::vector<std::shared_ptr<Window>> window_list;
 }
 
+void* OSHandles::win32_hinstance() const
+{
+	DevaLogger::err.println("Called OSHandles::win32_hinstance default implementation. Are you trying to get OS parameters for a different system?");
+	return nullptr;
+}
+
+void* OSHandles::win32_hwnd() const
+{
+	DevaLogger::err.println("Called OSHandles::win32_hwnd default implementation. Are you trying to get OS parameters for a different system?");
+	return nullptr;
+}
+
+void* OSHandles::xcb_connection() const
+{
+	DevaLogger::err.println("Called OSHandles::xcb_connection default implementation. Are you trying to get OS parameters for a different system?");
+	return nullptr;
+}
+
+void* OSHandles::xcb_window() const
+{
+	DevaLogger::err.println("Called OSHandles::xcb_window default implementation. Are you trying to get OS parameters for a different system?");
+	return nullptr;
+}
+
+void* OSHandles::xlib_dpy() const
+{
+	DevaLogger::err.println("Called OSHandles::xlib_dpy default implementation. Are you trying to get OS parameters for a different system?");
+	return nullptr;
+}
+
+void* OSHandles::xlib_window() const
+{
+	DevaLogger::err.println("Called OSHandles::xlib_window default implementation. Are you trying to get OS parameters for a different system?");
+	return nullptr;
+}
+
+
 std::shared_ptr<Window> Window::openWindow(uint32_t width, uint32_t height, const std::string &name)
 {
 	window_list.push_back(std::shared_ptr<Window>(new Window(width, height, name)));
@@ -34,6 +71,16 @@ WindowObserver& Window::getEventObserver()
 	return this->impl->getEventObserver();
 }
 
+unsigned int Window::getWidth() const
+{
+	return this->impl->getWidth();
+}
+
+unsigned int Window::getHeight() const 
+{
+	return this->impl->getHeight();
+}
+
 bool Window::update()
 {
 	return this->impl->update();
@@ -54,7 +101,7 @@ void Window::setUserData(void *userData)
 	this->impl->setUserData(userData);
 }
 
-void Window::bindSurface(VulkanInstance &vkinstance)
+std::unique_ptr<OSHandles> Window::getOSHandles() const
 {
-	this->impl->bindSurface(vkinstance);
+	return std::move(this->impl->getOSHandles());
 }

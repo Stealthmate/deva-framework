@@ -7,7 +7,17 @@
 
 namespace DevaFramework
 {
-	class VulkanInstance; 
+	struct OSHandles
+	{
+		DEVA_FRAMEWORK_API virtual void* win32_hinstance() const;
+		DEVA_FRAMEWORK_API virtual void* win32_hwnd() const;
+
+		DEVA_FRAMEWORK_API virtual void* xcb_connection() const;
+		DEVA_FRAMEWORK_API virtual void* xcb_window() const;
+
+		DEVA_FRAMEWORK_API virtual void* xlib_dpy() const;
+		DEVA_FRAMEWORK_API virtual void* xlib_window() const;
+	};
 
 	class Window
 	{
@@ -40,7 +50,10 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API void* getUserData() const;
 		DEVA_FRAMEWORK_API void setUserData(void* data);
 
-		DEVA_FRAMEWORK_API void bindSurface(VulkanInstance &vkinstance);
+		DEVA_FRAMEWORK_API std::unique_ptr<OSHandles> getOSHandles() const;
+
+		DEVA_FRAMEWORK_API unsigned int getWidth() const;
+		DEVA_FRAMEWORK_API unsigned int getHeight() const;
 	};
 }
 
