@@ -13,11 +13,10 @@ namespace DevaFramework
 	{
 	private:
 
-		VkDevice handle;
-		VulkanDeviceFunctionSet vk;
-
+		VkDevice mHandle;
+		VulkanDeviceFunctionSet mVk;
+		
 	public:
-
 		DEVA_FRAMEWORK_API VulkanDevice();
 		DEVA_FRAMEWORK_API VulkanDevice(VkDevice handle, const VulkanInstance &vkInstance);
 		VulkanDevice(const VulkanDevice &dev) = delete;
@@ -26,8 +25,13 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API VulkanDevice& operator=(VulkanDevice &&dev);
 		DEVA_FRAMEWORK_API ~VulkanDevice();
 
-		DEVA_FRAMEWORK_API VulkanDeviceFunctionSet getFunctionSet() const;
-		DEVA_FRAMEWORK_API VkDevice getHandle() const;
+		DEVA_FRAMEWORK_API VulkanDeviceFunctionSet vk() const;
+		DEVA_FRAMEWORK_API VkDevice handle() const;
+
+		DEVA_FRAMEWORK_API std::vector<VkQueue> renderQueues() const;
+		DEVA_FRAMEWORK_API std::vector<VkQueue> computeQueues() const;
+		DEVA_FRAMEWORK_API std::vector<VkQueue> transferQueues() const;
+		DEVA_FRAMEWORK_API std::vector<VkQueue> sparseBindingQueues() const;
 
 	};
 

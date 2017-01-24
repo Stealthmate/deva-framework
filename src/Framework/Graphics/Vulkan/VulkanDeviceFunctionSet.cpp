@@ -5,7 +5,7 @@ using namespace DevaFramework;
 
 #define LOAD(PFNNAME) \
 VULKAN_LOG.println("Getting Device PFN_" #PFNNAME "..."); \
-devf.PFNNAME = (PFN_##PFNNAME) vkinstance.getFunctionSet().vkGetDeviceProcAddr(vkdevice, #PFNNAME); \
+devf.PFNNAME = (PFN_##PFNNAME) vkinstance.vk().vkGetDeviceProcAddr(vkdevice, #PFNNAME); \
 if(devf.PFNNAME == NULL) \
 { \
 	VULKAN_WARN.println("Device PFN_" #PFNNAME " not available (Extension not specified in VkDeviceCreateInfo?)"); \

@@ -14,11 +14,11 @@ VulkanDeleter<VkShaderModule> DevaFramework::vulkanShaderFromFile(const VulkanDe
 	createInfo.codeSize = src.size();
 	createInfo.pCode = (uint32_t*)src.buf().data();
 
-	auto& vk = dev.getFunctionSet();
+	auto& vk = dev.vk();
 
-	VulkanDeleter<VkShaderModule> shaderModule{dev.getHandle(), vk.vkDestroyShaderModule};
+	VulkanDeleter<VkShaderModule> shaderModule{dev.handle(), vk.vkDestroyShaderModule};
 
-	if (vk.vkCreateShaderModule(dev.getHandle(), &createInfo, nullptr, shaderModule.replace()) != VK_SUCCESS) {
+	if (vk.vkCreateShaderModule(dev.handle(), &createInfo, nullptr, shaderModule.replace()) != VK_SUCCESS) {
 		throw DevaException("failed to create shader module!");
 	}
 

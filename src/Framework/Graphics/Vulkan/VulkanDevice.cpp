@@ -4,50 +4,48 @@
 
 using namespace DevaFramework;
 
-VulkanDevice::VulkanDevice()
-{
-	this->handle = VK_NULL_HANDLE;
-}
+VulkanDevice::VulkanDevice() : mHandle(VK_NULL_HANDLE) {}
 
 VulkanDevice::VulkanDevice(VulkanDevice &&dev)
 {
-	this->handle = dev.handle;
-	this->vk = dev.vk;
+	mHandle = dev.mHandle;
+	mVk = dev.mVk;
 
-	dev.handle = VK_NULL_HANDLE;
-	dev.vk = VulkanDeviceFunctionSet();
+	dev.mHandle = VK_NULL_HANDLE;
+	dev.mVk = VulkanDeviceFunctionSet();
 }
 
-VulkanDevice::VulkanDevice(VkDevice dev, const VulkanInstance &vkinstance) : handle(dev)
+VulkanDevice::VulkanDevice(VkDevice dev, const VulkanInstance &vkinstance) : mHandle(dev)
 {
-	vk = VulkanDeviceFunctionSet::load(dev, vkinstance);
+	mVk = VulkanDeviceFunctionSet::load(dev, vkinstance);
 }
 
 VulkanDevice& VulkanDevice::operator=(VulkanDevice &&dev)
 {
-	this->handle = dev.handle;
-	this->vk = dev.vk;
-	
-	dev.handle = VK_NULL_HANDLE;
-	dev.vk = VulkanDeviceFunctionSet();
+	mHandle = dev.mHandle;
+	mVk = dev.mVk;
+
+	dev.mHandle = VK_NULL_HANDLE;
+	dev.mVk = VulkanDeviceFunctionSet();
 
 	return *this;
 }
 
-VulkanDeviceFunctionSet VulkanDevice::getFunctionSet() const
+
+VulkanDeviceFunctionSet VulkanDevice::vk() const
 {
-	return vk;
+	return mVk;
 }
 
-VkDevice VulkanDevice::getHandle() const
+VkDevice VulkanDevice::handle() const
 {
-	return this->handle;
+	return mHandle;
 }
 
 VulkanDevice::~VulkanDevice()
 {
-	if (handle != VK_NULL_HANDLE) {
-		vk.vkDestroyDevice(handle, nullptr);
+	if (mHandle != VK_NULL_HANDLE) {
+		mVk.vkDestroyDevice(mHandle, nullptr);
 	}
-	handle = VK_NULL_HANDLE;
+	mHandle = VK_NULL_HANDLE;
 }

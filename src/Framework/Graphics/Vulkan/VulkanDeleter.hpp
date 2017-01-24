@@ -21,7 +21,7 @@ namespace DevaFramework {
 		VulkanDeleter() : VulkanDeleter([](T, VkAllocationCallbacks*) {}) {}
 		VulkanDeleter(VkInstance instance, std::function<void(VkInstance, T, VkAllocationCallbacks*)> deletef)
 		{
-			this->deleter = [&instance, deletef](T obj) { deletef(instance.getHandle(), obj, nullptr); };
+			this->deleter = [&instance, deletef](T obj) { deletef(instance.handle(), obj, nullptr); };
 		}
 
 		VulkanDeleter(VkDevice device, std::function<void(VkDevice, T, VkAllocationCallbacks*)> deletef)
