@@ -3,18 +3,18 @@ set(TEST_SRC_LIST "")
 
 function(add_approval_test name)
 	set(__OPTIONAL_SRCS ${ARGN})
-	
+
 	set(TEMP_DIR ${CURDIR})
 	set(CURDIR ${TEMP_DIR}/${name})
-	
+
 	if(__OPTIONAL_SRCS)
 		string(REGEX REPLACE "([^;]+;?)" "${CURDIR}\/\\1" __OPTIONAL_SRCS "${__OPTIONAL_SRCS}")
 	endif()
-	
+
 	add_executable(test-${name} ${CURDIR}/test-${name}.cpp ${__OPTIONAL_SRCS})
 	target_link_libraries(test-${name} ${DEVA_ENGINE_LINK_LIBRARIES})
 	target_include_directories(test-${name} PUBLIC ${DEVA_ENGINE_PUBLIC_INCLUDE_DIR} ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR})
-	
+
 	set(TEST_LIST ${TEST_LIST} test-${name} PARENT_SCOPE)
 	set(TEST_SRC_LIST ${TEST_SRC_LIST} ${CURDIR}/test-${name}.cpp ${__OPTIONAL_SRCS} PARENT_SCOPE)
 endfunction()
@@ -25,8 +25,8 @@ function(target_copy_files target dest files)
 	string(REGEX REPLACE "(.+)" "../${CURDIR}\/${target}\/\\1" __FILES "${__FILES}")
 	message(${__FILES})
 	message(${dest})
-	add_custom_command(TARGET test-${target} 
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${dest} 
+	add_custom_command(TARGET test-${target}
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${dest}
 		message(${dest})
 		COMMAND ${CMAKE_COMMAND} -E copy ${__FILES} ${dest})
 endfunction()
@@ -40,8 +40,7 @@ add_approval_test(Vulkan)
 # add_approval_test("Model")
 # add_approval_test("FT_text")
 
-add_library(test-all STATIC ${TEST_SRC_LIST})
-target_include_directories(test-all PUBLIC ${DEVA_ENGINE_PUBLIC_INCLUDE_DIR} ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR})
+add_custom_target(test-all)
 add_dependencies(test-all ${TEST_LIST})
 foreach(source IN LISTS TEST_SRC_LIST)
     get_filename_component(source_path "${source}" ABSOLUTE)

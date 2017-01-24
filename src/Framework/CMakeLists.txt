@@ -32,14 +32,17 @@ set(HEADER_OUTPUT_DIR ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR}/)
 foreach(header IN LISTS DEVA_FRAMEWORK_PUBLIC_HEADERS)
 	set(FORMATTED_PATH ${header})
 	string(REPLACE "/" "\\" FORMATTED_PATH ${FORMATTED_PATH})
-	
+
     string(REGEX REPLACE ".*\/Framework(.*)?\/.*" "${HEADER_OUTPUT_DIR}\/\\1\/" FORMATTED_OUTPUT_DIR "${header}")
 	string(REGEX REPLACE "\/+" "\/" FORMATTED_OUTPUT_DIR ${FORMATTED_OUTPUT_DIR})
 	string(REPLACE "/" "\\" FORMATTED_OUTPUT_DIR ${FORMATTED_OUTPUT_DIR})
-	
-	add_custom_command(TARGET deva-Framework
-		COMMAND PRE_BUILD ${CMAKE_COMMAND} -E make_directory ${FORMATTED_OUTPUT_DIR}
-		COMMAND PRE_BUILD ${CMAKE_COMMAND} -E copy ${FORMATTED_PATH} ${FORMATTED_OUTPUT_DIR})
+
+    get_filename_component(FNAME ${header} NAME)
+	add_custom_command(OUTPUT ${FORMATTED_OUTPUT_DIR}${FNAME}
+        COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan "Copying public header ${header}..."
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${FORMATTED_OUTPUT_DIR}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FORMATTED_PATH} ${FORMATTED_OUTPUT_DIR}
+        MAIN_DEPENDENCY ${header})
 endforeach()
 
 
