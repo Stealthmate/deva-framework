@@ -9,8 +9,6 @@ set(
 	${CURDIR}/Exceptions/DevaInitializationFailureException.hpp
 	${CURDIR}/Exceptions/DevaProgrammerErrorException.cpp
 	${CURDIR}/Exceptions/DevaProgrammerErrorException.hpp
-	${CURDIR}/Graphics/Common.cpp
-	${CURDIR}/Graphics/Common.hpp
 	${CURDIR}/Graphics/Config.hpp
 	${CURDIR}/Graphics/Font.hpp
 	${CURDIR}/Graphics/Image.cpp
@@ -20,11 +18,16 @@ set(
 	${CURDIR}/Graphics/Init.cpp
 	${CURDIR}/Graphics/Init.hpp
 	${CURDIR}/Graphics/Master.hpp
-	${CURDIR}/Graphics/Model.cpp
-	${CURDIR}/Graphics/Model.hpp
+	${CURDIR}/Graphics/OpenGL.hpp
+	${CURDIR}/Graphics/Vulkan.hpp
+	${CURDIR}/Graphics/OpenGL/Common.cpp
+	${CURDIR}/Graphics/OpenGL/Common.hpp
+	${CURDIR}/Graphics/OpenGL/Config.hpp
 	${CURDIR}/Graphics/OpenGL/glConfig.hpp
 	${CURDIR}/Graphics/OpenGL/glFunctions.hpp
 	${CURDIR}/Graphics/OpenGL/glTypes.hpp
+	${CURDIR}/Graphics/OpenGL/Model.cpp
+	${CURDIR}/Graphics/OpenGL/Model.hpp
 	${CURDIR}/Graphics/OpenGL/Shader.cpp
 	${CURDIR}/Graphics/OpenGL/Shader.hpp
 	${CURDIR}/Graphics/OpenGL/ShaderProgram.cpp
@@ -50,8 +53,6 @@ set(
 	${CURDIR}/Graphics/Vulkan/Surface.cpp
 	${CURDIR}/Graphics/Vulkan/Surface.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanAPI.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanContext.cpp
-	${CURDIR}/Graphics/Vulkan/VulkanContext.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeleter.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.hpp
