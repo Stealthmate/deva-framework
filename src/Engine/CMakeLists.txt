@@ -7,7 +7,8 @@ endif()
 
 message("Generating DevaEngine build files...")
 
-include(${CURDIR}/CMakeSourceList.txt)
+include(${CURDIR}/SourceList.cmake)
+include(${CURDIR}/PublicHeaders.cmake)
 
 set(SRCS ${DEVA_ENGINE_SOURCE_LIST})
 add_library(deva-Engine ${LIBTYPE} ${SRCS})

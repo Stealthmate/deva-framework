@@ -7,7 +7,8 @@ endif()
 
 message("Generating DevaFramework build files...")
 
-include(${CURDIR}/CMakeSourceList.txt)
+include(${CURDIR}/SourceList.cmake)
+include(${CURDIR}/PublicHeaders.cmake)
 
 set(SRCS ${DEVA_FRAMEWORK_SOURCE_LIST})
 add_library(deva-Framework ${LIBTYPE} ${SRCS})
