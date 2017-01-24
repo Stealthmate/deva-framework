@@ -47,7 +47,7 @@ elseif (${COMPILER} STREQUAL "GNU")
 	endif()
 elseif (${COMPILER} STREQUAL "Intel")
   # using Intel C++
-  
+
 elseif (${COMPILER} STREQUAL MSVC) # For some reason CMake complains about dereferencing MSVC when it's a string
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${REQUIRED_COMPILER_VERSION_MSVC})
 		message( SEND_ERROR "Compiler version is lower than required (${REQUIRED_COMPILER_VERSION_MSVC})! Build may fail!")
@@ -72,13 +72,13 @@ set(DEVA_FRAMEWORK_PROV_DEP_FREETYPE freetype263)
 
 #All dependencies
 set(
-	DEVA_FRAMEWORK_DEP 
+	DEVA_FRAMEWORK_DEP
 	${DEVA_FRAMEWORK_PROV_DEP_VULKAN}
-	${DEVA_FRAMEWORK_SYSTEM_DEP_OGL} 
+	${DEVA_FRAMEWORK_SYSTEM_DEP_OGL}
 	${DEVA_FRAMEWORK_PROV_DEP_GLBINDING}
-	# ${DEVA_FRAMEWORK_PROV_DEP_GLFW} 
-	${DEVA_FRAMEWORK_PROV_DEP_PNG} 
-	#${DEVA_FRAMEWORK_PROV_DEP_LUA} 
+	# ${DEVA_FRAMEWORK_PROV_DEP_GLFW}
+	${DEVA_FRAMEWORK_PROV_DEP_PNG}
+	#${DEVA_FRAMEWORK_PROV_DEP_LUA}
 	${DEVA_FRAMEWORK_PROV_DEP_FREETYPE}
 )
 
@@ -92,14 +92,50 @@ set(CURDIR ${DEVA_MASTER_DIR}/Framework)
 set(DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR ${DEVA_MASTER_DIR}/framework_include/DevaFramework)
 set(DEVA_ENGINE_PUBLIC_INCLUDE_DIR ${DEVA_MASTER_DIR}/engine_include/DevaEngine)
 include(${CURDIR}/CMakeLists.txt)
+
+#Framework Public Headers
+set(HEADER_OUTPUT_DIR ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR}/)
+add_custom_target(PublicHeaders DEPENDS ${DEVA_FRAMEWORK_PUBLIC_HEADERS})
+foreach(header IN LISTS DEVA_FRAMEWORK_PUBLIC_HEADERS)
+	set(FORMATTED_PATH ${header})
+	string(REPLACE "/" "\\" FORMATTED_PATH ${FORMATTED_PATH})
+
+    string(REGEX REPLACE ".*\/Framework(.*)?\/.*" "${HEADER_OUTPUT_DIR}\/\\1\/" FORMATTED_OUTPUT_DIR "${header}")
+	string(REGEX REPLACE "\/+" "\/" FORMATTED_OUTPUT_DIR ${FORMATTED_OUTPUT_DIR})
+	string(REPLACE "/" "\\" FORMATTED_OUTPUT_DIR ${FORMATTED_OUTPUT_DIR})
+
+    get_filename_component(FNAME ${header} NAME)
+	add_custom_command(TARGET PublicHeaders
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${FORMATTED_OUTPUT_DIR}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FORMATTED_PATH} ${FORMATTED_OUTPUT_DIR}
+        DEPENDS ${header})
+endforeach()
 set(DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR}/../)
 
 #Engine Sources
 set(CURDIR ${DEVA_MASTER_DIR}/Engine)
 include(${CURDIR}/CMakeLists.txt)
-set(DEVA_ENGINE_PUBLIC_INCLUDE_DIR ${DEVA_ENGINE_PUBLIC_INCLUDE_DIR}/../)
 
 set(DEVA_ENGINE_LINK_LIBRARIES deva-Engine deva-Framework ${DEVA_FRAMEWORK_PROV_DEP})
+
+#Engine Public Headers
+set(HEADER_OUTPUT_DIR ${DEVA_ENGINE_PUBLIC_INCLUDE_DIR}/)
+foreach(header IN LISTS DEVA_ENGINE_PUBLIC_HEADERS)
+	set(FORMATTED_PATH ${header})
+	string(REPLACE "/" "\\" FORMATTED_PATH ${FORMATTED_PATH})
+
+    string(REGEX REPLACE ".*\/Engine(.*)?\/.*" "${HEADER_OUTPUT_DIR}\/\\1\/" FORMATTED_OUTPUT_DIR "${header}")
+	string(REGEX REPLACE "\/+" "\/" FORMATTED_OUTPUT_DIR ${FORMATTED_OUTPUT_DIR})
+	string(REPLACE "/" "\\" FORMATTED_OUTPUT_DIR ${FORMATTED_OUTPUT_DIR})
+
+    get_filename_component(FNAME ${header} NAME)
+	add_custom_command(TARGET PublicHeaders
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${FORMATTED_OUTPUT_DIR}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FORMATTED_PATH} ${FORMATTED_OUTPUT_DIR}
+        DEPENDS ${header})
+endforeach()
+set(DEVA_ENGINE_PUBLIC_INCLUDE_DIR ${DEVA_ENGINE_PUBLIC_INCLUDE_DIR}/../)
+
 
 #Tests
 set(CURDIR tests)
