@@ -13,4 +13,6 @@ bin/**
 !bin/libpng16.dll
 !lua.dll
 docs/**
-public_headers/**
+public_headers/*i*
+temp/**
+dep/**
