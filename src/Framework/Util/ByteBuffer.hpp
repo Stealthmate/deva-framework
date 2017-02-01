@@ -14,16 +14,17 @@ namespace DevaFramework
 	{
 	private:
 
-		std::vector<char> buffer;
+		std::vector<byte_t> buffer;
 		size_t position;
 
 	public:
 
+		ByteBuffer() : buffer(0), position(0) {}
 		DEVA_FRAMEWORK_API ByteBuffer(size_t size);
-		DEVA_FRAMEWORK_API ByteBuffer(std::vector<char> &&buffer);
+		DEVA_FRAMEWORK_API ByteBuffer(const std::vector<byte_t> &buffer);
 
-		DEVA_FRAMEWORK_API ByteBuffer& write(const char* data, size_t count);
-		DEVA_FRAMEWORK_API ByteBuffer& read(char* dest, size_t count);
+		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count);
+		DEVA_FRAMEWORK_API virtual void read(byte_t* dest, size_t count);
 
 		DEVA_FRAMEWORK_API void setPosition(size_t new_pos);
 		DEVA_FRAMEWORK_API size_t getPosition() const;
@@ -32,8 +33,8 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API void resize(size_t new_size);
 
-		DEVA_FRAMEWORK_API const std::vector<char>& buf() const;
-		DEVA_FRAMEWORK_API std::vector<char>& buf();
+		DEVA_FRAMEWORK_API const std::vector<byte_t>& buf() const;
+		DEVA_FRAMEWORK_API std::vector<byte_t>& buf();
 
 	};
 }

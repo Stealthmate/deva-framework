@@ -19,7 +19,7 @@ std::string DevaFramework::readTextFile(const char* filepath)
 		input.close();
 	}
 	else {
-		throw DevaInvalidArgumentException("Cannot open file " + strm(filepath));
+		throw DevaInvalidArgumentException("Cannot open file " + std::string(filepath));
 	}
 	return text;
 }
@@ -33,11 +33,11 @@ ByteBuffer DevaFramework::readBinaryFile(const char* filepath)
 	{
 		buffer.resize((size_t)input.tellg());
 		input.seekg(0);
-		input.read(buffer.buf().data(), buffer.size());
+		input.read((char*)buffer.buf().data(), buffer.size());
 		input.close();
 	}
 	else {
-		throw DevaInvalidArgumentException("Cannot open file " + strm(filepath));
+		throw DevaInvalidArgumentException("Cannot open file " + std::string(filepath));
 	}
 	return buffer;
 }

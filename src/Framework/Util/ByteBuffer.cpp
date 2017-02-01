@@ -6,7 +6,7 @@ using namespace DevaFramework;
 
 ByteBuffer::ByteBuffer(size_t size) : buffer(size), position(0) {}
 
-ByteBuffer::ByteBuffer(std::vector<char> &&buffer) : buffer(buffer), position(0) {}
+ByteBuffer::ByteBuffer(const std::vector<byte_t> &buffer) : buffer(buffer), position(0) {}
 
 void ByteBuffer::setPosition(size_t new_pos)
 {
@@ -27,11 +27,11 @@ size_t ByteBuffer::size() const
 	return this->buffer.size();
 }
 
-ByteBuffer& ByteBuffer::write(const char* data, size_t count)
+void ByteBuffer::write(const byte_t* data, size_t count)
 {
-	if (count + position > buffer.size() - 1)
-		throw DevaInvalidInputException
-		("Attempted to write beyond buffer size. (" + strm(count + position) + " >= " + strm(buffer.size()) + ")");
+	if (count + position > buffer.size())
+		throw DevaException
+		("Attempted to write beyond buffer size. (" + strm(count + position) + " > " + strm(buffer.size()) + ")");
 
 	for (int i = 0;i <= count - 1;i++)
 	{
@@ -39,15 +39,13 @@ ByteBuffer& ByteBuffer::write(const char* data, size_t count)
 	}
 
 	position += count;
-
-	return *this;
 }
 
-ByteBuffer& ByteBuffer::read(char* dest, size_t count)
+void ByteBuffer::read(byte_t* dest, size_t count)
 {
-	if (count + position > buffer.size() - 1)
-		throw DevaInvalidInputException
-		("Attempted to read beyond buffer size. (" + strm(count + position) + " >= " + strm(buffer.size()) + ")");
+	if (count + position > buffer.size())
+		throw DevaException
+		("Attempted to read beyond buffer size. (" + strm(count + position) + " > " + strm(buffer.size()) + ")");
 
 	for (int i = 0;i <= count - 1;i++)
 	{
@@ -55,8 +53,6 @@ ByteBuffer& ByteBuffer::read(char* dest, size_t count)
 	}
 
 	position += count;
-
-	return *this;
 }
 
 void ByteBuffer::resize(size_t new_size)
@@ -64,11 +60,11 @@ void ByteBuffer::resize(size_t new_size)
 	buffer.resize(new_size);
 }
 
-const std::vector<char>& ByteBuffer::buf() const
+const std::vector<byte_t>& ByteBuffer::buf() const
 {
 	return buffer;
 }
-std::vector<char>& ByteBuffer::buf()
+std::vector<byte_t>& ByteBuffer::buf()
 {
 	return buffer;
 }

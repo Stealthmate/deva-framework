@@ -10,14 +10,12 @@ BinaryFileStreamWrapper::BinaryFileStreamWrapper(const std::string &path, std::i
 	stream.open(path, openmode | std::fstream::binary);
 }
 
-BinaryFileStreamWrapper& BinaryFileStreamWrapper::write(const char* data, size_t datasize)
+void BinaryFileStreamWrapper::write(const byte_t* data, size_t datasize)
 {
-	stream.write(data, datasize);
-	return *this;
+	stream.write((char*)data, datasize);
 }
 
-BinaryFileStreamWrapper& BinaryFileStreamWrapper::read(char* dest, size_t count)
+void BinaryFileStreamWrapper::read(byte_t* dest, size_t count)
 {
-	stream.read(dest, count);
-	return *this;
+	stream.read((char*)dest, count);
 }

@@ -8,17 +8,24 @@ namespace DevaFramework
 	class BinaryWriter
 	{
 	public:
-		DEVA_FRAMEWORK_API virtual BinaryWriter& write(const char* data, size_t count) = 0;
+		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count) = 0;
 	};
 
-	inline BinaryWriter& operator<<(BinaryWriter &os, int8_t data) { return os.write(reinterpret_cast<const char*>(&data), sizeof(int8_t)); };
-	inline BinaryWriter& operator<<(BinaryWriter &os, uint8_t data) { return os.write(reinterpret_cast<const char*>(&data), sizeof(uint8_t)); };
-	inline BinaryWriter& operator<<(BinaryWriter &os, int16_t data) { return os.write(reinterpret_cast<const char*>(&data), sizeof(int16_t)); };
-	inline BinaryWriter& operator<<(BinaryWriter &os, uint16_t data) { return os.write(reinterpret_cast<const char*>(&data), sizeof(uint16_t)); };
-	inline BinaryWriter& operator<<(BinaryWriter &os, int32_t data) { return os.write(reinterpret_cast<const char*>(&data), sizeof(int32_t)); };
-	inline BinaryWriter& operator<<(BinaryWriter &os, uint32_t data) { return os.write(reinterpret_cast<const char*>(&data), sizeof(uint32_t)); };
-	inline BinaryWriter& operator<<(BinaryWriter &os, float data) { return os.write(reinterpret_cast<const char*>(&data), sizeof(float)); };
-	inline BinaryWriter& operator<<(BinaryWriter &os, double data) { return os.write(reinterpret_cast<const char*>(&data), sizeof(double)); };
+#define OVERLOAD_OP_INSERT(type) \
+	inline BinaryWriter& operator<<(BinaryWriter &writer, type data) { writer.write(reinterpret_cast<const byte_t*>(&data), sizeof(type)); return writer; }
+
+	OVERLOAD_OP_INSERT(int8_t);
+	OVERLOAD_OP_INSERT(uint8_t);
+	OVERLOAD_OP_INSERT(int16_t);
+	OVERLOAD_OP_INSERT(uint16_t);
+	OVERLOAD_OP_INSERT(int32_t);
+	OVERLOAD_OP_INSERT(uint32_t);
+	OVERLOAD_OP_INSERT(int64_t);
+	OVERLOAD_OP_INSERT(uint64_t);
+	OVERLOAD_OP_INSERT(float);
+	OVERLOAD_OP_INSERT(double);
+
+#undef OVERLOAD_OP_INSERT
 }
 
 
