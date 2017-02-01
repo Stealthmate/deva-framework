@@ -37,6 +37,7 @@ add_approval_test(Window)
 # target_copy_files(Images ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources SS1.png)
 # add_approval_test(RotatingCube "VertexShader.inl" "FragmentShader.inl")
 add_approval_test(Vulkan)
+add_approval_test(UnitTests)
 # add_approval_test("Model")
 # add_approval_test("FT_text")
 
@@ -52,10 +53,14 @@ foreach(source IN LISTS TEST_SRC_LIST)
 	endif()
 endforeach()
 
-file(GLOB MY_PUBLIC_HEADERS
-  "myDir/*.h"
+file(GLOB TESTS_FRAMEWORK
+  "tests/Framework/*.cpp"
 )
-file(COPY ${MY_PUBLIC_HEADERS} DESTINATION myDestination)
-
-file(GLOB_RECURSE SRCS bin/shaders/*.glsl)
-add_custom_target(Shaders ALL SOURCES ${SRCS})
+add_custom_target(testsFramework)
+foreach(source IN LISTS TESTS_FRAMEWORK)
+	get_filename_component(name "${source}" NAME_WE)
+	add_executable(${name} ${source})
+	target_link_libraries(${name} deva-Framework)
+	target_include_directories(${name} PUBLIC ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR})
+	add_dependencies(testsFramework ${name})
+endforeach()
