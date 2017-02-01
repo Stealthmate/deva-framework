@@ -19,13 +19,13 @@ namespace DevaFramework
 	template<typename T, unsigned int vector_length>
 	class BaseVector : public BaseMatrix<T, vector_length, 1> //ACTUALLY N_VECTORS!!!!!!!! 
 	{
-
+		typedef BaseMatrix<T, vector_length, 1> super;
 		typedef BaseVector<T, vector_length> Vector;//Easier naming
 
 	public:
 
 		///Empty default constructor, calls BaseMatrix()
-		BaseVector() : BaseMatrix() {}
+		BaseVector() : BaseMatrix<T, vector_length, 1>() {}
 
 		/**
 			Takes an initializer list of \b T values and constructs a column vector
@@ -46,7 +46,7 @@ namespace DevaFramework
 			{
 				for (int i = 0;i <= vector_length;i++)
 				{
-					data[i] = *val_i;
+					this->data[i] = *val_i;
 					val_i++;
 				}
 			}
@@ -59,7 +59,7 @@ namespace DevaFramework
 		*/
 		T& operator[](int i)
 		{
-			return operator()(0, i);
+			return super::operator()(0, i);
 		}
 
 		/**
@@ -69,7 +69,7 @@ namespace DevaFramework
 		*/
 		const T& operator[](int i) const
 		{
-			return operator()(0, 1);
+			return super::operator()(0, 1);
 		}
 
 		/**

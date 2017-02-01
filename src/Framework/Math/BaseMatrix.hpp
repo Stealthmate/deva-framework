@@ -89,7 +89,7 @@ namespace DevaFramework
 		BaseMatrix(const std::initializer_list<float> values)
 		{
 			static_assert(values.size() == n_vectors*vector_length, "Not correct number of values.");
-			auto val_i = list.begin();
+			auto val_i = values.begin();
 
 		}
 
