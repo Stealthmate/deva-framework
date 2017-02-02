@@ -145,7 +145,7 @@ void VulkanGraphicsPipelineBuilder::prepare()
 	createInfo.pStages = shaderStageCreateInfos.data();
 	createInfo.stageCount = shaderStageCreateInfos.size();
 }
-
+//testcommit
 VkPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
 {
 	prepare();
