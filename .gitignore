@@ -16,3 +16,4 @@ docs/**
 public_headers/*i*
 temp/**
 dep/**
+shaders/*.spv
