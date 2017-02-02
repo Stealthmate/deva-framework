@@ -1,8 +1,5 @@
 #include "../ImplWindow.hpp"
-
-#ifndef DEVA_OS_WIN32
-#error "Platform not supported."
-#else
+#ifdef DEVA_OS_WIN32
 
 #include "../../Exceptions.hpp"
 

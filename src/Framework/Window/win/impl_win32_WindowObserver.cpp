@@ -1,12 +1,15 @@
 #include "../WindowObserver.hpp"
+
+#ifdef DEVA_OS_WIN32
+
 #include "impl_win32_EventInfo.hpp"
 #include "impl_keycode_mapping.inl"
 
 
 #include "../../DevaLogger.hpp"
+#include "../../Exceptions.hpp"
 using namespace DevaFramework;
 
-#ifdef DEVA_OS_WIN32
 
 namespace
 {
@@ -151,6 +154,8 @@ namespace
 
 		if (mb_state & RI_MOUSE_BUTTON_5_DOWN) return{ MouseButton::MOUSE_BUTTON_5, true };
 		else if (mb_state & RI_MOUSE_BUTTON_5_UP) return{ MouseButton::MOUSE_BUTTON_5, false };
+
+		throw DevaException("What the fuck invalid mouse button?");
 	}
 }
 
