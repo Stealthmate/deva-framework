@@ -6,10 +6,6 @@
 #include "VulkanPhysicalDevice.hpp"
 #include "InstanceFunctionSet.hpp"
 
-#include "../../Window/Window.hpp"
-
-
-
 namespace DevaFramework
 {
 	class VulkanInstance
@@ -17,7 +13,7 @@ namespace DevaFramework
 		VkInstance mHandle;
 		VulkanInstanceFunctionSet mVk;
 
-		std::vector<VulkanPhysicalDevice> physical_devices;
+		std::vector<VulkanPhysicalDeviceWrapper> physical_devices;
 
 		void populatePDeviceList();
 
@@ -36,9 +32,9 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance);
 		DEVA_FRAMEWORK_API ~VulkanInstance();
 
-		DEVA_FRAMEWORK_API std::vector<VulkanPhysicalDevice> getPhysicalDevices() const;
+		DEVA_FRAMEWORK_API std::vector<VulkanPhysicalDeviceWrapper> getPhysicalDevices() const;
 
-		DEVA_FRAMEWORK_API VulkanInstanceFunctionSet vk() const;
+		DEVA_FRAMEWORK_API const VulkanInstanceFunctionSet& vk() const;
 		DEVA_FRAMEWORK_API VkInstance handle() const;
 
 		DEVA_FRAMEWORK_API void destroy();

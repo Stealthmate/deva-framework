@@ -38,10 +38,10 @@ VulkanInstance VulkanInstance::create()
 
 VulkanInstance VulkanInstance::create(const VkInstanceCreateInfo &info)
 {
-	VULKAN_LOG.println("Creating VulkanInstance...");
+	VULKAN_VERBOSE.println("Creating VulkanInstance...");
 	VkInstance instance_handle;
 
-	if (!vkCreateInstance)
+	if (!internal::vkCreateInstance)
 		throw DevaProgrammerErrorException(//l
 			"Vulkan not initialized",
 			"DevaFramework::loadVulkan() not called?",
@@ -49,16 +49,14 @@ VulkanInstance VulkanInstance::create(const VkInstanceCreateInfo &info)
 			"-");
 
 	std::vector<std::string> extensions;
-	for (int i = 0;i <= info.enabledExtensionCount - 1;i++)
+	for (uint32_t i = 0;i <= info.enabledExtensionCount - 1;i++)
 	{
 		extensions.push_back(*(info.ppEnabledExtensionNames + i));
 		if (!vulkanInstanceExtensionAvailable(extensions[i]))
 			throw DevaException("Could not create VkInstance - extension " + extensions[i] + " not supported by system.");
 	}
 
-	VULKAN_LOG.println("Getting VkInstance mHandle...");
-	auto result = vkCreateInstance(&info, NULL, &instance_handle);
-	VULKAN_LOG.println(strm(instance_handle));
+	auto result = internal::vkCreateInstance(&info, NULL, &instance_handle);
 	ERRCHK;
 
 	return VulkanInstance(instance_handle);
@@ -68,7 +66,7 @@ void VulkanInstance::populatePDeviceList()
 {
 	VkResult result;
 
-	VULKAN_LOG.println("Enumerating physical devices (count)...");
+	VULKAN_VERBOSE.println("Enumerating physical devices (count)...");
 	uint32_t device_count = 0;
 	result = mVk.vkEnumeratePhysicalDevices(mHandle, &device_count, NULL);
 	ERRCHK;
@@ -77,61 +75,23 @@ void VulkanInstance::populatePDeviceList()
 		throw DevaException(std::string("No physical devices available."));
 	}
 
-	VULKAN_LOG.println("System has " + strm(device_count) + " devices.");
+	VULKAN_VERBOSE.println("System has " + strm(device_count) + " devices.");
 
-	VULKAN_LOG.println("Enumerating physical devices (mHandles)...");
+	VULKAN_VERBOSE.println("Enumerating physical devices (mHandles)...");
 	std::vector<VkPhysicalDevice> deviceHandles(device_count);
 	result = mVk.vkEnumeratePhysicalDevices(mHandle, &device_count, &deviceHandles[0]);
 	ERRCHK;
 
-	VkPhysicalDeviceProperties deviceProperties;
-	VkPhysicalDeviceFeatures deviceFeatures;
-	std::vector<VkQueueFamilyProperties> queueFamilies;
-	std::vector<VkExtensionProperties> deviceExtensions;
-	std::vector<VkLayerProperties> deviceLayers;
 	for (uint32_t i = 0; i <= device_count - 1; i++)
 	{
-
-		VULKAN_LOG.println("Querying VkPhysicalDeviceProperties for device " + strm(i) + "...");
-		mVk.vkGetPhysicalDeviceProperties(deviceHandles[i], &deviceProperties);
-		VULKAN_LOG.println("Querying VkPhysicalDeviceFeatures for device " + strm(i) + "...");
-		mVk.vkGetPhysicalDeviceFeatures(deviceHandles[i], &deviceFeatures);
-
-		uint32_t queueFamilyCount = 0;
-		VULKAN_LOG.println("Querying VkQueueFamilyProperties (count) for device " + strm(i) + "...");
-		mVk.vkGetPhysicalDeviceQueueFamilyProperties(deviceHandles[i], &queueFamilyCount, NULL);
-		VULKAN_LOG.println("Device " + strm(i) + " supports " + strm(queueFamilyCount) + " queues");
-
-		VULKAN_LOG.println("Querying VkQueueFamilyProperties (handles) for device " + strm(i) + "...");
-		queueFamilies.clear();
-		queueFamilies.resize(queueFamilyCount);
-		mVk.vkGetPhysicalDeviceQueueFamilyProperties(deviceHandles[i], &queueFamilyCount, &queueFamilies[0]);
-
-		VULKAN_LOG.println("Querying VkExtensionProperties (count) for device " + strm(i) + "...");
-		uint32_t ext_count = 0;
-		mVk.vkEnumerateDeviceExtensionProperties(deviceHandles[i], NULL, &ext_count, NULL);
-		deviceExtensions.clear();
-		deviceExtensions.resize(ext_count);
-		VULKAN_LOG.println("Querying VkExtensionProperties (handles) for device " + strm(i) + "...");
-		mVk.vkEnumerateDeviceExtensionProperties(deviceHandles[i], NULL, &ext_count, deviceExtensions.data());
-
-		VULKAN_LOG.println("Querying VkLayerProperties (count) for device " + strm(i) + "...");
-		uint32_t layer_count = 0;
-		mVk.vkEnumerateDeviceLayerProperties(deviceHandles[i], &layer_count, NULL);
-		deviceLayers.clear();
-		deviceLayers.resize(layer_count);
-		VULKAN_LOG.println("Querying VkLayerProperties (handles) for device " + strm(i) + "...");
-		mVk.vkEnumerateDeviceLayerProperties(deviceHandles[i], &layer_count, deviceLayers.data());
-
-		VULKAN_LOG.println("Adding device to list");
-		this->physical_devices.push_back(VulkanPhysicalDevice(deviceHandles[i], deviceProperties, deviceFeatures, queueFamilies, deviceExtensions, deviceLayers));
+		this->physical_devices.push_back(VulkanPhysicalDeviceWrapper::fromHandle(*this, deviceHandles[i]));
 	}
 }
 
 
 VulkanInstance::VulkanInstance(VkInstance handle) : mHandle(handle)
 {
-	VULKAN_LOG.println("Loading instance-local functions...");
+	VULKAN_VERBOSE.println("Loading instance-local functions...");
 	mVk = VulkanInstanceFunctionSet::load(mHandle);
 
 	populatePDeviceList();
@@ -172,12 +132,12 @@ VkInstance VulkanInstance::handle() const
 	return this->mHandle;
 }
 
-VulkanInstanceFunctionSet VulkanInstance::vk() const
+const VulkanInstanceFunctionSet& VulkanInstance::vk() const
 {
 	return mVk;
 }
 
-std::vector<VulkanPhysicalDevice> VulkanInstance::getPhysicalDevices() const
+std::vector<VulkanPhysicalDeviceWrapper> VulkanInstance::getPhysicalDevices() const
 {
 	return physical_devices;
 }

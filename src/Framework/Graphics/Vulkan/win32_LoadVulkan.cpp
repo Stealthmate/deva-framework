@@ -23,7 +23,7 @@ void DevaFramework::internal::loadVulkanOS(const std::string & path)
 			"DevaFramework::loadVulkanOS",
 			"Windows/Vulkan");
 
-	VULKAN_LOG.println("Load dll - SUCCESS");
+	VULKAN_VERBOSE.println("Load dll - SUCCESS");
 	
 	vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)GetProcAddress(VULKAN, "vkGetInstanceProcAddr");
 	if(!vkGetInstanceProcAddr)

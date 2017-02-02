@@ -6,7 +6,8 @@
 #include "VulkanInstance.hpp"
 #include "VulkanDevice.hpp"
 
-#include<functional>
+#include <functional>
+#include <memory>
 
 namespace DevaFramework {
 
@@ -18,15 +19,15 @@ namespace DevaFramework {
 		std::vector<std::shared_ptr<T>> ptrs;
 
 	public:
-		VulkanDeleter() : VulkanDeleter([](T, VkAllocationCallbacks*) {}) {}
+		VulkanDeleter() : deleter([](T) {}) {}
 		VulkanDeleter(VkInstance instance, std::function<void(VkInstance, T, VkAllocationCallbacks*)> deletef)
 		{
-			this->deleter = [&instance, deletef](T obj) { deletef(instance.handle(), obj, nullptr); };
+			this->deleter = [instance, deletef](T obj) { deletef(instance, obj, nullptr); };
 		}
 
 		VulkanDeleter(VkDevice device, std::function<void(VkDevice, T, VkAllocationCallbacks*)> deletef)
 		{
-			this->deleter = [&device, deletef](T obj) { deletef(device, obj, nullptr); };
+			this->deleter = [device, deletef](T obj) { deletef(device, obj, nullptr); };
 		}
 
 		VulkanDeleter(std::initializer_list<std::shared_ptr<T>> ptrs) : VulkanDeleter()
@@ -41,17 +42,21 @@ namespace DevaFramework {
 		{
 			cleanup();
 			object = vd.object;
+			deleter = vd.deleter;
 			vd.object = VK_NULL_HANDLE;
+			vd.deleter = [](T obj) {};
 		}
 
 		VulkanDeleter<T>& operator=(const VulkanDeleter<T> &vd) = delete;
 		VulkanDeleter<T>& operator=(VulkanDeleter<T> &&vd)
 		{
-			if (this != &vd)
+			if (object != vd.object)
 			{
 				cleanup();
 				object = vd.object;
+				deleter = vd.deleter;
 				vd.object = VK_NULL_HANDLE;
+				vd.deleter = [](T obj) {};
 			}
 
 			return *this;
@@ -69,16 +74,6 @@ namespace DevaFramework {
 		operator T() const {
 			return object;
 		}
-
-		T& operator=(T rhs) {
-			if (rhs != object) {
-				cleanup();
-				object = rhs;
-			}
-
-			return object;
-		}
-
 
 		template<typename V>
 		bool operator==(V rhs) {

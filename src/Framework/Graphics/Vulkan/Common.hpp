@@ -4,10 +4,18 @@
 #include "Config.hpp"
 
 #include "VulkanDeleter.hpp"
+#include "VulkanInstance.hpp"
+#include "VulkanPhysicalDevice.hpp"
+
+#include <vector>
 
 namespace DevaFramework {
 
-	DEVA_FRAMEWORK_API VulkanDeleter<VkShaderModule> vulkanShaderFromFile(const VulkanDevice &dev, const char *filepath);
+	class Window;
+
+	DEVA_FRAMEWORK_API VkShaderModule vulkanShaderFromFile(const VulkanDevice &dev, const char *filepath);
+	DEVA_FRAMEWORK_API VkSurfaceKHR createSurfaceFromWindow(const VulkanInstance &vkInstance, const Window &wnd);
+	DEVA_FRAMEWORK_API std::vector<uint32_t> deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice pdev, VkSurfaceKHR surface);
 
 }
 

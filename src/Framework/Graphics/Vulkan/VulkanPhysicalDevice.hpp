@@ -7,38 +7,27 @@
 
 namespace DevaFramework
 {
-	struct VulkanPhysicalDevice
+	class VulkanInstance;
+
+	struct VulkanPhysicalDeviceWrapper
 	{
+		struct SurfaceProperties {
+			std::vector<VkSurfaceFormatKHR> formats;
+			VkSurfaceCapabilitiesKHR capabilities;
+			std::vector<VkPresentModeKHR> presentModes;
+		};
+
+		DEVA_FRAMEWORK_API static VulkanPhysicalDeviceWrapper fromHandle(const VulkanInstance &vkInstance, VkPhysicalDevice handle);
 
 		VkPhysicalDevice handle;
+		VkPhysicalDeviceType type;
 		VkPhysicalDeviceProperties properties;
 		VkPhysicalDeviceFeatures features;
 		std::vector<VkQueueFamilyProperties> queueFamilies;
 		std::vector<VkExtensionProperties> extensions;
 		std::vector<VkLayerProperties> layers;
 
-		DEVA_FRAMEWORK_API VulkanPhysicalDevice(
-			VkPhysicalDevice handle,
-			const VkPhysicalDeviceProperties &properties,
-			const VkPhysicalDeviceFeatures &features,
-			const std::vector<VkQueueFamilyProperties> &queueFamilies,
-			const std::vector<VkExtensionProperties> & extensions,
-			const std::vector<VkLayerProperties> & layers) 
-			: handle(handle), 
-			properties(properties), 
-			features(features), 
-			queueFamilies(queueFamilies),
-			extensions(extensions),
-			layers(layers) {}
-
-		DEVA_FRAMEWORK_API VulkanPhysicalDevice();
-		DEVA_FRAMEWORK_API VulkanPhysicalDevice(const VulkanPhysicalDevice &pdev);
-
-		DEVA_FRAMEWORK_API VulkanPhysicalDevice(VulkanPhysicalDevice &&pdev);
-		DEVA_FRAMEWORK_API VulkanPhysicalDevice& operator=(const VulkanPhysicalDevice &pdev);
-		DEVA_FRAMEWORK_API VulkanPhysicalDevice& operator=(VulkanPhysicalDevice &&pdev);
-
-		DEVA_FRAMEWORK_API ~VulkanPhysicalDevice();
+		DEVA_FRAMEWORK_API SurfaceProperties getSurfaceProperties(const VulkanInstance &vkInstance, VkSurfaceKHR surface);
 
 		DEVA_FRAMEWORK_API std::string to_string() const;
 	};

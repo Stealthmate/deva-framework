@@ -7,12 +7,13 @@
 
 using namespace DevaFramework;
 
-PFN_vkGetInstanceProcAddr                           vkGetInstanceProcAddr = nullptr;
+PFN_vkGetInstanceProcAddr                           DevaFramework::internal::vkGetInstanceProcAddr = nullptr;
 
-PFN_vkCreateInstance                                vkCreateInstance = nullptr;
-PFN_vkEnumerateInstanceLayerProperties              vkEnumerateInstanceLayerProperties = nullptr;
-PFN_vkEnumerateInstanceExtensionProperties          vkEnumerateInstanceExtensionProperties = nullptr;
+PFN_vkCreateInstance                                DevaFramework::internal::vkCreateInstance = nullptr;
+PFN_vkEnumerateInstanceLayerProperties              DevaFramework::internal::vkEnumerateInstanceLayerProperties = nullptr;
+PFN_vkEnumerateInstanceExtensionProperties          DevaFramework::internal::vkEnumerateInstanceExtensionProperties = nullptr;
 
+DevaLogger DevaFramework::VULKAN_VERBOSE = DevaLogger("[Vulkan] Verbose: ", DevaLogger::LogLevel::LOG_MESSAGE, true);
 DevaLogger DevaFramework::VULKAN_LOG = DevaLogger("[Vulkan] Log: ", DevaLogger::LogLevel::LOG_MESSAGE, true);
 DevaLogger DevaFramework::VULKAN_WARN = DevaLogger("[Vulkan] Warning: ", DevaLogger::LogLevel::LOG_WARNING, true);
 DevaLogger DevaFramework::VULKAN_ERR = DevaLogger("[Vulkan] Error: ", DevaLogger::LogLevel::LOG_ERROR, true);
@@ -31,7 +32,7 @@ else \
 	std::string msg = "Getting PFN "; \
 	msg += #PFNNAME; \
 	msg.append(70 - msg.length(), ' '); \
-	VULKAN_LOG.println(msg + " - SUCCESS"); \
+	VULKAN_VERBOSE.println(msg + " - SUCCESS"); \
 }
 
 void internal::getVulkanGlobalFunctions()
@@ -39,7 +40,7 @@ void internal::getVulkanGlobalFunctions()
 	LOADPFN(vkCreateInstance);
 	LOADPFN(vkEnumerateInstanceExtensionProperties);
 	LOADPFN(vkEnumerateInstanceLayerProperties);
-	VULKAN_LOG.println("Successfully got all global functions.");
+	VULKAN_VERBOSE.println("Successfully got all global functions.");
 }
 
 #undef LOADPFN
@@ -50,24 +51,24 @@ void DevaFramework::LoadVulkan(const std::string &dllpath)
 	internal::getVulkanGlobalFunctions();
 
 	uint32_t extension_count = 0;
-	vkEnumerateInstanceExtensionProperties(NULL, &extension_count, NULL);
+	internal::vkEnumerateInstanceExtensionProperties(NULL, &extension_count, NULL);
 	EXTENSIONS_AVAILABLE = std::vector<VkExtensionProperties>(extension_count);
-	vkEnumerateInstanceExtensionProperties(NULL, &extension_count, EXTENSIONS_AVAILABLE.data());
+	internal::vkEnumerateInstanceExtensionProperties(NULL, &extension_count, EXTENSIONS_AVAILABLE.data());
 
-	VULKAN_LOG.println("Successfully enumerated extensions");
+	VULKAN_VERBOSE.println("Successfully enumerated extensions");
 }
 
 bool DevaFramework::vulkanInstanceExtensionAvailable(const std::string & extensionName)
 {
-	VULKAN_LOG << VULKAN_LOG.stamp() << "Querying instance extension " + extensionName << "...";
+	VULKAN_VERBOSE << VULKAN_VERBOSE.stamp() << "Querying instance extension " + extensionName << "...";
 	for (auto &i : EXTENSIONS_AVAILABLE)
 	{
 		if (extensionName == i.extensionName) 
 		{
-			VULKAN_LOG << " FOUND" << Logger::endl;
+			VULKAN_VERBOSE << " FOUND" << Logger::endl;
 			return true;
 		}
 	}
-	VULKAN_LOG << " NOT FOUND" << Logger::endl;
+	VULKAN_VERBOSE << " NOT FOUND" << Logger::endl;
 	return false;
 }

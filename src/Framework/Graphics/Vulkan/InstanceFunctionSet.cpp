@@ -5,40 +5,72 @@
 using namespace DevaFramework;
 
 #define LOAD(PFNNAME) \
-VULKAN_LOG.println("Getting Instance PFN_" #PFNNAME "..."); \
-vinstf.PFNNAME = (PFN_##PFNNAME) vkGetInstanceProcAddr(vkinstance, #PFNNAME); \
+VULKAN_VERBOSE.println("Getting Instance PFN_" #PFNNAME "..."); \
+vinstf.PFNNAME = (PFN_##PFNNAME) internal::vkGetInstanceProcAddr(vkinstance, #PFNNAME); \
 if(vinstf.PFNNAME == NULL) \
 { \
-	VULKAN_WARN.println("Instance PFN_" #PFNNAME " not available (Extension not specified in VkInstanceCreateInfo?)"); \
+	VULKAN_VERBOSE.println("Instance PFN_" #PFNNAME " not available. Assigning default implementation (throw exception)"); \
 	vinstf.PFNNAME = (PFN_##PFNNAME) internal::impldef_##PFNNAME; \
 }
 
 VulkanInstanceFunctionSet VulkanInstanceFunctionSet::load(VkInstance vkinstance)
 {
 	VulkanInstanceFunctionSet vinstf;
+
+	LOAD(vkGetDeviceProcAddr);
 	LOAD(vkDestroyInstance);
 	LOAD(vkEnumeratePhysicalDevices);
 	LOAD(vkGetPhysicalDeviceFeatures);
+	LOAD(vkGetPhysicalDeviceFormatProperties);
+	LOAD(vkGetPhysicalDeviceImageFormatProperties);
 	LOAD(vkGetPhysicalDeviceProperties);
 	LOAD(vkGetPhysicalDeviceQueueFamilyProperties);
-	LOAD(vkGetPhysicalDeviceSurfaceSupportKHR);
-	LOAD(vkGetPhysicalDeviceSurfaceFormatsKHR);
-	LOAD(vkGetPhysicalDeviceSurfaceCapabilitiesKHR);
-	LOAD(vkGetPhysicalDeviceSurfacePresentModesKHR);
+	LOAD(vkGetPhysicalDeviceMemoryProperties);
+	LOAD(vkCreateDevice);
 	LOAD(vkEnumerateDeviceExtensionProperties);
 	LOAD(vkEnumerateDeviceLayerProperties);
-
-	LOAD(vkCreateDevice);
-	LOAD(vkDestroyDevice);
-	LOAD(vkGetDeviceProcAddr);
+	LOAD(vkGetPhysicalDeviceSparseImageFormatProperties);
+	LOAD(vkDestroySurfaceKHR);
+	LOAD(vkGetPhysicalDeviceSurfaceSupportKHR);
+	LOAD(vkGetPhysicalDeviceSurfaceCapabilitiesKHR);
+	LOAD(vkGetPhysicalDeviceSurfaceFormatsKHR);
+	LOAD(vkGetPhysicalDeviceSurfacePresentModesKHR);
+	LOAD(vkGetPhysicalDeviceDisplayPropertiesKHR);
+	LOAD(vkGetPhysicalDeviceDisplayPlanePropertiesKHR);
+	LOAD(vkGetDisplayPlaneSupportedDisplaysKHR);
+	LOAD(vkGetDisplayModePropertiesKHR);
+	LOAD(vkCreateDisplayModeKHR);
+	LOAD(vkGetDisplayPlaneCapabilitiesKHR);
+	LOAD(vkCreateDisplayPlaneSurfaceKHR);
+	LOAD(vkCreateDebugReportCallbackEXT);
+	LOAD(vkDestroyDebugReportCallbackEXT);
+	LOAD(vkDebugReportMessageEXT);
+	LOAD(vkGetPhysicalDeviceExternalImageFormatPropertiesNV);
+	LOAD(vkGetPhysicalDeviceGeneratedCommandsPropertiesNVX);
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 	LOAD(vkCreateWin32SurfaceKHR);
 	LOAD(vkGetPhysicalDeviceWin32PresentationSupportKHR);
-#endif //VK_USE_PLATFORM_WIN32_KHR
-
-	LOAD(vkDestroySurfaceKHR);
-	LOAD(vkCreateDebugReportCallbackEXT);
+#endif
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+	LOAD(vkCreateXlibSurfaceKHR);
+	LOAD(vkGetPhysicalDeviceXlibPresentationSupportKHR);
+#endif
+#ifdef VK_USE_PLATFORM_XCB_KHR
+	LOAD(vkCreateXcbSurfaceKHR);
+	LOAD(vkGetPhysicalDeviceXcbPresentationSupportKHR);
+#endif
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+	LOAD(vkCreateWaylandSurfaceKHR);
+	LOAD(vkGetPhysicalDeviceWaylandPresentationSupportKHR);
+#endif
+#ifdef VK_USE_PLATFORM_MIR_KHR
+	LOAD(vkCreateMirSurfaceKHR);
+	LOAD(vkGetPhysicalDeviceMirPresentationSupportKHR);
+#endif
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+	LOAD(vkCreateAndroidSurfaceKHR);
+#endif
 
 	return vinstf;
 }
