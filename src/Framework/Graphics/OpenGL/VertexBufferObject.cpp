@@ -10,7 +10,7 @@ std::string VertexBufferObject::VertexArrayObject::str() const
     std::string output = "";
     output+= "  Position: " + strm(id) + "\n";
     output+= "  nValuesPerVertex: " + strm(nValuesPerVertex) + "\n";
-    output+= "  dataType: " + strm(dataType) + "\n";
+    output+= "  dataType: " + strm((int)dataType) + "\n";
     output+= "  stride:  " + strm(stride) + "\n";
     output+= "  offset: " + strm((uintptr_t)offset) + "\n";
     return output;
@@ -28,7 +28,7 @@ VertexBufferObject::VertexArrayObject::VertexArrayObject(
 
 VertexBufferObject::VertexBufferObject() : data(), nVertices(0), data_nValues(0), data_byteSize(0), vaos(), vaos_size(0) {}
 VertexBufferObject::VertexBufferObject(
-	const std::vector<char> &data,
+	const std::vector<byte_t> &data,
 	gl::GLuint nVertices,
 	gl::GLuint data_nValues,
 	gl::GLuint data_byteSize,

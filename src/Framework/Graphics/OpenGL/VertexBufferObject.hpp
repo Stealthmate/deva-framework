@@ -40,7 +40,7 @@ struct VertexBufferObject
     };
 
     ///The raw data to be copied in the buffer
-	std::vector<char> data;
+	std::vector<byte_t> data;
     ///The number of vertices, for which information is stored
 	gl::GLuint nVertices;
     ///The number of values to be stored
@@ -54,7 +54,7 @@ struct VertexBufferObject
 
 	DEVA_FRAMEWORK_API VertexBufferObject();
 	DEVA_FRAMEWORK_API VertexBufferObject(
-		const std::vector<char> &data, 
+		const std::vector<byte_t> &data,
 		gl::GLuint nVertices, 
 		gl::GLuint data_nValues, 
 		gl::GLuint data_byteSize,
