@@ -19,6 +19,8 @@ set(
 	${CURDIR}/Graphics/Init.hpp
 	${CURDIR}/Graphics/Master.hpp
 	${CURDIR}/Graphics/OpenGL.hpp
+	${CURDIR}/Graphics/VertexBuffer.cpp
+	${CURDIR}/Graphics/VertexBuffer.hpp
 	${CURDIR}/Graphics/Vulkan.hpp
 	${CURDIR}/Graphics/OpenGL/Common.cpp
 	${CURDIR}/Graphics/OpenGL/Common.hpp
@@ -56,8 +58,10 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanDeleter.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanDeviceBuilder.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceFunctionSet.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceFunctionSet.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanDeviceQueue.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanException.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.hpp
