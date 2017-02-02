@@ -143,17 +143,17 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::setRenderPass(VkRe
 void VulkanGraphicsPipelineBuilder::prepare()
 {
 	createInfo.pStages = shaderStageCreateInfos.data();
-	createInfo.stageCount = shaderStageCreateInfos.size() - 1;
+	createInfo.stageCount = shaderStageCreateInfos.size();
 }
 
-VulkanDeleter<VkPipeline> VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
+VkPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
 {
 	prepare();
-	auto device = dev.getHandle();
-	auto & vk = dev.getFunctionSet();
+	auto device = dev.handle();
+	auto & vk = dev.vk();
 
-	VulkanDeleter<VkPipeline> pl{device, vk.vkDestroyPipeline};
-	auto result = vk.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &createInfo, nullptr, pl.replace());
+	VkPipeline pl;
+	auto result = vk.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &createInfo, nullptr, &pl);
 	if (result != VK_SUCCESS) {
 		throw DevaException("Failed to create graphics pipeline!");
 	}

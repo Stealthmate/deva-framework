@@ -19,8 +19,6 @@ set(
 	${CURDIR}/Renderer.cpp
 	${CURDIR}/Renderer.hpp
 	${CURDIR}/Scene.hpp
-	${CURDIR}/VulkanDevice.cpp
-	${CURDIR}/VulkanDevice.hpp
 	${CURDIR}/VulkanPipeline.hpp
 	${CURDIR}/VulkanPipelineBuilder.cpp
 	${CURDIR}/VulkanPipelineBuilder.hpp

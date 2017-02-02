@@ -35,17 +35,17 @@ namespace DevaEngine {
 		void prepare();
 
 	public:
-		VulkanGraphicsPipelineBuilder();
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder();
 
 
-		VulkanGraphicsPipelineBuilder& outputExtent(const VkExtent2D &extent);
-		VulkanGraphicsPipelineBuilder& setTopology(VkPrimitiveTopology t);
-		VulkanGraphicsPipelineBuilder& setRenderPass(VkRenderPass rp, int subpass);
-		VulkanGraphicsPipelineBuilder& setLayout(VkPipelineLayout layout);
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& outputExtent(const VkExtent2D &extent);
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setTopology(VkPrimitiveTopology t);
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setRenderPass(VkRenderPass rp, int subpass);
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setLayout(VkPipelineLayout layout);
 
-		VulkanGraphicsPipelineBuilder& attachShader(VkShaderModule shader, VkShaderStageFlagBits type, const char* entry);
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& attachShader(VkShaderModule shader, VkShaderStageFlagBits type, const char* entry);
 
-		DevaFramework::VulkanDeleter<VkPipeline> build(const DevaFramework::VulkanDevice &dev);
+		DEVA_ENGINE_API VkPipeline build(const DevaFramework::VulkanDevice &dev);
 
 	};
 }

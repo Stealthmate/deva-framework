@@ -15,7 +15,7 @@ namespace DevaEngine
 	{
 
 		DevaFramework::VulkanInstance instance;
-		DevaFramework::VulkanPhysicalDevice main_pdev;
+		DevaFramework::VulkanPhysicalDeviceWrapper main_pdev;
 		DevaFramework::VulkanDevice main_device;
 
 		VkColorSpaceKHR colorSpace;
@@ -33,7 +33,7 @@ namespace DevaEngine
 		DEVA_ENGINE_API VulkanRenderer();
 		DEVA_ENGINE_API VulkanRenderer(const DevaFramework::Window &wnd);
 
-		DEVA_ENGINE_API virtual void attachToWindow(const DevaFramework::Window &wnd, uint32_t queueIndex);
+		DEVA_ENGINE_API virtual void attachToWindow(const DevaFramework::Window &wnd);
 		DEVA_ENGINE_API virtual void createPipeline();
 
 		DEVA_ENGINE_API virtual void renderExample();
