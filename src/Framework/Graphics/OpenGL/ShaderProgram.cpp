@@ -1,6 +1,7 @@
 #include "ShaderProgram.hpp"
 
 #include "glFunctions.hpp"
+#include <algorithm>
 
 USE_GL;
 using namespace DevaFramework;
