@@ -12,7 +12,7 @@ namespace DevaFramework {
 	class GraphicsState
 	{
 		static VkInstance this_instance;
-		static std::vector<VulkanPhysicalDevice> available_physical_devices;
+		static std::vector<VulkanPhysicalDeviceWrapper> available_physical_devices;
 
 		static void initVulkan(const VkInstanceCreateInfo &vulkan_info);
 
@@ -21,7 +21,7 @@ namespace DevaFramework {
 		//DEVA_FRAMEWORK_API static VkInstanceCreateInfo DEFAULT_INSTANCE_SETTINGS;
 		//DEVA_FRAMEWORK_API static size_t getPhysicalDeviceCount();
 		//
-		//DEVA_FRAMEWORK_API static const VulkanPhysicalDevice& getPhysicalDevice(uint32_t i);
+		//DEVA_FRAMEWORK_API static const VulkanPhysicalDeviceWrapper& getPhysicalDevice(uint32_t i);
 	};
 
 }

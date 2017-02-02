@@ -45,7 +45,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 				new_data[(4 * i*raw.width) + (4 * j) + 0] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 0];
 				new_data[(4 * i*raw.width) + (4 * j) + 1] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 1];
 				new_data[(4 * i*raw.width) + (4 * j) + 2] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 2];
-				new_data[(4 * i*raw.width) + (4 * j) + 3] = 0xFF;
+				new_data[(4 * i*raw.width) + (4 * j) + 3] = (byte_t) 0xFF;
 
 			}
 		}

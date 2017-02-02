@@ -79,7 +79,7 @@ int DevaFramework::DEVA_INIT_GRAPHICS(const VkInstanceCreateInfo &vulkan_info)
 }
 
 VkInstanceCreateInfo DEFAULT_INSTANCE_SETTINGS = make_default_instance_settings();
-std::vector<VulkanPhysicalDevice> GraphicsState::available_physical_devices = std::vector<VulkanPhysicalDevice>(0);
+std::vector<VulkanPhysicalDeviceWrapper> GraphicsState::available_physical_devices = std::vector<VulkanPhysicalDeviceWrapper>(0);
 
 
 void GraphicsState::initVulkan(const VkInstanceCreateInfo &vulkan_info)
@@ -134,7 +134,7 @@ void GraphicsState::initVulkan(const VkInstanceCreateInfo &vulkan_info)
 		queueFamilies.resize(queueFamilyCount);
 		vkGetPhysicalDeviceQueueFamilyProperties(deviceHandles[i], &queueFamilyCount, &queueFamilies[0]);
 
-		available_physical_devices.push_back(VulkanPhysicalDevice(deviceHandles[i], deviceProperties, deviceFeatures, queueFamilies));
+		available_physical_devices.push_back(VulkanPhysicalDeviceWrapper(deviceHandles[i], deviceProperties, deviceFeatures, queueFamilies));
 	}
 }
 
@@ -143,7 +143,7 @@ size_t DevaFramework::GraphicsState::getPhysicalDeviceCount()
 	return available_physical_devices.size();
 }
 
-const VulkanPhysicalDevice& GraphicsState::getPhysicalDevice(uint32_t i)
+const VulkanPhysicalDeviceWrapper& GraphicsState::getPhysicalDevice(uint32_t i)
 {
 	if (i >= available_physical_devices.size())
 		throw DevaInvalidInputException("Invalid device id");
