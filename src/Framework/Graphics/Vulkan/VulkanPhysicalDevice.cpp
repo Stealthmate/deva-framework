@@ -212,6 +212,9 @@ VulkanPhysicalDeviceWrapper VulkanPhysicalDeviceWrapper::fromHandle(const Vulkan
 	if (result != VK_SUCCESS)
 		throw DevaException("Could not populate device layer properties");
 
+	VkPhysicalDeviceMemoryProperties memProperties;
+	vk.vkGetPhysicalDeviceMemoryProperties(handle, &pdev.memoryProperties);
+
 	return pdev;
 }
 

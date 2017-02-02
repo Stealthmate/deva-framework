@@ -26,6 +26,7 @@ namespace DevaFramework
 		std::vector<VkQueueFamilyProperties> queueFamilies;
 		std::vector<VkExtensionProperties> extensions;
 		std::vector<VkLayerProperties> layers;
+		VkPhysicalDeviceMemoryProperties memoryProperties;
 
 		DEVA_FRAMEWORK_API SurfaceProperties getSurfaceProperties(const VulkanInstance &vkInstance, VkSurfaceKHR surface);
 
