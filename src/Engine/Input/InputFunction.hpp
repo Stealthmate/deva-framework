@@ -3,6 +3,8 @@
 
 #include "../Config.hpp"
 
+#include <functional>
+
 namespace DevaEngine
 {
 	class InputFunction
