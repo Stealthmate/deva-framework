@@ -37,7 +37,7 @@ namespace DevaFramework
 	typedef uint32_t ShaderID;
 	typedef uint32_t TextureID;
 
-	typedef char byte_t;
+	typedef unsigned char byte_t;
 
 	const uint32_t DEVA_VERSION_MAJOR = DEVA_VERSION_MACRO_MAJOR;
 	const uint32_t DEVA_VERSION_MINOR = DEVA_VERSION_MACRO_MINOR;
