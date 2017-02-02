@@ -25,4 +25,4 @@ namespace DevaFramework
 	};
 }
 
-#endif // DEVA_FRAMEWORK_SYSTEM_NUMBER_FORMATTER_h
+#endif // DEVA_FRAMEWORK_SYSTEM_NUMBER_FORMATTER_HPP
