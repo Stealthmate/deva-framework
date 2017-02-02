@@ -40,16 +40,18 @@ const Logger& DevaLogger::print(const std::string &msg) const
 	return *this;
 }
 
+#pragma message("NEED TO FIX THIS FUNCTION -> DevaLogger:46")
+
 template<typename T>
 std::string formatNumberIfNeeded(T num, DevaLogger::NumberFormat format)
 {
 	switch (format)
 	{
 	case DevaLogger::NumberFormat::BINARY:
-		return NumberFormatter::toBinary(num);
+		return NumberFormatter::toBinary((uint64_t)num);
 		break;
 	case DevaLogger::NumberFormat::HEX:
-		return NumberFormatter::toHex(num);
+		return NumberFormatter::toHex((uint64_t)num);
 		break;
 	case DevaLogger::NumberFormat::PLAIN:
 	default:
