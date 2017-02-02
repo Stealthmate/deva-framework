@@ -11,15 +11,15 @@ using namespace DevaFramework;
 
 static const int32_t SERIALID = 102;
 
-static const char DATA_TYPE_FLOAT = (char)0b10000000;
-static const char DATA_TYPE_INT   = (char)0b01000000;
-static const char DATA_TYPE_UINT  = (char)0b00100000;
+static const byte_t DATA_TYPE_FLOAT = (byte_t)0b10000000;
+static const byte_t DATA_TYPE_INT   = (byte_t)0b01000000;
+static const byte_t DATA_TYPE_UINT  = (byte_t)0b00100000;
 
-static const char DATA_SIZE_8  = (char)0b00000001;
-static const char DATA_SIZE_16 = (char)0b00000010;
-static const char DATA_SIZE_32 = (char)0b00000100;
+static const byte_t DATA_SIZE_8  = (byte_t)0b00000001;
+static const byte_t DATA_SIZE_16 = (byte_t)0b00000010;
+static const byte_t DATA_SIZE_32 = (byte_t)0b00000100;
 
-static const char DATA_SIZE_MASK = 0b000000111;
+static const byte_t DATA_SIZE_MASK = 0b000000111;
 
 static const int INDICES_PER_ELEMENT = 3;
 
@@ -58,7 +58,7 @@ static int8_t getToken(gl::GLenum type)
 	case gl::GL_UNSIGNED_SHORT: return DATA_TYPE_UINT | DATA_SIZE_16;
 	case gl::GL_INT: return DATA_TYPE_INT | DATA_SIZE_32;
 	case gl::GL_UNSIGNED_INT: return DATA_TYPE_UINT | DATA_SIZE_32;
-	default: throw DevaInvalidInputException("Requested token for invalid GL type (" + strm(type) + ")");
+	default: throw DevaInvalidInputException("Requested token for invalid GL type (" + strm((int)type) + ")");
 	}
 }
 
@@ -99,7 +99,7 @@ Model Model::fromFile(const std::string &filename) {
 	for (int i = 0; i <= n_vao - 1;i++) 
 	{
 		bfsw >> n_components_vao[i];
-		bfsw >> (int8_t)component_type_vao[i];
+		bfsw >> component_type_vao[i];
 
 		VAO vao;
 		vao.id = i;
@@ -117,7 +117,7 @@ Model Model::fromFile(const std::string &filename) {
 
 	vbo.vaos = vaos;
 	vbo.data_byteSize = bytesize;
-	std::vector<char> data;
+	std::vector<byte_t> data;
 	data.resize(vbo.data_byteSize);
 	bfsw.read(&data[0], vbo.data_byteSize);
 
@@ -132,15 +132,15 @@ Model Model::fromFile(const std::string &filename) {
 	if (!(index_type & DATA_TYPE_INT || index_type & DATA_TYPE_UINT))
 		throw DevaInvalidInputException("Cannot load model. Bad index type. (type: " + strm((int)index_type) + ")");
 
-	std::vector<char> index_data;
+	std::vector<byte_t> index_data;
 	index_data.resize(n_elements * INDICES_PER_ELEMENT * (index_type & DATA_SIZE_MASK));
 
-	bfsw.read((char*)(&index_data[0]), n_elements * INDICES_PER_ELEMENT * (index_type & DATA_SIZE_MASK));
+	bfsw.read((byte_t*)(&index_data[0]), n_elements * INDICES_PER_ELEMENT * (index_type & DATA_SIZE_MASK));
 
 	return Model(vbo, getGLType(index_type), index_data);
 }
 
-std::vector<char> Model::exportBinary(const Model &model)
+std::vector<byte_t> Model::exportBinary(const Model &model)
 {
 
 	int nVertices = model.vbo.nVertices;
@@ -190,7 +190,7 @@ std::vector<char> Model::exportBinary(const Model &model)
 
 Model::Model() : vbo(), index_type(gl::GL_INT), indices() {}
 
-Model::Model(const VBO &vbo, gl::GLenum index_type, const std::vector<char> &indices) : vbo(vbo), index_type(index_type), indices(indices) {}
+Model::Model(const VBO &vbo, gl::GLenum index_type, const std::vector<byte_t> &indices) : vbo(vbo), index_type(index_type), indices(indices) {}
 
 const VBO& Model::getVBO() const
 {
@@ -202,7 +202,7 @@ gl::GLenum Model::getIndexType() const
 	return this->index_type;
 }
 
-const std::vector<char>& Model::getIndexArray() const
+const std::vector<byte_t>& Model::getIndexArray() const
 {
 	return this->indices;
 }

@@ -82,21 +82,21 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API static Model fromFile(const std::string &filename);
 		/**TODO: NOT FULLY IMPLEMENTED!!!!!!*/
-		DEVA_FRAMEWORK_API static std::vector<char> exportBinary(const Model &model);
+		DEVA_FRAMEWORK_API static std::vector<byte_t> exportBinary(const Model &model);
 
 	private:
 		
 		VBO vbo;
 		gl::GLenum index_type;
-		std::vector<char> indices;
+		std::vector<byte_t> indices;
 
 	public:
 		DEVA_FRAMEWORK_API Model();
-		DEVA_FRAMEWORK_API Model(const VBO &vbo, gl::GLenum index_type, const std::vector<char> &index_arr);
+		DEVA_FRAMEWORK_API Model(const VBO &vbo, gl::GLenum index_type, const std::vector<byte_t> &index_arr);
 
 		DEVA_FRAMEWORK_API const VBO& getVBO() const;
 		DEVA_FRAMEWORK_API gl::GLenum getIndexType() const;
-		DEVA_FRAMEWORK_API const std::vector<char>& getIndexArray() const;
+		DEVA_FRAMEWORK_API const std::vector<byte_t>& getIndexArray() const;
 
 		DEVA_FRAMEWORK_API std::string str();
 	};
