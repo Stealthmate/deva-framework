@@ -13,17 +13,16 @@ protected:
 
 	void SetUp() {
 
-		ByteBuffer bbuf(36);
-		bbuf << 1.1f << 1.2f << 1.3f;
-		bbuf << 2.1f << 2.2f << 2.3f;
-		bbuf << 3.1f << 3.2f << 3.3f;
-
-		vector<VertexComponentInfo> components;
-		components.push_back({ 4, FLOAT });
-		components.push_back({ 4, FLOAT });
-		components.push_back({ 4, FLOAT });
-
-		buffer = new VertexBuffer(bbuf.buf(), 3, components, INTERLEAVED);
+		ByteBuffer bbuf(60);
+		bbuf << 1.1f << 1.2f << 1.3f << 1.4f << 1.5f;
+		bbuf << 2.1f << 2.2f << 2.3f << 2.4f << 2.5f;
+		bbuf << 3.1f << 3.2f << 3.3f << 3.4f << 3.5f;
+		vector<VertexDataElementDescription> elements;
+		vector<size_t> components = { 32, 32, 32 };
+		elements.push_back({ 3 * 4, FLOAT, components });
+		components = { 32, 32 };
+		elements.push_back({ 2 * 4, FLOAT, components });
+		buffer = new VertexBuffer(bbuf.buf(), 3, elements, INTERLEAVED);
 	}
 
 	~BufferTester()
@@ -35,13 +34,16 @@ protected:
 TEST_F(BufferTester, testByteBuffer)
 {
 	EXPECT_EQ(buffer->vertexCount(), 3);
-	EXPECT_EQ(buffer->vertexSize(), 12);
+	EXPECT_EQ(buffer->vertexSize(), 20);
 	EXPECT_EQ(buffer->layout(), INTERLEAVED);
 
-	ByteBuffer bbuf(36);
-	bbuf << 1.1f << 2.1f << 3.1f;
-	bbuf << 1.2f << 2.2f << 3.2f;
-	bbuf << 1.3f << 2.3f << 3.3f;
+	ByteBuffer bbuf(60);
+	bbuf << 1.1f << 1.2f << 1.3f;
+	bbuf << 2.1f << 2.2f << 2.3f;
+	bbuf << 3.1f << 3.2f << 3.3f;
+	bbuf << 1.4f << 1.5f;
+	bbuf << 2.4f << 2.5f;
+	bbuf << 3.4f << 3.5f;
 	bbuf.setPosition(0);
 
 	VertexBuffer vbremapped = VertexBuffer::convertToLayout(*buffer, SEPARATE);

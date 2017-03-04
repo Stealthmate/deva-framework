@@ -5,10 +5,10 @@
 using namespace DevaFramework;
 
 namespace {
-	size_t sumComponentSizes(const std::vector<VertexComponentInfo> &components)
+	size_t sumComponentSizes(const std::vector<VertexDataElementDescription> &elements)
 	{
 		size_t sum = 0;
-		for (auto & c : components)
+		for (auto & c : elements)
 		{
 			sum += c.size;
 		}
@@ -30,7 +30,7 @@ VertexBuffer VertexBuffer::convertToLayout(const VertexBuffer &buffer, VertexBuf
 	for (int i = 0;i < buffer.vertexCount();i++)
 	{
 		size_t offset = 0;
-		for (int j = 0;j < buffer.components().size();j++)
+		for (int j = 0;j < buffer.elements().size();j++)
 		{
 			auto start = data.begin();
 			switch (layout)
@@ -41,17 +41,17 @@ VertexBuffer VertexBuffer::convertToLayout(const VertexBuffer &buffer, VertexBuf
 			}break;
 			case SEPARATE:
 			{
-				start += (offset * buffer.vertexCount()) + (i*buffer.components()[j].size);
+				start += (offset * buffer.vertexCount()) + (i*buffer.elements()[j].size);
 			}break;
 			}
 
-			std::copy(buffer[i].components[j], buffer[i].components[j] + buffer.components()[j].size, start);
+			std::copy(buffer[i].elements[j], buffer[i].elements[j] + buffer.elements()[j].size, start);
 
-			offset += buffer.components()[j].size;
+			offset += buffer.elements()[j].size;
 		}
 	}
 
-	return VertexBuffer(data, buffer.vertexCount(), buffer.components(), layout);
+	return VertexBuffer(data, buffer.vertexCount(), buffer.elements(), layout);
 }
 
 
@@ -180,7 +180,7 @@ vertex VertexBuffer::operator[](size_t index)
 	std::vector<byte_t*> ptrs;
 	ptrs.reserve(vertexSize());
 	size_t comp_offset = 0;
-	for (int i = 0;i < mComponents.size();i++)
+	for (int i = 0;i < mElements.size();i++)
 	{
 		size_t start = 0;
 		switch (mLayout)
@@ -206,7 +206,7 @@ const vertex VertexBuffer::operator[](size_t index) const
 	std::vector<byte_t*> ptrs;
 	ptrs.reserve(vertexSize());
 	size_t comp_offset = 0;
-	for (int i = 0;i < mComponents.size();i++)
+	for (int i = 0;i < mElements.size();i++)
 	{
 		size_t start = 0;
 		switch (mLayout)
@@ -217,12 +217,12 @@ const vertex VertexBuffer::operator[](size_t index) const
 		}break;
 		case SEPARATE:
 		{
-			start += (comp_offset * mVertexCount) + (index*mComponents[i].size);
+			start += (comp_offset * mVertexCount) + (index*mElements[i].size);
 		}break;
 		}
 
 		ptrs.push_back(const_cast<byte_t*>(&mBuffer[start]));
-		comp_offset += mComponents[i].size;
+		comp_offset += mElements[i].size;
 	}
 
 	return Vertex(ptrs);
@@ -231,10 +231,10 @@ const vertex VertexBuffer::operator[](size_t index) const
 VertexBuffer::VertexBuffer(
 	const std::vector<byte_t> &data,
 	size_t vertexCount,
-	const std::vector<VertexComponentInfo> &components,
-	VertexBufferLayout layout) : mBuffer(data), mVertexCount(vertexCount), mComponents(components), mLayout(layout) {}
+	const std::vector<VertexDataElementDescription> &elements,
+	VertexBufferLayout layout) : mBuffer(data), mVertexCount(vertexCount), mElements(elements), mLayout(layout) {}
 
 size_t VertexBuffer::vertexSize() const
 {
-	return sumComponentSizes(mComponents);
+	return sumComponentSizes(mElements);
 }

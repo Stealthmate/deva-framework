@@ -7,15 +7,23 @@
 #include "VulkanInstance.hpp"
 #include "VulkanPhysicalDevice.hpp"
 
+
+#include "../VertexBuffer.hpp"
+
 #include <vector>
 
 namespace DevaFramework {
 
 	class Window;
-
-	DEVA_FRAMEWORK_API VkShaderModule vulkanShaderFromFile(const VulkanDevice &dev, const char *filepath);
-	DEVA_FRAMEWORK_API VkSurfaceKHR createSurfaceFromWindow(const VulkanInstance &vkInstance, const Window &wnd);
-	DEVA_FRAMEWORK_API std::vector<uint32_t> deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice pdev, VkSurfaceKHR surface);
+	namespace Vulkan
+	{
+		DEVA_FRAMEWORK_API VkShaderModule loadShaderFromFile(const VulkanDevice &dev, const char *filepath);
+		DEVA_FRAMEWORK_API VkSurfaceKHR createSurfaceFromWindow(const VulkanInstance &vkInstance, const Window &wnd);
+		DEVA_FRAMEWORK_API std::vector<uint32_t> deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice pdev, VkSurfaceKHR surface);
+		DEVA_FRAMEWORK_API std::vector<VkVertexInputAttributeDescription> getAttributeDescriptionsForVertexBuffer(
+			const VertexBuffer &vb, 
+			const std::vector<uint32_t> &locations);
+	}
 
 }
 

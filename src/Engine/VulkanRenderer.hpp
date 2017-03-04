@@ -26,6 +26,9 @@ namespace DevaEngine
 		VkSurfaceKHR surface;
 		VulkanSwapchain swapchain;
 		VkPipeline pipeline;
+
+		VkCommandPool commandPool;
+
 		void drawFrame();
 
 	public:

@@ -15,10 +15,10 @@
 #include<DevaEngine\VulkanPipelineBuilder.hpp>
 using namespace DevaFramework;
 using namespace DevaEngine;
-/*
+
 const int WIDTH = 800;
 const int HEIGHT = 600;
-
+/*
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_LUNARG_standard_validation"
 };
@@ -128,6 +128,43 @@ struct SwapChainSupportDetails {
 	std::vector<VkSurfaceFormatKHR> formats;
 	std::vector<VkPresentModeKHR> presentModes;
 };
+#include <DevaFramework\Math\Master.hpp>
+struct Vertex {
+	vec2 pos;
+	vec3 color;
+
+	static VkVertexInputBindingDescription getBindingDescription() {
+		VkVertexInputBindingDescription bindingDescription = {};
+		bindingDescription.binding = 0;
+		bindingDescription.stride = sizeof(Vertex);
+		bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+		return bindingDescription;
+	}
+
+	static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
+		std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = {};
+		DevaLogger::log << "WHAT " << sizeof(vec2) << DevaLogger::endl;
+		attributeDescriptions[0].binding = 0;
+		attributeDescriptions[0].location = 0;
+		attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+		attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+		attributeDescriptions[1].binding = 0;
+		attributeDescriptions[1].location = 1;
+		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+		return attributeDescriptions;
+	}
+};
+
+const std::vector<Vertex> vertices = {
+	{ { 0.0f, -0.5f },{ 1.0f, 0.0f, 0.0f } },
+	{ { 0.5f, 0.5f },{ 0.0f, 1.0f, 0.0f } },
+	{ { -0.5f, 0.5f },{ 0.0f, 0.0f, 1.0f } }
+};
+
 
 class HelloTriangleApplication {
 public:
@@ -165,6 +202,10 @@ private:
 	VDeleter<VkPipeline> graphicsPipeline{ device.handle(), vk.vkDestroyPipeline };
 
 	VDeleter<VkCommandPool> commandPool{ device.handle(), vk.vkDestroyCommandPool };
+	
+	VDeleter<VkBuffer> vertexBuffer{ device.handle(), vk.vkDestroyBuffer };
+	VDeleter<VkDeviceMemory> vertexBufferMemory{ device.handle(), vk.vkFreeMemory };
+	
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	VDeleter<VkSemaphore> imageAvailableSemaphore{ device.handle(), vk.vkDestroySemaphore };
@@ -524,6 +565,50 @@ private:
 		}
 	}
 
+	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+		VkPhysicalDeviceMemoryProperties memProperties;
+		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+		for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+			if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+				return i;
+			}
+		}
+
+		throw std::runtime_error("failed to find suitable memory type!");
+	}
+
+	void createVertexBuffer() {
+		VkBufferCreateInfo bufferInfo = {};
+		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferInfo.size = sizeof(vertices[0]) * vertices.size();
+		bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		if (vkCreateBuffer(device.handle(), &bufferInfo, nullptr, vertexBuffer.replace()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create vertex buffer!");
+		}
+
+		VkMemoryRequirements memRequirements;
+		vkGetBufferMemoryRequirements(device.handle(), vertexBuffer, &memRequirements);
+
+		VkMemoryAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = memRequirements.size;
+		allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+		if (vkAllocateMemory(device.handle(), &allocInfo, nullptr, vertexBufferMemory.replace()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate vertex buffer memory!");
+		}
+
+		vkBindBufferMemory(device.handle(), vertexBuffer, vertexBufferMemory, 0);
+
+		void* data;
+		vkMapMemory(device.handle(), vertexBufferMemory, 0, bufferInfo.size, 0, &data);
+		memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+		vkUnmapMemory(device.handle(), vertexBufferMemory);
+	}
+
 	void createCommandBuffers() {
 		commandBuffers.resize(swapChainFramebuffers.size());
 
@@ -836,8 +921,8 @@ int main() {
 	}
 
 	return EXIT_SUCCESS;
-}
-*/
+}*/
+
 
 #include <DevaEngine\DevaEngineInstance.hpp>
 #include <DevaFramework\Graphics\Vulkan\Config.hpp>
@@ -859,7 +944,7 @@ bool troll()
 
 int main()
 {
-	VULKAN_VERBOSE.toggle(false);
+	//VULKAN_VERBOSE.toggle(false);
 	DevaEngineInstanceCreateInfo info;
 	info.window_height = 600;
 	info.window_width = 800;

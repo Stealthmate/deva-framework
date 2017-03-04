@@ -1,3 +1,5 @@
+#ifdef DEVA_BUILD_OPENGL
+
 #include "Model.hpp"
 
 #include <fstream>
@@ -206,3 +208,5 @@ const std::vector<byte_t>& Model::getIndexArray() const
 {
 	return this->indices;
 }
+
+#endif // DEVA_BUILD_OPENGL

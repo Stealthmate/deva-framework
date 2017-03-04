@@ -7,6 +7,25 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 
+VertexBuffer createVertexBuffer(float f = 0.0f) {
+	ByteBuffer buf(72);
+	/*buf << +0.0f << -0.5f << +0.0f << +1.0f << +0.0f + f << +1.0f;
+	buf << +0.5f << +0.5f << +0.0f << +0.0f << +1.0f << +1.0f;
+	buf << -0.5f << +0.5f << +0.0f << +0.0f << +0.0f + f << +1.0f;*/
+	
+
+	std::vector<VertexDataElementDescription> elements;
+	VertexDataElementDescription desc;
+	desc.componentBitsizes = { 32, 32, 32 };
+	desc.size = 12;
+	desc.type = VertexComponentType::FLOAT;
+	elements.push_back(desc);
+	elements.push_back(desc);
+
+	return VertexBuffer(buf.buf(), 3, elements, INTERLEAVED);
+}
+
+
 namespace
 {
 	const VkApplicationInfo APPLICATION_INFO =
@@ -41,7 +60,7 @@ namespace
 		&APPLICATION_INFO,                                        //pApplicationInfo
 		(uint32_t) sizeof INSTANCE_LAYERS / sizeof(const char*),  //enabledLayerCount
 		INSTANCE_LAYERS,                                          //ppEnabledLayerNames
-		(uint32_t) N_EXTENSIONS,                                  //enabledExtensionCount
+		(uint32_t)N_EXTENSIONS,                                  //enabledExtensionCount
 		EXTENSIONS                                                //ppEnabledExtensionNames
 	};
 
@@ -59,7 +78,7 @@ namespace
 		auto pdevs = instance.getPhysicalDevices();
 		for (auto &pdev : pdevs) {
 			if (pdev.properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) continue;
-			auto& supportedQueues = deviceQueueFamiliesSupportSurface(instance, pdev.handle, surface);
+			auto& supportedQueues = Vulkan::deviceQueueFamiliesSupportSurface(instance, pdev.handle, surface);
 			for (int i = 0;i < supportedQueues.size();i++)
 			{
 				auto& q = pdev.queueFamilies[supportedQueues[i]];
@@ -155,7 +174,7 @@ VulkanRenderer::VulkanRenderer(const Window &wnd)
 	VkDebugReportCallbackEXT callback;
 	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle(), &callbackCreateInfo, nullptr, &callback);
 
-	this->surface = createSurfaceFromWindow(instance, wnd);
+	this->surface = Vulkan::createSurfaceFromWindow(instance, wnd);
 	VulkanPhysicalDeviceWrapper gpu;
 	uint32_t queueIndex = 0;
 	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
@@ -173,7 +192,7 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	auto vk = instance.vk();
 
 	unsigned int queue = UINT_MAX;
-	auto & queues = deviceQueueFamiliesSupportSurface(instance, dev.handle, surface);
+	auto & queues = Vulkan::deviceQueueFamiliesSupportSurface(instance, dev.handle, surface);
 
 	this->renderQueue = 0;
 
@@ -194,8 +213,8 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	VkExtent2D swapchainExtent = {};
 
 	if (surfaceprops.capabilities.currentExtent.width == -1 || surfaceprops.capabilities.currentExtent.height == -1) {
-		swapchainExtent.width = wnd.getWidth() / 2 ;
-		swapchainExtent.height = wnd.getHeight() / 2 ;
+		swapchainExtent.width = wnd.getWidth() / 2;
+		swapchainExtent.height = wnd.getHeight() / 2;
 	}
 	else {
 		swapchainExtent = surfaceprops.capabilities.currentExtent;
@@ -240,20 +259,19 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
 	this->swapchain = VulkanSwapchain::createSwapchain(this->main_device, swapchainCreateInfo);
-
-	VULKAN_LOG.println("Created swapchain");
-
-	//TODO: Implement OS-specific code
-
 }
 
 VkSemaphore imageAvailableSemaphore;
 VkSemaphore renderFinishedSemaphore;
 std::vector<VkCommandBuffer> commandBuffers;
+std::vector<VkBuffer> buffers;
+VkDeviceMemory bufmem;
+VkRenderPass renderPass;
+void *devmem;
 void VulkanRenderer::createPipeline()
 {
-	auto vert = vulkanShaderFromFile(this->main_device, "shaders/vert.spv");
-	auto frag = vulkanShaderFromFile(this->main_device, "shaders/frag.spv");
+	auto vert = Vulkan::loadShaderFromFile(this->main_device, "shaders/vert.spv");
+	auto frag = Vulkan::loadShaderFromFile(this->main_device, "shaders/frag.spv");
 
 	VulkanGraphicsPipelineBuilder plb;
 	plb.attachShader(vert, VK_SHADER_STAGE_VERTEX_BIT, "main")
@@ -296,8 +314,6 @@ void VulkanRenderer::createPipeline()
 	subpass.colorAttachmentCount = 1;
 	subpass.pColorAttachments = &colorAttachmentRef;
 
-	VkRenderPass renderPass;
-
 	VkRenderPassCreateInfo renderPassInfo = {};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 	renderPassInfo.attachmentCount = 1;
@@ -314,6 +330,19 @@ void VulkanRenderer::createPipeline()
 	plb.setLayout(pipelineLayout)
 		.setTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.setRenderPass(renderPass, 0);
+
+	Vulkan::VertexInputBinding vib(0, VK_VERTEX_INPUT_RATE_VERTEX, 24);
+	VkVertexInputAttributeDescription vad;
+	vad.binding = 0;
+	vad.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+	vad.location = 0;
+	vad.offset = 0;
+	vib.addAttribute(vad);
+	vad.offset = 12;
+	vad.location = 1;
+	vib.addAttribute(vad);
+
+	plb.addVertexInputBinding(vib);
 
 	this->pipeline = plb.build(this->main_device);
 
@@ -336,16 +365,85 @@ void VulkanRenderer::createPipeline()
 		}
 	}
 
+
+	VkBufferCreateInfo bufferInfo = {};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.pNext = nullptr;
+	bufferInfo.size = 72;
+	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	buffers.resize(1);
+	if (vk.vkCreateBuffer(device, &bufferInfo, nullptr, buffers.data()) != VK_SUCCESS) {
+		throw DevaException("failed to create vertex buffer!");
+	}
+
+	VkMemoryRequirements memRequirements;
+	vk.vkGetBufferMemoryRequirements(device, buffers[0], &memRequirements);
+	
+
+	VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	uint32_t typeFilter = memRequirements.memoryTypeBits;
+	auto memProperties = main_pdev.memoryProperties;
+	uint32_t index;
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+			index = i;
+		}
+	}
+
+	VkMemoryAllocateInfo allocInfo1 = {};
+	allocInfo1.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo1.allocationSize = memRequirements.size;
+	allocInfo1.memoryTypeIndex = index;
+	allocInfo1.pNext = nullptr;
+
+	if (vk.vkAllocateMemory(device, &allocInfo1, nullptr, &bufmem) != VK_SUCCESS)
+		throw DevaException("failed to allocate vertex buffer memory!");
+
+	vk.vkBindBufferMemory(device, buffers[0], bufmem, 0);
+
+	auto VERTEXBUFFER = createVertexBuffer();
+	vk.vkMapMemory(device, bufmem, 0, bufferInfo.size, 0, &devmem);
+	memcpy(devmem, VERTEXBUFFER.buffer().data(), VERTEXBUFFER.buffer().size());
+
+
 	VkCommandPoolCreateInfo poolInfo = {};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.queueFamilyIndex = renderQueue;
 	poolInfo.flags = 0; // Optional
-	VkCommandPool commandPool;
+
 	if (vk.vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create command pool!");
 	}
 
 	commandBuffers.resize(swapchain.framebuffers.size());
+
+	VkSemaphoreCreateInfo semaphoreInfo = {};
+	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	semaphoreInfo.pNext = nullptr;
+	semaphoreInfo.flags = 0;
+
+	if (vk.vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
+		vk.vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS) {
+
+		throw std::runtime_error("failed to create semaphores!");
+	}
+}
+
+float f = 0.0f;
+float df = 0.001f;
+
+#undef max
+#include <limits>
+void VulkanRenderer::drawFrame()
+{
+	auto &vk = main_device.vk();
+	auto device = main_device.handle();
+
+	if (f > 0.5f || f < -0.5f) df = -df;
+	f += df;
+	auto VERTEXBUFFER = createVertexBuffer(f);
+	memcpy(devmem, VERTEXBUFFER.buffer().data(), VERTEXBUFFER.buffer().size());
 
 	VkCommandBufferAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -370,37 +468,21 @@ void VulkanRenderer::createPipeline()
 		renderPassInfo.framebuffer = swapchain.framebuffers[i];
 		renderPassInfo.renderArea.offset = { 0, 0 };
 		renderPassInfo.renderArea.extent = swapchain.extent;
-		VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		VkClearValue clearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		renderPassInfo.clearValueCount = 1;
 		renderPassInfo.pClearValues = &clearColor;
 		vk.vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		vk.vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-		vk.vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+		VkDeviceSize offsets[] = { 0 };
+		vk.vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, buffers.data(), offsets);
+		vk.vkCmdDraw(commandBuffers[i], VERTEXBUFFER.vertexCount(), 1, 0, 0);
 		vk.vkCmdEndRenderPass(commandBuffers[i]);
 		if (vk.vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
 			throw DevaException("failed to record command buffer!");
 		}
 	}
 
-	VkSemaphoreCreateInfo semaphoreInfo = {};
-	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	semaphoreInfo.pNext = nullptr;
-	semaphoreInfo.flags = 0;
 
-	if (vk.vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
-		vk.vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS) {
-
-		throw std::runtime_error("failed to create semaphores!");
-	}
-}
-
-
-#undef max
-#include <limits>
-void VulkanRenderer::drawFrame()
-{
-	auto &vk = main_device.vk();
-	auto device = main_device.handle();
 	uint32_t imageIndex;
 	vk.vkAcquireNextImageKHR(device, swapchain.handle, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 

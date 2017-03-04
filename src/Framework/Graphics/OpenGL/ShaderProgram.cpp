@@ -1,3 +1,5 @@
+#ifdef DEVA_BUILD_OPENGL
+
 #include "ShaderProgram.hpp"
 
 #include "glFunctions.hpp"
@@ -89,3 +91,5 @@ ShaderProgram::~ShaderProgram()
 
 	glDeleteProgram(mHandle);
 }
+
+#endif // DEVA_BUILD_OPENGL

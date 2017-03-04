@@ -5,6 +5,8 @@
 #include <DevaFramework\Util\CStructDeleter.hpp>
 #include "VulkanSwapchain.hpp"
 
+#include <DevaFramework\Graphics\Vulkan\VertexInputBinding.hpp>
+
 namespace DevaEngine {
 
 	class VulkanGraphicsPipelineBuilder {
@@ -14,6 +16,9 @@ namespace DevaEngine {
 		std::vector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;
 
 		VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo;
+		std::vector<DevaFramework::Vulkan::VertexInputBinding> vertexBindings;
+		std::vector<VkVertexInputBindingDescription> vertexInputBindings;
+		std::vector<VkVertexInputAttributeDescription> vertexInputAttributes;
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyCreateInfo;
 
@@ -44,6 +49,8 @@ namespace DevaEngine {
 		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setLayout(VkPipelineLayout layout);
 
 		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& attachShader(VkShaderModule shader, VkShaderStageFlagBits type, const char* entry);
+
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding);
 
 		DEVA_ENGINE_API VkPipeline build(const DevaFramework::VulkanDevice &dev);
 

@@ -42,6 +42,7 @@ set(
 	${CURDIR}/Graphics/OpenGL/ShaderVariableFactory.hpp
 	${CURDIR}/Graphics/OpenGL/VertexBufferObject.cpp
 	${CURDIR}/Graphics/OpenGL/VertexBufferObject.hpp
+	${CURDIR}/Graphics/Vulkan/Buffer.hpp
 	${CURDIR}/Graphics/Vulkan/Common.cpp
 	${CURDIR}/Graphics/Vulkan/Common.hpp
 	${CURDIR}/Graphics/Vulkan/Config.cpp
@@ -54,6 +55,8 @@ set(
 	${CURDIR}/Graphics/Vulkan/InstanceFunctionSet.hpp
 	${CURDIR}/Graphics/Vulkan/Surface.cpp
 	${CURDIR}/Graphics/Vulkan/Surface.hpp
+	${CURDIR}/Graphics/Vulkan/VertexInputBinding.cpp
+	${CURDIR}/Graphics/Vulkan/VertexInputBinding.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanAPI.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeleter.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.cpp

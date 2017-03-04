@@ -35,7 +35,7 @@ namespace DevaFramework
 		*/
 		DEVA_FRAMEWORK_API Shader(GLenum shaderType, const std::string &source = "");
 	
-		DEVA_FRAMEWORK_API Shader(const Shader &shader) = delete;
+		Shader(const Shader &shader) = delete;
 
 		/**
 			Obtains ownership of the OpenGL ShaderObject
@@ -43,7 +43,7 @@ namespace DevaFramework
 		*/
 		DEVA_FRAMEWORK_API Shader(Shader &&shader);
 		
-		DEVA_FRAMEWORK_API Shader& operator=(const Shader &shader) = delete;
+		Shader& operator=(const Shader &shader) = delete;
 
 		/**
 			Calls glDeleteShader() on the current shader and obtains ownership of the OpenGL ShaderObject

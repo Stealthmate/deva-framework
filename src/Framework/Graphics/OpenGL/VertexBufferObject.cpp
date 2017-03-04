@@ -1,3 +1,5 @@
+#ifdef DEVA_BUILD_OPENGL
+
 #include "VertexBufferObject.hpp"
 
 #include <glbinding/gl/gl.h>
@@ -55,3 +57,5 @@ std::string VertexBufferObject::str() const
     output+= "\n";
     return output;
 }
+
+#endif // DEVA_BUILD_OPENGL

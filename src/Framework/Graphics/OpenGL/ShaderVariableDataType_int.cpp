@@ -1,3 +1,5 @@
+#ifdef DEVA_BUILD_OPENGL
+
 #include "ShaderVariableDataType_int.hpp"
 
 #include "glFunctions.hpp"
@@ -16,3 +18,5 @@ void vartype_int::initializeAtID(GLuint id) const
 {
 	glUniform1i(id, data);
 }
+
+#endif // DEVA_BUILD_OPENGL

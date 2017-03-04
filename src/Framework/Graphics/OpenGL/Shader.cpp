@@ -1,3 +1,5 @@
+#ifdef DEVA_BUILD_OPENGL
+
 #include "Shader.hpp"
 #include "glFunctions.hpp"
 
@@ -63,3 +65,5 @@ Shader::~Shader()
 {
 	if(mHandle != SHADER_HANDLE_NULL) glDeleteShader(mHandle);
 }
+
+#endif // DEVA_BUILD_OPENGL

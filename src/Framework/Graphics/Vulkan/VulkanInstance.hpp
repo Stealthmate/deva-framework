@@ -26,9 +26,9 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API VulkanInstance(VkInstance handle); //Wraps the handle
 		DEVA_FRAMEWORK_API VulkanInstance(); //This does NOT create a valid VkInstance. This only creates an empty object.
-		DEVA_FRAMEWORK_API VulkanInstance(const VulkanInstance &vkinstance)             = delete;
+		VulkanInstance(const VulkanInstance &vkinstance) = delete;
 		DEVA_FRAMEWORK_API VulkanInstance(VulkanInstance &&vkinstance);
-		DEVA_FRAMEWORK_API VulkanInstance& operator=(const VulkanInstance &vkinstance)  = delete;
+		VulkanInstance& operator=(const VulkanInstance &vkinstance) = delete;
 		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance);
 		DEVA_FRAMEWORK_API ~VulkanInstance();
 

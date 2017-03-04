@@ -4,6 +4,9 @@
 project(Deva)
 cmake_minimum_required(VERSION 3.2.2)
 
+option(BUILD_OPENGL "Build with support for OpenGL" OFF)
+option(BUILD_VULKAN "Build with support for Vulkan" ON)
+
 set(BINDIR ../bin)
 set(LIBDIR ../bin/lib)
 
@@ -31,6 +34,15 @@ set(DEVA_VERSION_PATCH 0)
 add_definitions(-DDEVA_VERSION_MACRO_MAJOR=${DEVA_VERSION_MAJOR})
 add_definitions(-DDEVA_VERSION_MACRO_MINOR=${DEVA_VERSION_MINOR})
 add_definitions(-DDEVA_VERSION_MACRO_PATCH=${DEVA_VERSION_PATCH})
+
+if(${BUILD_OPENGL})
+	message("Building with support for OpenGL")
+	add_definitions(-DDEVA_BUILD_OPENGL)
+endif()
+if(${BUILD_VULKAN})
+	message("Building with support for Vulkan")
+	add_definitions(-DDEVA_BUILD_VULKAN)
+endif()
 
 set(REQUIRED_COMPILER_VERSION_GCC "4.8")
 set(REQUIRED_COMPILER_VERSION_MSVC "19.0")

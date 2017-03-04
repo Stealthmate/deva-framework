@@ -1,3 +1,5 @@
+#ifdef DEVA_BUILD_OPENGL
+
 #include "Common.hpp"
 
 #include <vector>
@@ -51,3 +53,5 @@ GLuint DevaFramework::loadShaderSet(std::string VertexShaderCode, std::string Fr
 }
 
 #include "Common-setUniform.inl"
+
+#endif // DEVA_BUILD_OPENGL

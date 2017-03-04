@@ -6,7 +6,11 @@
 
 using namespace DevaFramework;
 
-VkShaderModule DevaFramework::vulkanShaderFromFile(const VulkanDevice &dev, const char *filepath)
+namespace {
+
+}
+
+VkShaderModule Vulkan::loadShaderFromFile(const VulkanDevice &dev, const char *filepath)
 {
 	auto src = readBinaryFile(filepath);
 
@@ -26,7 +30,7 @@ VkShaderModule DevaFramework::vulkanShaderFromFile(const VulkanDevice &dev, cons
 	return shaderModule;
 }
 
-VkSurfaceKHR DevaFramework::createSurfaceFromWindow(const VulkanInstance &vkInstance, const Window &wnd)
+VkSurfaceKHR Vulkan::createSurfaceFromWindow(const VulkanInstance &vkInstance, const Window &wnd)
 {
 	auto os = wnd.getOSHandles();
 #ifdef VK_USE_PLATFORM_WIN32_KHR
@@ -61,7 +65,7 @@ VkSurfaceKHR DevaFramework::createSurfaceFromWindow(const VulkanInstance &vkInst
 }
 
 
-std::vector<uint32_t> DevaFramework::deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice handle, VkSurfaceKHR surface)
+std::vector<uint32_t> Vulkan::deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice handle, VkSurfaceKHR surface)
 {
 	auto &vk = vkInstance.vk();
 	auto pdev = VulkanPhysicalDeviceWrapper::fromHandle(vkInstance, handle);

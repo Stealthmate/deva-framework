@@ -15,12 +15,12 @@ float readWriteBuffer(float f)
 std::string readWriteBuffer(std::string str)
 {
 	ByteBuffer buf(1000);
-	buf.write(str.data(), str.length());
+	buf.write((byte_t*)str.data(), str.length());
 	buf.setPosition(0);
-	char cbuf[10];
+	byte_t cbuf[10];
 	memset(cbuf, 0, 10);
 	buf.read(cbuf, 10);
-	return std::string(cbuf);
+	return std::string((char*)cbuf);
 }
 
 TEST(BufferFloat, ByteBuffer) 

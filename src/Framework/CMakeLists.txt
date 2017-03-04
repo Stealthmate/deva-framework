@@ -11,6 +11,7 @@ include(${CURDIR}/SourceList.cmake)
 include(${CURDIR}/PublicHeaders.cmake)
 
 set(SRCS ${DEVA_FRAMEWORK_SOURCE_LIST})
+set(PUBLIC_HEADERS ${DEVA_FRAMEWORK_PUBLIC_HEADERS})
 add_library(deva-Framework ${LIBTYPE} ${SRCS})
 
 set_target_properties(deva-Framework PROPERTIES COMPILE_DEFINITIONS ${DEVA_BUILD_DEFINES})

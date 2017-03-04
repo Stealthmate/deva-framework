@@ -33,8 +33,8 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API ShaderProgram(const std::vector<Shader> &shaders = std::vector<Shader>());
 
-		DEVA_FRAMEWORK_API ShaderProgram(const ShaderProgram &shaderprog) = delete;
-		DEVA_FRAMEWORK_API ShaderProgram& operator=(const ShaderProgram &shaderprog) = delete;
+		ShaderProgram(const ShaderProgram &shaderprog) = delete;
+		ShaderProgram& operator=(const ShaderProgram &shaderprog) = delete;
 
 		///NOT YET IMPLEMENTED!!!
 		DEVA_FRAMEWORK_API ShaderProgram(ShaderProgram &&shaderprogram);

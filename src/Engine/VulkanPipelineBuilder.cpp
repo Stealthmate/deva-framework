@@ -18,14 +18,6 @@ VulkanGraphicsPipelineBuilder::VulkanGraphicsPipelineBuilder()
 	viewportCreateInfo.scissorCount = 1;
 	viewportCreateInfo.pScissors = &scissor;
 
-	vertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputCreateInfo.vertexBindingDescriptionCount = 0;
-	vertexInputCreateInfo.pVertexBindingDescriptions = nullptr; // Optional
-	vertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputCreateInfo.pVertexAttributeDescriptions = nullptr; // Optional
-	vertexInputCreateInfo.pNext = nullptr;
-	vertexInputCreateInfo.flags = 0;
-
 	inputAssemblyCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssemblyCreateInfo.primitiveRestartEnable = VK_FALSE;
 	inputAssemblyCreateInfo.pNext = nullptr;
@@ -143,7 +135,7 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::setRenderPass(VkRe
 void VulkanGraphicsPipelineBuilder::prepare()
 {
 	createInfo.pStages = shaderStageCreateInfos.data();
-	createInfo.stageCount = shaderStageCreateInfos.size();
+	createInfo.stageCount = (uint32_t)shaderStageCreateInfos.size();
 }
 
 VkPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
@@ -151,6 +143,30 @@ VkPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
 	prepare();
 	auto device = dev.handle();
 	auto & vk = dev.vk();
+
+	std::vector<VkVertexInputBindingDescription> bindingDescriptions;
+	std::vector<VkVertexInputAttributeDescription> attrDescriptions;
+	for (int i = 0;i < vertexBindings.size();i++)
+	{
+		auto & vib = vertexBindings[i];
+		VkVertexInputBindingDescription bd;
+		bd.binding = i;
+		bd.inputRate = vib.inputRate();
+		bd.stride = vib.stride();
+		bindingDescriptions.push_back(bd);
+		auto & attrs = vib.attributes();
+		attrDescriptions.insert(attrDescriptions.end(), attrs.begin(), attrs.end());
+	}
+
+	VkPipelineVertexInputStateCreateInfo inputState;
+	inputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	inputState.pNext = nullptr;
+	inputState.flags = 0;
+	inputState.vertexBindingDescriptionCount = (uint32_t)bindingDescriptions.size();
+	inputState.pVertexBindingDescriptions = bindingDescriptions.data();
+	inputState.vertexAttributeDescriptionCount = (uint32_t)attrDescriptions.size();
+	inputState.pVertexAttributeDescriptions = attrDescriptions.data();
+	createInfo.pVertexInputState = &inputState;
 
 	VkPipeline pl;
 	auto result = vk.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &createInfo, nullptr, &pl);
@@ -165,5 +181,11 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::setLayout(VkPipeli
 {
 	createInfo.layout = layout;
 
+	return *this;
+}
+
+VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding)
+{
+	vertexBindings.push_back(binding);
 	return *this;
 }
