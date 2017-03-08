@@ -2,8 +2,6 @@
 #define DEVA_FRAMEWORK_GRAPHICS_VULKAN_CONFIG_HPP
 
 #include "../Config.hpp"
-#include "../../DevaLogger.hpp"
-
 
 #define VK_NO_PROTOTYPES
 
@@ -30,10 +28,11 @@ namespace DevaFramework
 		void getVulkanGlobalFunctions();
 	}
 
-	DEVA_FRAMEWORK_API extern DevaLogger VULKAN_VERBOSE;
-	DEVA_FRAMEWORK_API extern DevaLogger VULKAN_LOG;
-	DEVA_FRAMEWORK_API extern DevaLogger VULKAN_WARN;
-	DEVA_FRAMEWORK_API extern DevaLogger VULKAN_ERR;
+	namespace Log {
+
+	}
+
+	DEVA_FRAMEWORK_API extern DevaLogger LOG_VULKAN;
 	DEVA_FRAMEWORK_API void LoadVulkan(const std::string &dllpath = "");
 	DEVA_FRAMEWORK_API bool vulkanInstanceExtensionAvailable(const std::string & extensionName);
 }

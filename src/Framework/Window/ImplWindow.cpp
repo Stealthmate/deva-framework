@@ -1,7 +1,5 @@
 #include "ImplWindow.hpp"
 
-#include "../DevaLogger.hpp"
-
 #include <vector>
 
 using namespace DevaFramework;

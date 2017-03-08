@@ -8,6 +8,17 @@
 
 namespace DevaFramework {
 
+	class VulkanShaderDescription {
+
+		VkShaderStageFlagBits shaderType;
+		std::string entry;
+
+		std::vector<>
+
+	public:
+
+	};
+
 	class VulkanShaderBuilder {
 
 	public:

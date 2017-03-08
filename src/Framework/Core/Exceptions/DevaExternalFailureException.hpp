@@ -1,7 +1,7 @@
 #ifndef DEVA_FRAMEWORK_SYSTEM_EXCEPTIONS_DEVA_EXTERNAL_FAILURE_EXCEPTION_H
 #define DEVA_FRAMEWORK_SYSTEM_EXCEPTIONS_DEVA_EXTERNAL_FAILURE_EXCEPTION_H
 
-#include "DevaFailureException.hpp"
+#include "DevaException.hpp"
 
 namespace DevaFramework
 {
@@ -10,10 +10,8 @@ namespace DevaFramework
 		const std::string external;
 
 		DEVA_FRAMEWORK_API DevaExternalFailureException(
-			const std::string &description,
-			const std::string &callee,
-			const std::string &caller,
-			const std::string &external);
+			const std::string &external,
+			const std::string &description);
 	};
 }
 

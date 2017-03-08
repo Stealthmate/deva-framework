@@ -5,7 +5,6 @@
 #include <initializer_list>
 #include <cmath>
 
-#include "../Exceptions.hpp"
 
 namespace DevaFramework
 {

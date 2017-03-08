@@ -1,5 +1,5 @@
 #include "BinaryFileStreamWrapper.hpp"
-#include "../Logger.hpp"
+
 using namespace DevaFramework;
 
 BinaryFileStreamWrapper::BinaryFileStreamWrapper() : BinaryWriter(), BinaryReader(), stream() {}

@@ -45,9 +45,11 @@ namespace DevaFramework
 }
 
 #ifdef DEVA_DEBUG
-#include "DevaLogger.hpp"
+
 #endif
 
-
+#ifndef DEVA_FRAMEWORK_CORE_CONFIG_HPP
+#include "Include\Core.hpp"
+#endif
 
 #endif // DEVA_FRAMEWORK_CONFIG_H

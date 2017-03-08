@@ -1,8 +1,5 @@
 #include "VulkanDevice.hpp"
 
-#include "../../Exceptions.hpp"
-#include "../../NumberFormatter.hpp"
-
 using namespace DevaFramework;
 
 VulkanDevice::VulkanDevice() : mHandle(VK_NULL_HANDLE) {}

@@ -5,11 +5,11 @@
 using namespace DevaFramework;
 
 #define LOAD(PFNNAME) \
-VULKAN_VERBOSE.println("Getting Instance PFN_" #PFNNAME "..."); \
+LOG_VULKAN.v("Getting Instance PFN_" #PFNNAME "..."); \
 vinstf.PFNNAME = (PFN_##PFNNAME) internal::vkGetInstanceProcAddr(vkinstance, #PFNNAME); \
 if(vinstf.PFNNAME == NULL) \
 { \
-	VULKAN_VERBOSE.println("Instance PFN_" #PFNNAME " not available. Assigning default implementation (throw exception)"); \
+	LOG_VULKAN.v("Instance PFN_" #PFNNAME " not available. Assigning default implementation (throw exception)"); \
 	vinstf.PFNNAME = (PFN_##PFNNAME) internal::impldef_##PFNNAME; \
 }
 

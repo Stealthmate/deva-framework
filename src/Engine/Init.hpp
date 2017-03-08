@@ -5,6 +5,7 @@
 
 #include "DevaEngineInstance.hpp"
 
+
 namespace DevaEngine
 {
 	DEVA_ENGINE_API void DEVA_ENIGNE_INIT();

@@ -1,5 +1,4 @@
 #include "VulkanInstance.hpp"
-#include "../../Exceptions.hpp"
 
 using namespace DevaFramework;
 
@@ -38,22 +37,18 @@ VulkanInstance VulkanInstance::create()
 
 VulkanInstance VulkanInstance::create(const VkInstanceCreateInfo &info)
 {
-	VULKAN_VERBOSE.println("Creating VulkanInstance...");
+	LOG_VULKAN.v("Creating VulkanInstance...");
 	VkInstance instance_handle;
 
 	if (!internal::vkCreateInstance)
-		throw DevaProgrammerErrorException(//l
-			"Vulkan not initialized",
-			"DevaFramework::loadVulkan() not called?",
-			"Call DevaFramework::loadVulkan() before using the Vulkan wrappers",
-			"-");
+		throw DevaProgrammerErrorException("Vulkan not initialized (did you call DevaFramework::loadVulkan()?)");
 
 	std::vector<std::string> extensions;
 	for (uint32_t i = 0;i <= info.enabledExtensionCount - 1;i++)
 	{
 		extensions.push_back(*(info.ppEnabledExtensionNames + i));
 		if (!vulkanInstanceExtensionAvailable(extensions[i]))
-			throw DevaException("Could not create VkInstance - extension " + extensions[i] + " not supported by system.");
+			throw DevaExternalFailureException("Vulkan", "Could not create VkInstance - extension " + extensions[i] + " not supported by system.");
 	}
 
 	auto result = internal::vkCreateInstance(&info, NULL, &instance_handle);
@@ -66,7 +61,7 @@ void VulkanInstance::populatePDeviceList()
 {
 	VkResult result;
 
-	VULKAN_VERBOSE.println("Enumerating physical devices (count)...");
+	LOG_VULKAN.v("Enumerating physical devices (count)...");
 	uint32_t device_count = 0;
 	result = mVk.vkEnumeratePhysicalDevices(mHandle, &device_count, NULL);
 	ERRCHK;
@@ -75,9 +70,9 @@ void VulkanInstance::populatePDeviceList()
 		throw DevaException(std::string("No physical devices available."));
 	}
 
-	VULKAN_VERBOSE.println("System has " + strm(device_count) + " devices.");
+	LOG_VULKAN.v("System has " + strm(device_count) + " devices.");
 
-	VULKAN_VERBOSE.println("Enumerating physical devices (mHandles)...");
+	LOG_VULKAN.v("Enumerating physical devices (mHandles)...");
 	std::vector<VkPhysicalDevice> deviceHandles(device_count);
 	result = mVk.vkEnumeratePhysicalDevices(mHandle, &device_count, &deviceHandles[0]);
 	ERRCHK;
@@ -91,12 +86,12 @@ void VulkanInstance::populatePDeviceList()
 
 VulkanInstance::VulkanInstance(VkInstance handle) : mHandle(handle)
 {
-	VULKAN_VERBOSE.println("Loading instance-local functions...");
+	LOG_VULKAN.v("Loading instance-local functions...");
 	mVk = VulkanInstanceFunctionSet::load(mHandle);
 
 	populatePDeviceList();
 
-	VULKAN_LOG.println("Successfully initialized VulkanInstance");
+	LOG_VULKAN.i("Successfully initialized VulkanInstance");
 }
 
 VulkanInstance::VulkanInstance() : mHandle(VK_NULL_HANDLE) {}

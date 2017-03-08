@@ -3,10 +3,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "../DevaLogger.hpp"
-#include "../Exceptions.hpp"
-
-
 using namespace DevaFramework;
 /*
 namespace

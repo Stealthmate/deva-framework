@@ -1,12 +1,17 @@
-#ifndef DEVA_FRAMEWORK_LOGGER_H
-#define DEVA_FRAMEWORK_LOGGER_H
+#ifndef DEVA_FRAMEWORK_CORE_LOGGER_HPP
+#define DEVA_FRAMEWORK_CORE_LOGGER_HPP
 
 #include "Config.hpp"
 
 #include <string>
-
+#include <fmt\format.h>
 namespace DevaFramework
 {
+
+	template <typename... Args>
+	std::string strformat(const std::string &str, const Args & ... args) {
+		return fmt::format(str, args...);
+	}
 
 	class Logger
 	{
@@ -17,20 +22,20 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API static const std::string endl;
 
-		DEVA_FRAMEWORK_API Logger(const std::string &stampstr, bool enabled);
+		DEVA_FRAMEWORK_API Logger(const std::string &stampstr);
 
 		DEVA_FRAMEWORK_API virtual const Logger& println(const std::string &msg) const;
 
 
-		inline virtual const Logger& operator<<(const std::string &msg) const { return this->print(msg); }
-		inline virtual const Logger& operator<<(const char *msg) const { return this->print(std::string(msg)); }
-		//DEVA_FRAMEWORK_API virtual const Logger& operator<<(const std::string &msg) const;
+		inline virtual const Logger& operator<<(const std::string &msg) const { return enabled ? this->print(msg) : *this; }
+		inline virtual const Logger& operator<<(const char *msg) const { return enabled ? this->print(std::string(msg)) : *this; }
+
 		/*
 		To the future Me (or whoever reads this):
 		Please do not blame me for using defines. I'm trying as hard as I can to follow the DRY principle.
 		Thank you.
 		*/
-#define INSERTION_FOR_TYPE(TYPE) inline virtual const Logger& operator<<(TYPE msg) const { return this->print(strm(msg)); }
+#define INSERTION_FOR_TYPE(TYPE) inline virtual const Logger& operator<<(TYPE msg) const { return enabled ? this->print(strm(msg)) : *this; }
 		INSERTION_FOR_TYPE(byte_t);
 		INSERTION_FOR_TYPE(signed short);
 		INSERTION_FOR_TYPE(unsigned short);
@@ -50,4 +55,4 @@ namespace DevaFramework
 	};
 }
 
-#endif // DEVA_FRAMEWORK_LOGGER_H
+#endif // DEVA_FRAMEWORK_CORE_LOGGER_HPP

@@ -1,6 +1,5 @@
 #include "VulkanPhysicalDevice.hpp"
 #include "VulkanInstance.hpp"
-#include "../../Exceptions.hpp"
 
 #include <iomanip>
 #include <cstring>
@@ -212,7 +211,6 @@ VulkanPhysicalDeviceWrapper VulkanPhysicalDeviceWrapper::fromHandle(const Vulkan
 	if (result != VK_SUCCESS)
 		throw DevaException("Could not populate device layer properties");
 
-	VkPhysicalDeviceMemoryProperties memProperties;
 	vk.vkGetPhysicalDeviceMemoryProperties(handle, &pdev.memoryProperties);
 
 	return pdev;
@@ -274,12 +272,12 @@ VulkanPhysicalDeviceWrapper::SurfaceProperties VulkanPhysicalDeviceWrapper::getS
 
 	uint32_t formatCount;
 	if (vk.vkGetPhysicalDeviceSurfaceFormatsKHR(handle, surface, &formatCount, NULL) != VK_SUCCESS)
-		throw DevaExternalFailureException("Error getting color formats!", "vkGetPhysicalDeviceSurfaceFormatsKHR", "VulkanRenderer::attachToWindow", "Vulkan");
+		throw DevaExternalFailureException("Vulkan", "Error getting color formats!");
 	prop.formats.resize(formatCount);
 	if (vk.vkGetPhysicalDeviceSurfaceFormatsKHR(handle, surface, &formatCount, prop.formats.data()) != VK_SUCCESS)
-		throw DevaExternalFailureException("No color formats!", "vkGetPhysicalDeviceSurfaceFormatsKHR", "VulkanRenderer::attachToWindow", "Vulkan");
+		throw DevaExternalFailureException("Vulkan", "Device has no surface formats!");
 
-	DevaExternalFailureException e = DevaExternalFailureException("Vulkan error", "", "", "Vulkan");
+	DevaExternalFailureException e = DevaExternalFailureException("Vulkan", "Vulkan error");
 
 	VkSurfaceCapabilitiesKHR caps = {};
 	if (vk.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(handle, surface, &caps) != VK_SUCCESS) throw e;

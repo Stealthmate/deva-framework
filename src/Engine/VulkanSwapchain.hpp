@@ -3,9 +3,9 @@
 
 #include "Config.hpp"
 
-#include <DevaFramework/Graphics/Vulkan/VulkanDevice.hpp>
-#include <DevaFramework/Graphics/Vulkan/VulkanDeviceFunctionSet.hpp>
-#include <DevaFramework\Graphics\Vulkan\VulkanDeleter.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanDevice.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanDeviceFunctionSet.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanHandle.hpp>
 
 namespace DevaEngine {
 	class VulkanSwapchain {

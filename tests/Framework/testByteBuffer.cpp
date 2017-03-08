@@ -1,5 +1,4 @@
 #include <DevaFramework\Util\ByteBuffer.hpp>
-#include <DevaFramework\Exceptions.hpp>
 #include <gtest\gtest.h>
 
 using namespace DevaFramework;

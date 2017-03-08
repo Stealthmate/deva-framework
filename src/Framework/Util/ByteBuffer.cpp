@@ -1,7 +1,5 @@
 #include "ByteBuffer.hpp"
 
-#include "../Exceptions.hpp"
-
 using namespace DevaFramework;
 
 ByteBuffer::ByteBuffer(size_t size) : buffer(size), position(0) {}

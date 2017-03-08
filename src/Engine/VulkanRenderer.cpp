@@ -1,18 +1,21 @@
+#define NOMINMAX
 #include "VulkanRenderer.hpp"
 
 #include "VulkanPipelineBuilder.hpp"
 
 #include <DevaFramework\Graphics\Vulkan\Common.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanCommandPool.hpp>
+#include <limits>
 
 using namespace DevaFramework;
 using namespace DevaEngine;
 
 VertexBuffer createVertexBuffer(float f = 0.0f) {
 	ByteBuffer buf(72);
-	/*buf << +0.0f << -0.5f << +0.0f << +1.0f << +0.0f + f << +1.0f;
+	buf << +0.0f << -0.5f << +0.0f << +1.0f << +0.0f + f << +1.0f;
 	buf << +0.5f << +0.5f << +0.0f << +0.0f << +1.0f << +1.0f;
-	buf << -0.5f << +0.5f << +0.0f << +0.0f << +0.0f + f << +1.0f;*/
-	
+	buf << -0.5f << +0.5f << +0.0f << +0.0f << +0.0f + f << +1.0f;
+
 
 	std::vector<VertexDataElementDescription> elements;
 	VertexDataElementDescription desc;
@@ -67,8 +70,14 @@ namespace
 	const char * DEVICE_EXTENSIONS[] =
 	{
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-
 	};
+
+	const char * DEVICE_FEATURES[] =
+	{
+		"ASD"
+	};
+
+	const VkPhysicalDeviceFeatures EMPTY_FEATURES;
 
 	const bool VULKAN_LOADED = false;
 
@@ -130,7 +139,9 @@ namespace
 		dev_cinfo.ppEnabledLayerNames = nullptr;
 		dev_cinfo.enabledExtensionCount = sizeof DEVICE_EXTENSIONS / sizeof(const char*);
 		dev_cinfo.ppEnabledExtensionNames = DEVICE_EXTENSIONS;
-		dev_cinfo.pEnabledFeatures = nullptr;
+		VkPhysicalDeviceFeatures features = EMPTY_FEATURES;
+		features.fillModeNonSolid = VK_TRUE;
+		if (pdev.features.fillModeNonSolid) dev_cinfo.pEnabledFeatures = &features;
 
 		return VulkanDevice(instance, pdev, dev_cinfo);
 	}
@@ -149,11 +160,26 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 	const char*                 pMessage,
 	void*                       pUserData)
 {
-	VULKAN_ERR << "Error from: " << pLayerPrefix << DevaLogger::endl;
-	VULKAN_ERR << "Error: " << pMessage << DevaLogger::endl;
+	switch (flags) {
+	case VK_DEBUG_REPORT_ERROR_BIT_EXT: {
+		LOG_VULKAN.e("Error from: " + strm(pLayerPrefix));
+		LOG_VULKAN.e(pMessage);
+	} break;
+	case VK_DEBUG_REPORT_DEBUG_BIT_EXT: {
+		LOG_VULKAN.d(pLayerPrefix);
+		LOG_VULKAN.d(pMessage);
+	} break;
+	case VK_DEBUG_REPORT_WARNING_BIT_EXT:
+	{
+		LOG_VULKAN.w(pLayerPrefix);
+		LOG_VULKAN.w(pMessage);
+
+	}break;
+	}
 	return VK_FALSE;
 }
 
+VkDebugReportCallbackEXT callback;
 VulkanRenderer::VulkanRenderer(const Window &wnd)
 {
 	if (!VULKAN_LOADED) LoadVulkan();
@@ -166,12 +192,11 @@ VulkanRenderer::VulkanRenderer(const Window &wnd)
 	VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
 	callbackCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
 	callbackCreateInfo.pNext = nullptr;
-	callbackCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+	callbackCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
 	callbackCreateInfo.pfnCallback = &debug;
 	callbackCreateInfo.pUserData = nullptr;
 
 	/* Register the callback */
-	VkDebugReportCallbackEXT callback;
 	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle(), &callbackCreateInfo, nullptr, &callback);
 
 	this->surface = Vulkan::createSurfaceFromWindow(instance, wnd);
@@ -180,6 +205,8 @@ VulkanRenderer::VulkanRenderer(const Window &wnd)
 	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
 	this->main_pdev = gpu;
 	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
+	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties.deviceName));
+
 	this->renderQueue = queueIndex;
 
 	attachToWindow(wnd);
@@ -198,17 +225,17 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 
 	auto surfaceprops = dev.getSurfaceProperties(instance, this->surface);
 
-	uint32_t formatCount = surfaceprops.formats.size();
+	uint32_t formatCount = static_cast<uint32_t>(surfaceprops.formats.size());
 	if (formatCount == 1 && surfaceprops.formats[0].format == VK_FORMAT_UNDEFINED)
 		this->colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
 	else {
 		if (formatCount == 0)
-			throw DevaExternalFailureException("No color formats!", "vkGetPhysicalDeviceSurfaceFormatsKHR", "VulkanRenderer::attachToWindow", "Vulkan");
+			throw DevaExternalFailureException("Vulkan", "Device has no surface formats!");
 		this->colorFormat = surfaceprops.formats[0].format;
 	}
 	this->colorSpace = surfaceprops.formats[0].colorSpace;
 
-	DevaExternalFailureException e = DevaExternalFailureException("Vulkan error", "", "", "Vulkan");
+	DevaExternalFailureException e = DevaExternalFailureException("Vulkan", "Vulkan error");
 
 	VkExtent2D swapchainExtent = {};
 
@@ -261,8 +288,8 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	this->swapchain = VulkanSwapchain::createSwapchain(this->main_device, swapchainCreateInfo);
 }
 
-VkSemaphore imageAvailableSemaphore;
-VkSemaphore renderFinishedSemaphore;
+VulkanHandle<VkSemaphore> imageAvailableSemaphore;
+VulkanHandle<VkSemaphore> renderFinishedSemaphore;
 std::vector<VkCommandBuffer> commandBuffers;
 std::vector<VkBuffer> buffers;
 VkDeviceMemory bufmem;
@@ -281,19 +308,6 @@ void VulkanRenderer::createPipeline()
 	auto &vk = main_device.vk();
 	auto device = main_device.handle();
 
-	VkPipelineLayout pipelineLayout;
-
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
-	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 0; // Optional
-	pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
-	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-	pipelineLayoutInfo.pPushConstantRanges = 0; // Optional
-
-	if (vk.vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr,
-		&pipelineLayout) != VK_SUCCESS) {
-		throw DevaException("Failed to create pipeline layout!");
-	}
 
 	VkAttachmentDescription colorAttachment = {};
 	colorAttachment.format = swapchain.format;
@@ -327,8 +341,7 @@ void VulkanRenderer::createPipeline()
 		throw std::runtime_error("failed to create render pass!");
 	}
 
-	plb.setLayout(pipelineLayout)
-		.setTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
+	plb.setTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.setRenderPass(renderPass, 0);
 
 	Vulkan::VertexInputBinding vib(0, VK_VERTEX_INPUT_RATE_VERTEX, 24);
@@ -379,7 +392,7 @@ void VulkanRenderer::createPipeline()
 
 	VkMemoryRequirements memRequirements;
 	vk.vkGetBufferMemoryRequirements(device, buffers[0], &memRequirements);
-	
+
 
 	VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 	uint32_t typeFilter = memRequirements.memoryTypeBits;
@@ -406,37 +419,20 @@ void VulkanRenderer::createPipeline()
 	vk.vkMapMemory(device, bufmem, 0, bufferInfo.size, 0, &devmem);
 	memcpy(devmem, VERTEXBUFFER.buffer().data(), VERTEXBUFFER.buffer().size());
 
-
-	VkCommandPoolCreateInfo poolInfo = {};
-	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	poolInfo.queueFamilyIndex = renderQueue;
-	poolInfo.flags = 0; // Optional
-
-	if (vk.vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create command pool!");
-	}
-
+	commandPool = VulkanCommandPool(main_device, renderQueue);
 	commandBuffers.resize(swapchain.framebuffers.size());
 
-	VkSemaphoreCreateInfo semaphoreInfo = {};
-	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	semaphoreInfo.pNext = nullptr;
-	semaphoreInfo.flags = 0;
-
-	if (vk.vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
-		vk.vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS) {
-
-		throw std::runtime_error("failed to create semaphores!");
-	}
+	imageAvailableSemaphore = Vulkan::createSemaphore(main_device);
+	renderFinishedSemaphore = Vulkan::createSemaphore(main_device);
 }
 
 float f = 0.0f;
 float df = 0.001f;
+bool drawn = false;
 
-#undef max
-#include <limits>
 void VulkanRenderer::drawFrame()
 {
+	if (drawn) return;
 	auto &vk = main_device.vk();
 	auto device = main_device.handle();
 
@@ -447,7 +443,7 @@ void VulkanRenderer::drawFrame()
 
 	VkCommandBufferAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = commandPool;
+	allocInfo.commandPool = commandPool.handle();
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 
@@ -474,8 +470,8 @@ void VulkanRenderer::drawFrame()
 		vk.vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		vk.vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 		VkDeviceSize offsets[] = { 0 };
-		vk.vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, buffers.data(), offsets);
-		vk.vkCmdDraw(commandBuffers[i], VERTEXBUFFER.vertexCount(), 1, 0, 0);
+		vk.vkCmdBindVertexBuffers(commandBuffers[i], 0, static_cast<uint32_t>(buffers.size()), buffers.data(), offsets);
+		vk.vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(VERTEXBUFFER.vertexCount()), 1, 0, 0);
 		vk.vkCmdEndRenderPass(commandBuffers[i]);
 		if (vk.vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
 			throw DevaException("failed to record command buffer!");
@@ -519,10 +515,58 @@ void VulkanRenderer::drawFrame()
 	presentInfo.pResults = nullptr; // Optional
 
 	vk.vkQueuePresentKHR(q, &presentInfo);
+	drawn = true;
 }
 
 
 void VulkanRenderer::renderExample()
 {
 	drawFrame();
+}
+
+VulkanRenderer::VulkanRenderer(VulkanRenderer &&renderer) :
+	instance(std::move(renderer.instance)),
+	main_device(std::move(renderer.main_device)),
+	main_pdev(std::move(renderer.main_pdev)),
+	swapchain(std::move(renderer.swapchain)),
+	surface(std::move(renderer.surface)),
+	colorFormat(renderer.colorFormat),
+	colorSpace(renderer.colorSpace),
+	commandPool(std::move(renderer.commandPool)),
+	pipeline(std::move(renderer.pipeline))
+	{
+	renderer.instance = VulkanInstance();
+	renderer.main_device = VulkanDevice();
+}
+
+VulkanRenderer::~VulkanRenderer() {
+	destroy();
+}
+
+void VulkanRenderer::destroy() {
+	auto inst = this->instance.handle();
+	auto &vki = this->instance.vk();
+
+	auto dev = this->main_device.handle();
+	auto &vkd = this->main_device.vk();
+
+	if (inst != VK_NULL_HANDLE) {
+		vkd.vkDeviceWaitIdle(dev);
+		imageAvailableSemaphore.replace();
+		renderFinishedSemaphore.replace();
+		vkd.vkDestroySwapchainKHR(dev, this->swapchain.handle, nullptr);
+		this->surface.replace();
+		vki.vkDestroyDebugReportCallbackEXT(inst, callback, nullptr);
+		for (auto i : swapchain.framebuffers) {
+			vkd.vkDestroyFramebuffer(dev, i, nullptr);
+		}
+		/*for (auto i : swapchain.images) {
+			vkd.vkDestroyImage(dev, i, nullptr);
+		}*/
+		for (auto i : swapchain.imageViews) {
+			vkd.vkDestroyImageView(dev, i, nullptr);
+		}
+		this->pipeline.replace();
+		this->commandPool.replace();
+	}
 }

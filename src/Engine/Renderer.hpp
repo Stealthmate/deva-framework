@@ -12,7 +12,7 @@ namespace DevaEngine
 
 		virtual void renderExample() = 0;
 
-		~Renderer() {}
+		virtual ~Renderer() {}
 	};
 }
 

@@ -5,9 +5,6 @@
 #include "impl_win32_EventInfo.hpp"
 #include "impl_keycode_mapping.inl"
 
-
-#include "../../DevaLogger.hpp"
-#include "../../Exceptions.hpp"
 using namespace DevaFramework;
 
 

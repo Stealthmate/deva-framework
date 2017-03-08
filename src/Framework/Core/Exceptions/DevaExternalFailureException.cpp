@@ -8,11 +8,9 @@ namespace
 }
 
 DevaFramework::DevaExternalFailureException::DevaExternalFailureException(
-	const std::string & description, 
-	const std::string & callee, 
-	const std::string & caller,
-	const std::string &external)
-	: DevaFailureException(description, callee, caller), external(external) 
+	const std::string &external,
+	const std::string &description)
+	: DevaFailureException(description), external(external) 
 {
 	stamp = DEVA_EXTERNAL_FAILURE_EXCEPTION;
 

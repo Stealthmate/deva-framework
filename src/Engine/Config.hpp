@@ -16,6 +16,12 @@
 #define DEVA_ENGINE_API
 #endif
 
-#include <DevaFramework/Deva.hpp>
+#include <DevaFramework/Include/Core.hpp>
+#include <DevaFramework/Include/Window.hpp>
+#include <DevaFramework/Util/Common.hpp>
+
+namespace DevaEngine {
+	DEVA_ENGINE_API extern DevaFramework::DevaLogger ENGINE_LOG;
+}
 
 #endif // DEVA_ENGINE_CONFIG_H

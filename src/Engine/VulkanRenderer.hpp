@@ -6,6 +6,7 @@
 #include "Renderer.hpp"
 #include <DevaFramework/Graphics/Vulkan/VulkanInstance.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanDevice.hpp>
+#include <DevaFramework/Graphics/Vulkan/VulkanCommandPool.hpp>
 
 #include "VulkanSwapchain.hpp"
 
@@ -13,7 +14,6 @@ namespace DevaEngine
 {
 	class VulkanRenderer : public Renderer
 	{
-
 		DevaFramework::VulkanInstance instance;
 		DevaFramework::VulkanPhysicalDeviceWrapper main_pdev;
 		DevaFramework::VulkanDevice main_device;
@@ -23,11 +23,11 @@ namespace DevaEngine
 
 		unsigned int renderQueue;
 
-		VkSurfaceKHR surface;
+		DevaFramework::VulkanHandle<VkSurfaceKHR> surface;
 		VulkanSwapchain swapchain;
-		VkPipeline pipeline;
+		DevaFramework::VulkanHandle<VkPipeline> pipeline;
 
-		VkCommandPool commandPool;
+		DevaFramework::VulkanCommandPool commandPool;
 
 		void drawFrame();
 
@@ -35,12 +35,15 @@ namespace DevaEngine
 
 		DEVA_ENGINE_API VulkanRenderer();
 		DEVA_ENGINE_API VulkanRenderer(const DevaFramework::Window &wnd);
+		DEVA_ENGINE_API VulkanRenderer(VulkanRenderer &&renderer);
 
 		DEVA_ENGINE_API virtual void attachToWindow(const DevaFramework::Window &wnd);
 		DEVA_ENGINE_API virtual void createPipeline();
 
 		DEVA_ENGINE_API virtual void renderExample();
 
+		DEVA_ENGINE_API void destroy();
+		DEVA_ENGINE_API virtual ~VulkanRenderer();
 	};
 }
 

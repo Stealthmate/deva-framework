@@ -1,4 +1,5 @@
-#include <DevaFramework/Deva.hpp>
+#include <DevaFramework\Include\Core.hpp>
+#include <DevaFramework\Include\Window.hpp>
 
 using namespace DevaFramework;
 namespace

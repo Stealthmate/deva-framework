@@ -22,6 +22,19 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API virtual const char* what() const noexcept final;
 		DEVA_FRAMEWORK_API virtual std::string getStamp() const final;
 	};
+
+#define SIMPLE_EXCEPT(name) \
+struct name  : public DevaException \
+{ \
+	name(const std::string &description) : DevaException(description) {} \
+protected: \
+}; \
+
+	SIMPLE_EXCEPT(DevaInvalidInputException);
+	SIMPLE_EXCEPT(DevaInvalidArgumentException);
+	SIMPLE_EXCEPT(DevaProgrammerErrorException);
+	SIMPLE_EXCEPT(DevaFailureException);
 }
+#undef SIMPLE_EXCEPT
 
 #endif //DEVA_FRAMEWORK_EXCEPTIONS_DEVA_EXCEPTION_HPP

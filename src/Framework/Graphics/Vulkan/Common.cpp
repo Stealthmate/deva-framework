@@ -10,7 +10,7 @@ namespace {
 
 }
 
-VkShaderModule Vulkan::loadShaderFromFile(const VulkanDevice &dev, const char *filepath)
+VulkanHandle<VkShaderModule> Vulkan::loadShaderFromFile(const VulkanDevice &dev, const char *filepath)
 {
 	auto src = readBinaryFile(filepath);
 
@@ -21,16 +21,18 @@ VkShaderModule Vulkan::loadShaderFromFile(const VulkanDevice &dev, const char *f
 
 	auto& vk = dev.vk();
 
-	VkShaderModule shaderModule;
+	VulkanHandle<VkShaderModule> shaderModule(dev.handle(), dev.vk().vkDestroyShaderModule);
 
-	if (vk.vkCreateShaderModule(dev.handle(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+	if (vk.vkCreateShaderModule(dev.handle(), &createInfo, nullptr, shaderModule.replace()) != VK_SUCCESS) {
 		throw DevaException("failed to create shader module!");
 	}
+
+	LOG.v(strformat("Load shader file \"{}\" with id: {}", filepath, (uintptr_t)shaderModule.handle()));
 
 	return shaderModule;
 }
 
-VkSurfaceKHR Vulkan::createSurfaceFromWindow(const VulkanInstance &vkInstance, const Window &wnd)
+VulkanHandle<VkSurfaceKHR> Vulkan::createSurfaceFromWindow(const VulkanInstance &vkInstance, const Window &wnd)
 {
 	auto os = wnd.getOSHandles();
 #ifdef VK_USE_PLATFORM_WIN32_KHR
@@ -59,8 +61,8 @@ VkSurfaceKHR Vulkan::createSurfaceFromWindow(const VulkanInstance &vkInstance, c
 #error ANDROID NOT IMPLEMENTED!
 #endif
 
-	VkSurfaceKHR surface;
-	vkInstance.vk().vkCreateWin32SurfaceKHR(vkInstance.handle(), &surface_cinfo, nullptr, &surface);
+	VulkanHandle<VkSurfaceKHR> surface(vkInstance.handle(), vkInstance.vk().vkDestroySurfaceKHR);
+	vkInstance.vk().vkCreateWin32SurfaceKHR(vkInstance.handle(), &surface_cinfo, nullptr, surface.replace());
 	return surface;
 }
 
@@ -86,4 +88,22 @@ std::vector<uint32_t> Vulkan::deviceQueueFamiliesSupportSurface(const VulkanInst
 	}
 
 	return queues;
+}
+
+VulkanHandle<VkSemaphore> Vulkan::createSemaphore(const VulkanDevice &dev) {
+
+	auto device = dev.handle();
+	auto &vk = dev.vk();
+
+	VkSemaphoreCreateInfo semaphoreInfo = {};
+	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	semaphoreInfo.pNext = nullptr;
+	semaphoreInfo.flags = 0;
+	VulkanHandle<VkSemaphore> sem(device, vk.vkDestroySemaphore);
+	VkResult result = vk.vkCreateSemaphore(device, &semaphoreInfo, nullptr, sem.replace());
+	if (result != VK_SUCCESS) {
+		throw DevaException("Could not create semaphore!");
+	}
+
+	return sem;
 }

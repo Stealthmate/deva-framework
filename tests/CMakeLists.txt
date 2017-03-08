@@ -54,7 +54,7 @@ foreach(source IN LISTS TEST_SRC_LIST)
 endforeach()
 
 file(GLOB TESTS_FRAMEWORK
-  "tests/Framework/*.cpp"
+  "tests/Framework/test*.cpp"
 )
 add_custom_target(testsFramework)
 foreach(source IN LISTS TESTS_FRAMEWORK)

@@ -1,14 +1,17 @@
 set(
 	DEVA_FRAMEWORK_PUBLIC_HEADERS
-	${CURDIR}/Exceptions/DevaException.cpp
-	${CURDIR}/Exceptions/DevaException.hpp
-	${CURDIR}/Exceptions/DevaExternalFailureException.cpp
-	${CURDIR}/Exceptions/DevaExternalFailureException.hpp
-	${CURDIR}/Exceptions/DevaFailureException.cpp
-	${CURDIR}/Exceptions/DevaFailureException.hpp
-	${CURDIR}/Exceptions/DevaInitializationFailureException.hpp
-	${CURDIR}/Exceptions/DevaProgrammerErrorException.cpp
-	${CURDIR}/Exceptions/DevaProgrammerErrorException.hpp
+	${CURDIR}/Core/Config.hpp
+	${CURDIR}/Core/DevaLogger.cpp
+	${CURDIR}/Core/DevaLogger.hpp
+	${CURDIR}/Core/Exceptions.hpp
+	${CURDIR}/Core/Logger.cpp
+	${CURDIR}/Core/Logger.hpp
+	${CURDIR}/Core/TypeInfo.hpp
+	${CURDIR}/Core/Exceptions/DevaException.cpp
+	${CURDIR}/Core/Exceptions/DevaException.hpp
+	${CURDIR}/Core/Exceptions/DevaExternalFailureException.cpp
+	${CURDIR}/Core/Exceptions/DevaExternalFailureException.hpp
+	${CURDIR}/Core/Exceptions/DevaInitializationFailureException.hpp
 	${CURDIR}/Graphics/Config.hpp
 	${CURDIR}/Graphics/Font.hpp
 	${CURDIR}/Graphics/Image.cpp
@@ -58,7 +61,9 @@ set(
 	${CURDIR}/Graphics/Vulkan/VertexInputBinding.cpp
 	${CURDIR}/Graphics/Vulkan/VertexInputBinding.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanAPI.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanDeleter.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.cpp
+	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanDestructibleHandle.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceBuilder.hpp
@@ -66,6 +71,7 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceFunctionSet.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceQueue.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanException.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanHandle.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanLogicalDevice.hpp
@@ -75,6 +81,8 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanShader.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanSurface.hpp
 	${CURDIR}/Graphics/Vulkan/win32_LoadVulkan.cpp
+	${CURDIR}/Include/Core.hpp
+	${CURDIR}/Include/Window.hpp
 	${CURDIR}/Math/BaseMatrix.hpp
 	${CURDIR}/Math/BaseVector.hpp
 	${CURDIR}/Math/Config.hpp
@@ -96,6 +104,13 @@ set(
 	${CURDIR}/Memory/LinearAllocator.hpp
 	${CURDIR}/Memory/PoolAllocator.cpp
 	${CURDIR}/Memory/PoolAllocator.hpp
+	${CURDIR}/Scripting/Config.hpp
+	${CURDIR}/Scripting/Lua/Config.cpp
+	${CURDIR}/Scripting/Lua/Config.hpp
+	${CURDIR}/Scripting/Lua/LuaContext.cpp
+	${CURDIR}/Scripting/Lua/LuaContext.hpp
+	${CURDIR}/Scripting/Lua/LuaException.cpp
+	${CURDIR}/Scripting/Lua/LuaException.hpp
 	${CURDIR}/Util/BinaryFileStreamWrapper.cpp
 	${CURDIR}/Util/BinaryFileStreamWrapper.hpp
 	${CURDIR}/Util/BinaryReader.hpp
@@ -132,17 +147,5 @@ set(
 	${CURDIR}/Window/win/win_RawInputKeyboard.hpp
 	${CURDIR}/BasicFunctor.hpp
 	${CURDIR}/Config.hpp
-	${CURDIR}/Deva.cpp
-	${CURDIR}/Deva.hpp
-	${CURDIR}/DevaLogger.cpp
-	${CURDIR}/DevaLogger.hpp
-	${CURDIR}/Exceptions.hpp
-	${CURDIR}/Init.cpp
-	${CURDIR}/Init.hpp
-	${CURDIR}/Logger.cpp
-	${CURDIR}/Logger.hpp
-	${CURDIR}/Master.hpp
-	${CURDIR}/NumberFormatter.cpp
-	${CURDIR}/NumberFormatter.hpp
 	${CURDIR}/Platform.hpp
 )

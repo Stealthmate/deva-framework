@@ -3,7 +3,7 @@
 
 #include "../Config.hpp"
 
-#include <DevaFramework/Window/Input.hpp>
+#include <DevaFramework/Include/Window.hpp>
 
 namespace DevaEngine
 {

@@ -2,9 +2,6 @@
 
 #ifdef DEVA_OS_WIN32
 
-#include "../../Exceptions.hpp"
-#include "../../DevaLogger.hpp"
-
 namespace
 {
 	HMODULE VULKAN = NULL;
@@ -18,20 +15,16 @@ void DevaFramework::internal::loadVulkanOS(const std::string & path)
 	VULKAN = LoadLibrary(dllpath.c_str());
 	if (!VULKAN)
 		throw DevaExternalFailureException(
-			"Could not load Vulkan dll",
-			"LoadLibrary(\"vulkan-1.dll\")",
-			"DevaFramework::loadVulkanOS",
-			"Windows/Vulkan");
+			"Windows/Vulkan",
+			"Could not load Vulkan dll");
 
-	VULKAN_VERBOSE.println("Load dll - SUCCESS");
+	LOG_VULKAN.v("Load dll - SUCCESS");
 	
 	vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)GetProcAddress(VULKAN, "vkGetInstanceProcAddr");
 	if(!vkGetInstanceProcAddr)
 		throw DevaExternalFailureException(
-			"Could not load Vulkan function loader",
-			"LoadLibrary(\"vulkan-1.dll\")",
-			"DevaFramework::loadVulkanOS",
-			"Windows/Vulkan");
-	else VULKAN_LOG.println("Load Vulkan function loader - SUCCESS");
+			"Windows/Vulkan",
+			"Could not load Vulkan function loader");
+	else LOG_VULKAN.v("Load Vulkan function loader - SUCCESS");
 }
 #endif //DEVA_OS_WIN32

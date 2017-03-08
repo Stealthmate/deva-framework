@@ -1,8 +1,5 @@
 #include "Config.hpp"
 
-#include "../../Exceptions.hpp"
-#include "../../DevaLogger.hpp"
-
 #include <vector>
 
 using namespace DevaFramework;
@@ -13,10 +10,7 @@ PFN_vkCreateInstance                                DevaFramework::internal::vkC
 PFN_vkEnumerateInstanceLayerProperties              DevaFramework::internal::vkEnumerateInstanceLayerProperties = nullptr;
 PFN_vkEnumerateInstanceExtensionProperties          DevaFramework::internal::vkEnumerateInstanceExtensionProperties = nullptr;
 
-DevaLogger DevaFramework::VULKAN_VERBOSE = DevaLogger("[Vulkan] Verbose: ", DevaLogger::LogLevel::LOG_MESSAGE, true);
-DevaLogger DevaFramework::VULKAN_LOG = DevaLogger("[Vulkan] Log: ", DevaLogger::LogLevel::LOG_MESSAGE, true);
-DevaLogger DevaFramework::VULKAN_WARN = DevaLogger("[Vulkan] Warning: ", DevaLogger::LogLevel::LOG_WARNING, true);
-DevaLogger DevaFramework::VULKAN_ERR = DevaLogger("[Vulkan] Error: ", DevaLogger::LogLevel::LOG_ERROR, true);
+DevaLogger DevaFramework::LOG_VULKAN = DevaLogger("[Vulkan]: ");
 
 namespace
 {
@@ -26,13 +20,13 @@ namespace
 #define LOADPFN(PFNNAME) \
 PFNNAME = (PFN_##PFNNAME)vkGetInstanceProcAddr(nullptr, #PFNNAME); \
 if(!PFNNAME) \
-	throw DevaExternalFailureException("Could not get PFN_"#PFNNAME, "DevaFramework::internal::getVulkanGlobalFunctions", "vkGetInstanceProcAddr", "Windows/Vulkan"); \
+	throw DevaExternalFailureException("Windows/Vulkan", "Could not get PFN_"#PFNNAME); \
 else \
 { \
 	std::string msg = "Getting PFN "; \
 	msg += #PFNNAME; \
 	msg.append(70 - msg.length(), ' '); \
-	VULKAN_VERBOSE.println(msg + " - SUCCESS"); \
+	LOG_VULKAN.v(msg + " - SUCCESS"); \
 }
 
 void internal::getVulkanGlobalFunctions()
@@ -40,7 +34,7 @@ void internal::getVulkanGlobalFunctions()
 	LOADPFN(vkCreateInstance);
 	LOADPFN(vkEnumerateInstanceExtensionProperties);
 	LOADPFN(vkEnumerateInstanceLayerProperties);
-	VULKAN_VERBOSE.println("Successfully got all global functions.");
+	LOG_VULKAN.v("Successfully got all global functions.");
 }
 
 #undef LOADPFN
@@ -55,20 +49,20 @@ void DevaFramework::LoadVulkan(const std::string &dllpath)
 	EXTENSIONS_AVAILABLE = std::vector<VkExtensionProperties>(extension_count);
 	internal::vkEnumerateInstanceExtensionProperties(NULL, &extension_count, EXTENSIONS_AVAILABLE.data());
 
-	VULKAN_VERBOSE.println("Successfully enumerated extensions");
+	LOG_VULKAN.v("Successfully enumerated extensions");
 }
 
 bool DevaFramework::vulkanInstanceExtensionAvailable(const std::string & extensionName)
 {
-	VULKAN_VERBOSE << VULKAN_VERBOSE.stamp() << "Querying instance extension " + extensionName << "...";
+	LOG_VULKAN.v("Querying instance extension " + extensionName + "...", false);
 	for (auto &i : EXTENSIONS_AVAILABLE)
 	{
 		if (extensionName == i.extensionName) 
 		{
-			VULKAN_VERBOSE << " FOUND" << Logger::endl;
+			LOG_VULKAN.v(" FOUND");
 			return true;
 		}
 	}
-	VULKAN_VERBOSE << " NOT FOUND" << Logger::endl;
+	LOG_VULKAN.v(" NOT FOUND");
 	return false;
 }

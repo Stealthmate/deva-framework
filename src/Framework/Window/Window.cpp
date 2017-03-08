@@ -1,7 +1,5 @@
 #include "ImplWindow.hpp"
 
-#include "../DevaLogger.hpp"
-
 #include <vector>
 
 using namespace DevaFramework;
@@ -13,37 +11,37 @@ namespace
 
 void* OSHandles::win32_hinstance() const
 {
-	DevaLogger::err.println("Called OSHandles::win32_hinstance default implementation. Are you trying to get OS parameters for a different system?");
+	LOG.e("Called OSHandles::win32_hinstance default implementation. Are you trying to get OS parameters for a different system?");
 	return nullptr;
 }
 
 void* OSHandles::win32_hwnd() const
 {
-	DevaLogger::err.println("Called OSHandles::win32_hwnd default implementation. Are you trying to get OS parameters for a different system?");
+	LOG.e("Called OSHandles::win32_hwnd default implementation. Are you trying to get OS parameters for a different system?");
 	return nullptr;
 }
 
 void* OSHandles::xcb_connection() const
 {
-	DevaLogger::err.println("Called OSHandles::xcb_connection default implementation. Are you trying to get OS parameters for a different system?");
+	LOG.e("Called OSHandles::xcb_connection default implementation. Are you trying to get OS parameters for a different system?");
 	return nullptr;
 }
 
 void* OSHandles::xcb_window() const
 {
-	DevaLogger::err.println("Called OSHandles::xcb_window default implementation. Are you trying to get OS parameters for a different system?");
+	LOG.e("Called OSHandles::xcb_window default implementation. Are you trying to get OS parameters for a different system?");
 	return nullptr;
 }
 
 void* OSHandles::xlib_dpy() const
 {
-	DevaLogger::err.println("Called OSHandles::xlib_dpy default implementation. Are you trying to get OS parameters for a different system?");
+	LOG.e("Called OSHandles::xlib_dpy default implementation. Are you trying to get OS parameters for a different system?");
 	return nullptr;
 }
 
 void* OSHandles::xlib_window() const
 {
-	DevaLogger::err.println("Called OSHandles::xlib_window default implementation. Are you trying to get OS parameters for a different system?");
+	LOG.e("Called OSHandles::xlib_window default implementation. Are you trying to get OS parameters for a different system?");
 	return nullptr;
 }
 
@@ -51,7 +49,7 @@ void* OSHandles::xlib_window() const
 std::shared_ptr<Window> Window::openWindow(uint32_t width, uint32_t height, const std::string &name)
 {
 	window_list.push_back(std::shared_ptr<Window>(new Window(width, height, name)));
-	DevaLogger::log << window_list[window_list.size() - 1]->impl->surface_width << " \n";
+	LOG.i(strm(window_list[window_list.size() - 1]->impl->surface_width) + " \n");
 	return window_list[window_list.size() - 1];
 }
 

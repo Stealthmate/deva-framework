@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "Config.hpp"
-#include "../Exceptions.hpp"
 
 namespace DevaFramework
 {

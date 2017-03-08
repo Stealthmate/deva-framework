@@ -3,6 +3,16 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 
+namespace {
+	VkDescriptorSetLayoutBinding EMPTY_DESCRIPTOR_SET_LAYOUT_BINDING = {
+		0,
+		VK_DESCRIPTOR_TYPE_MAX_ENUM,
+		0,
+		0,
+		0
+	};
+}
+
 VulkanGraphicsPipelineBuilder::VulkanGraphicsPipelineBuilder()
 {
 	viewport.x = 0.0f;
@@ -121,6 +131,8 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::attachShader(VkSha
 
 	shaderStageCreateInfos.push_back(shaderStageInfo);
 
+	ENGINE_LOG.v(strformat("Atttached shader {} to pipeline", (uintptr_t)shader));
+
 	return *this;
 }
 
@@ -132,17 +144,38 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::setRenderPass(VkRe
 	return *this;
 }
 
-void VulkanGraphicsPipelineBuilder::prepare()
+VulkanHandle<VkPipeline> VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
 {
-	createInfo.pStages = shaderStageCreateInfos.data();
-	createInfo.stageCount = (uint32_t)shaderStageCreateInfos.size();
-}
-
-VkPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
-{
-	prepare();
 	auto device = dev.handle();
 	auto & vk = dev.vk();
+
+	std::vector<VkDescriptorSetLayout> descsetlayouts;
+	for (auto i : descriptorSets) {
+		descsetlayouts.push_back({});
+		VkDescriptorSetLayoutCreateInfo cinfo;
+		cinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		cinfo.pNext = nullptr;
+		cinfo.flags = 0;
+		cinfo.bindingCount = static_cast<uint32_t>(i.size());
+		cinfo.pBindings = i.data();
+		VkResult result = vk.vkCreateDescriptorSetLayout(device, &cinfo, nullptr, &*(descsetlayouts.end() - 1));
+	}
+
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
+	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descsetlayouts.size());// Optional
+	pipelineLayoutInfo.pSetLayouts = descsetlayouts.data(); // Optional
+	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
+	pipelineLayoutInfo.pPushConstantRanges = 0; // Optional
+
+	if (vk.vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr,
+		&createInfo.layout) != VK_SUCCESS) {
+		throw DevaException("Failed to create pipeline layout!");
+	}
+
+	createInfo.pStages = shaderStageCreateInfos.data();
+	createInfo.stageCount = (uint32_t)shaderStageCreateInfos.size();
+
 
 	std::vector<VkVertexInputBindingDescription> bindingDescriptions;
 	std::vector<VkVertexInputAttributeDescription> attrDescriptions;
@@ -168,8 +201,8 @@ VkPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
 	inputState.pVertexAttributeDescriptions = attrDescriptions.data();
 	createInfo.pVertexInputState = &inputState;
 
-	VkPipeline pl;
-	auto result = vk.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &createInfo, nullptr, &pl);
+	VulkanHandle<VkPipeline> pl(device, vk.vkDestroyPipeline);
+	auto result = vk.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &createInfo, nullptr, pl.replace());
 	if (result != VK_SUCCESS) {
 		throw DevaException("Failed to create graphics pipeline!");
 	}
@@ -177,15 +210,51 @@ VkPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
 	return pl;
 }
 
-VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::setLayout(VkPipelineLayout layout)
+VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding)
 {
-	createInfo.layout = layout;
+	vertexBindings.push_back(binding);
+	return *this;
+}
+
+VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::setDescriptorSetCount(uint32_t count) {
+	descriptorSets.resize(count, std::vector<VkDescriptorSetLayoutBinding>());
 
 	return *this;
 }
 
-VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding)
-{
-	vertexBindings.push_back(binding);
+VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::defineUniform(
+	uint32_t set,
+	uint32_t binding,
+	VkDescriptorType type,
+	uint32_t count,
+	VkShaderStageFlags stage,
+	std::vector<VkSampler> pImmutableSamplers) {
+
+	if (set >= descriptorSets.size()) {
+		throw DevaException("Attempt to define uniform for set number " + strm(set) + " which is larger than current set count " + strm(set));
+	}
+
+	auto& bindings = descriptorSets[set];
+	VkDescriptorSetLayoutBinding *newbind = nullptr;
+	for (auto &b : bindings) {
+		if (b.binding == binding) {
+			ENGINE_LOG.w(strformat("Overwriting binding {} in set {}", binding, set));
+			newbind = &b;
+			break;
+		}
+	}
+	if (!newbind) {
+		bindings.push_back({});
+		newbind = &*(bindings.end() - 1);
+	}
+
+	newbind->binding = binding;
+	newbind->descriptorCount = count;
+	newbind->descriptorType = type;
+	newbind->pImmutableSamplers = pImmutableSamplers.data();
+	newbind->stageFlags = stage;
+
+	ENGINE_LOG.v(strformat("Add pipeline binding {} to set {}", binding, set));
+
 	return *this;
 }

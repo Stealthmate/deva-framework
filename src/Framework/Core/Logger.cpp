@@ -6,12 +6,28 @@
 
 using namespace DevaFramework;
 
+namespace {
+	char hexarr[] = {
+		'0', '1', '2', '3', '4',
+		'5', '6', '7', '8', '9',
+		'A', 'B', 'C', 'D', 'F'
+	};
 
-#include "Logger-format.inl"
+	std::string hex(char byte)
+	{
+		unsigned char ub = static_cast<unsigned char>(byte);
+		std::string sb = "0x";
+		sb += hexarr[ub / 16];
+		sb += hexarr[ub % 16];
+		return  sb;
+	}
+}
 
+
+/*
 std::string timestamp()
 {
-	/*using namespace std::chrono;
+	using namespace std::chrono;
 	std::string time;
 	std::string time_ms = ":";
 	auto _now = high_resolution_clock::now();
@@ -23,19 +39,16 @@ std::string timestamp()
 	if(ms<100) time_ms += "0";
 	time_ms+=strm(ms);
 	if(!ErrorHandler::showMS) time_ms = "";
-	return std::string("[") + time.substr(11, 8) + time_ms + "] ";*/
+	return std::string("[") + time.substr(11, 8) + time_ms + "] ";
 	return "";
 }
-
+*/
 
 const std::string Logger::endl = "\n";
 
-Logger::Logger(const std::string &stampstr, bool enabled) : stampstr(stampstr), enabled(enabled) {}
+Logger::Logger(const std::string &stampstr) : stampstr(stampstr), enabled(true) {}
 
 const Logger& Logger::println(const std::string &msg) const {
-
-	if (!enabled) return *this; 
-
 	return *this << stampstr << msg << endl; 
 }
 

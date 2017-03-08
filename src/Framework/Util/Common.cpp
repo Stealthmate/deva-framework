@@ -1,8 +1,7 @@
 #include "Common.hpp"
 
-#include "../Exceptions.hpp"
-
 #include <fstream>
+#include <stdarg.h> 
 
 using namespace DevaFramework;
 
@@ -19,7 +18,8 @@ std::string DevaFramework::readTextFile(const char* filepath)
 		input.close();
 	}
 	else {
-		throw DevaInvalidArgumentException("Cannot open file " + std::string(filepath));
+		
+		throw DevaInvalidArgumentException(strformat("Cannot open file {}", filepath));
 	}
 	return text;
 }

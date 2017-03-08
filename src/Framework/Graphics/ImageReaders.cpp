@@ -1,7 +1,6 @@
 #include "ImageReaders.hpp"
 
 #include <fstream>
-#include "../Exceptions.hpp"
 #include <iostream>
 using namespace DevaFramework;
 

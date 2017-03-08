@@ -1,10 +1,6 @@
 #include "../ImplWindow.hpp"
 #ifdef DEVA_OS_WIN32
 
-#include "../../Exceptions.hpp"
-
-#include "../../DevaLogger.hpp"
-
 #include "../../Graphics/Vulkan/VulkanInstance.hpp"
 
 //#include "impl_keycode_mapping.inl"
@@ -116,7 +112,7 @@ void ImplWindow::impl_init()
 
 	// Register window class:
 	if (!RegisterClassEx(&win_class)) {
-		throw DevaExternalFailureException("Could not create window.", "Windows", "RegisterClassEx", "DevaFramework::ImplWindow::initOSWindow");
+		throw DevaExternalFailureException("Windows", "Could not create window.");
 	}
 
 	DWORD ex_style = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
@@ -132,7 +128,7 @@ void ImplWindow::impl_init()
 			sizeof(ACCEPTED_INPUT_DEVICES) / sizeof(ACCEPTED_INPUT_DEVICES[0]), //Number of elements 
 			sizeof(ACCEPTED_INPUT_DEVICES[0]))) {                               //Size of single element
 		throw DevaExternalFailureException(
-			"Could not register for raw input.", "Windows", "RegisterRawInputDevies", "DevaFramework::ImplWindow::initOSWindow");
+			"Windows", "Could not register for raw input.");
 	}
 	
 
@@ -153,7 +149,7 @@ void ImplWindow::impl_init()
 	init_call = false;
 
 	if (!this->impl_win32_hwnd) {
-		throw DevaExternalFailureException("Could not create window.", "Windows", "CreateWindowEx", "DevaFramework::ImplWindow::initOSWindow");
+		throw DevaExternalFailureException("Windows", "Could not create window.");
 	}
 
 	SetWindowLongPtr(this->impl_win32_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));

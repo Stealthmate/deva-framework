@@ -6,7 +6,8 @@
 #include "VulkanRenderer.hpp"
 #include "Input/InputListener.hpp"
 
-#include <DevaFramework/Deva.hpp>
+#include <DevaFramework\Include\Core.hpp>
+#include <DevaFramework\Graphics\Vulkan.hpp>
 
 #include <memory>
 
@@ -24,16 +25,16 @@ namespace DevaEngine
 
 	class DevaEngineInstance
 	{
-
+		uint64_t mID;
 		std::shared_ptr<DevaFramework::Window> wnd;
 		std::shared_ptr<InputListener> inputlstnr;
 
 	public:
-		DEVA_ENGINE_API static DevaEngineInstance& createInstance(const DevaEngineInstanceCreateInfo &info);
+		DEVA_ENGINE_API static std::shared_ptr<DevaEngineInstance> createInstance(const DevaEngineInstanceCreateInfo &info);
 	private:
 
-		VulkanRenderer renderer;
-		DevaEngineInstance(const DevaEngineInstanceCreateInfo &info);
+		std::unique_ptr<Renderer> renderer;
+		DevaEngineInstance(const DevaEngineInstanceCreateInfo &info, uint64_t id);
 		
 
 	public:
@@ -41,12 +42,17 @@ namespace DevaEngine
 		DEVA_ENGINE_API DevaEngineInstance();
 
 		DEVA_ENGINE_API DevaEngineInstance(const DevaEngineInstance &instance) = delete;
+		DEVA_ENGINE_API DevaEngineInstance& operator=(const DevaEngineInstance &instance) = delete;
+		DEVA_ENGINE_API DevaEngineInstance& operator=(DevaEngineInstance &&instance) = delete;
 		DEVA_ENGINE_API DevaEngineInstance(DevaEngineInstance &&instance);
+		DEVA_ENGINE_API ~DevaEngineInstance();
 
 		DEVA_ENGINE_API Renderer& getRenderer();
 		DEVA_ENGINE_API InputListener& getInputListener();
 
 		DEVA_ENGINE_API bool update();
+
+		DEVA_ENGINE_API void destroy();
 	};
 
 }

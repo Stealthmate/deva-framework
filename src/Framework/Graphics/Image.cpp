@@ -1,7 +1,6 @@
 #include "Image.hpp"
 
 #include "ImageReaders.hpp"
-#include "../DevaLogger.hpp"
 
 #include <string>
 
@@ -22,7 +21,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 
 	if (raw.error)
 	{
-		DevaLogger::err << DevaLogger::err.stamp() << "Could not load image. Error code: " << raw.error << Logger::endl;
+		LOG.e("Could not load image. Error code: " + strm(raw.error));
 		return Image();
 	}
 
