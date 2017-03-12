@@ -81,20 +81,20 @@ namespace
 
 	const bool VULKAN_LOADED = false;
 
-	bool pickGPU(const VulkanInstance &instance, VkSurfaceKHR surface, VulkanPhysicalDeviceWrapper * gpu, uint32_t * queueIndex)
+	bool pickGPU(const VulkanInstance &instance, VkSurfaceKHR surface, VulkanPhysicalDeviceTraits * gpu, uint32_t * queueIndex)
 	{
 		auto vk = instance.vk();
 		auto pdevs = instance.getPhysicalDevices();
 		for (auto &pdev : pdevs) {
-			if (pdev.properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) continue;
-			auto& supportedQueues = Vulkan::deviceQueueFamiliesSupportSurface(instance, pdev.handle, surface);
+			if (pdev.properties().deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) continue;
+			auto& supportedQueues = Vulkan::deviceQueueFamiliesSupportSurface(instance, pdev.handle(), surface);
 			for (int i = 0;i < supportedQueues.size();i++)
 			{
-				auto& q = pdev.queueFamilies[supportedQueues[i]];
+				auto& q = pdev.queueFamilyProperties()[supportedQueues[i]];
 				if ((q.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) continue;
 
 				VkBool32 supportsPresent;
-				vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle,
+				vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle(),
 					supportedQueues[i],
 					surface,
 					&supportsPresent);
@@ -108,7 +108,7 @@ namespace
 		return false;
 	}
 
-	VulkanDevice createLogicalDevice(const VulkanInstance& instance, const VulkanPhysicalDeviceWrapper &pdev, uint32_t queueIndex)
+	VulkanDevice createLogicalDevice(const VulkanInstance& instance, const VulkanPhysicalDeviceTraits &pdev, uint32_t queueIndex)
 	{
 		std::vector<float> priorities = { 1.0f };
 		VkDeviceQueueCreateInfo q_cinfo;
@@ -121,7 +121,7 @@ namespace
 		for (auto ext : DEVICE_EXTENSIONS)
 		{
 			bool supported = false;
-			for (auto &devext : pdev.extensions)
+			for (auto &devext : pdev.extensionProperties())
 			{
 				supported = std::string(devext.extensionName).compare(ext) == 0;
 				if (supported) break;
@@ -141,14 +141,14 @@ namespace
 		dev_cinfo.ppEnabledExtensionNames = DEVICE_EXTENSIONS;
 		VkPhysicalDeviceFeatures features = EMPTY_FEATURES;
 		features.fillModeNonSolid = VK_TRUE;
-		if (pdev.features.fillModeNonSolid) dev_cinfo.pEnabledFeatures = &features;
+		if (pdev.features().fillModeNonSolid) dev_cinfo.pEnabledFeatures = &features;
 
 		return VulkanDevice(instance, pdev, dev_cinfo);
 	}
 }
 
 
-VulkanRenderer::VulkanRenderer() {}
+VulkanRenderer::VulkanRenderer() : instance(VulkanInstance()) {}
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 	VkDebugReportFlagsEXT       flags,
@@ -181,6 +181,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 
 VkDebugReportCallbackEXT callback;
 VulkanRenderer::VulkanRenderer(const Window &wnd)
+	:instance(VulkanInstance())
 {
 	if (!VULKAN_LOADED) LoadVulkan();
 
@@ -200,12 +201,12 @@ VulkanRenderer::VulkanRenderer(const Window &wnd)
 	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle(), &callbackCreateInfo, nullptr, &callback);
 
 	this->surface = Vulkan::createSurfaceFromWindow(instance, wnd);
-	VulkanPhysicalDeviceWrapper gpu;
+	VulkanPhysicalDeviceTraits gpu;
 	uint32_t queueIndex = 0;
 	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
 	this->main_pdev = gpu;
 	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
-	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties.deviceName));
+	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties().deviceName));
 
 	this->renderQueue = queueIndex;
 
@@ -219,7 +220,7 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	auto vk = instance.vk();
 
 	unsigned int queue = UINT_MAX;
-	auto & queues = Vulkan::deviceQueueFamiliesSupportSurface(instance, dev.handle, surface);
+	auto & queues = Vulkan::deviceQueueFamiliesSupportSurface(instance, dev.handle(), surface);
 
 	this->renderQueue = 0;
 
@@ -396,7 +397,7 @@ void VulkanRenderer::createPipeline()
 
 	VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 	uint32_t typeFilter = memRequirements.memoryTypeBits;
-	auto memProperties = main_pdev.memoryProperties;
+	auto memProperties = main_pdev.memoryProperties();
 	uint32_t index;
 	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
 		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
@@ -499,7 +500,7 @@ void VulkanRenderer::drawFrame()
 	if (queues.size() == 0)
 		throw DevaException("0 queues");
 
-	VkQueue q = queues[0].mHandle;
+	VkQueue q = queues[0].handle();
 	if (vk.vkQueueSubmit(q, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
 		throw std::runtime_error("failed to submit draw command buffer!");
 	}
@@ -533,11 +534,7 @@ VulkanRenderer::VulkanRenderer(VulkanRenderer &&renderer) :
 	colorFormat(renderer.colorFormat),
 	colorSpace(renderer.colorSpace),
 	commandPool(std::move(renderer.commandPool)),
-	pipeline(std::move(renderer.pipeline))
-	{
-	renderer.instance = VulkanInstance();
-	renderer.main_device = VulkanDevice();
-}
+	pipeline(std::move(renderer.pipeline)) {}
 
 VulkanRenderer::~VulkanRenderer() {
 	destroy();

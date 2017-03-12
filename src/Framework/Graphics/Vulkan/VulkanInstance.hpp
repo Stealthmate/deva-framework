@@ -8,36 +8,41 @@
 
 namespace DevaFramework
 {
+
+	//Immutable
+
 	class VulkanInstance
 	{
+	public:
+
+		DEVA_FRAMEWORK_API static VulkanInstance createDefault();
+		DEVA_FRAMEWORK_API static VulkanInstance create(const VkInstanceCreateInfo &info);
+
+		DEVA_FRAMEWORK_API VulkanInstance() noexcept;
+		DEVA_FRAMEWORK_API VulkanInstance(VulkanInstance &&vkinstance) noexcept;
+		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance) noexcept;
+		DEVA_FRAMEWORK_API ~VulkanInstance();
+
+		DEVA_FRAMEWORK_API std::vector<VulkanPhysicalDeviceTraits> getPhysicalDevices() const;
+
+		DEVA_FRAMEWORK_API VkInstance handle() const noexcept { return mHandle; }
+		DEVA_FRAMEWORK_API const VulkanInstanceFunctionSet& vk() const noexcept { return mVk; }
+
+		DEVA_FRAMEWORK_API void destroy();
+
+	private:
+
 		VkInstance mHandle;
 		VulkanInstanceFunctionSet mVk;
 
-		std::vector<VulkanPhysicalDeviceWrapper> physical_devices;
+		std::vector<VulkanPhysicalDeviceTraits> physical_devices;
 
 		void populatePDeviceList();
 
+		VulkanInstance(VkInstance handle); //Wraps the handle
 		VulkanInstance(const VkInstanceCreateInfo &info);
-
-	public: 
-
-		DEVA_FRAMEWORK_API static VulkanInstance create(); //This DOES create a valid VkInstance, with implementation-defined default createinfo
-		DEVA_FRAMEWORK_API static VulkanInstance create(const VkInstanceCreateInfo &info);
-
-		DEVA_FRAMEWORK_API VulkanInstance(VkInstance handle); //Wraps the handle
-		DEVA_FRAMEWORK_API VulkanInstance(); //This does NOT create a valid VkInstance. This only creates an empty object.
 		VulkanInstance(const VulkanInstance &vkinstance) = delete;
-		DEVA_FRAMEWORK_API VulkanInstance(VulkanInstance &&vkinstance);
 		VulkanInstance& operator=(const VulkanInstance &vkinstance) = delete;
-		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance);
-		DEVA_FRAMEWORK_API ~VulkanInstance();
-
-		DEVA_FRAMEWORK_API std::vector<VulkanPhysicalDeviceWrapper> getPhysicalDevices() const;
-
-		DEVA_FRAMEWORK_API const VulkanInstanceFunctionSet& vk() const;
-		DEVA_FRAMEWORK_API VkInstance handle() const;
-
-		DEVA_FRAMEWORK_API void destroy();
 	};
 }
 

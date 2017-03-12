@@ -61,6 +61,7 @@ set(
 	${CURDIR}/Graphics/Vulkan/VertexInputBinding.cpp
 	${CURDIR}/Graphics/Vulkan/VertexInputBinding.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanAPI.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanBuffer.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDestructibleHandle.hpp

@@ -14,7 +14,7 @@ namespace DevaFramework
 
 	public:
 
-		DEVA_FRAMEWORK_API VulkanDeviceBuilder(const VulkanPhysicalDeviceWrapper &pdev);
+		DEVA_FRAMEWORK_API VulkanDeviceBuilder(const VulkanPhysicalDeviceTraits &pdev);
 
 		DEVA_FRAMEWORK_API VulkanDeviceBuilder& useQueueFamily(uint32_t familyIndex, uint32_t count);
 		DEVA_FRAMEWORK_API VulkanDeviceBuilder& 

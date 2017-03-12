@@ -70,15 +70,15 @@ VulkanHandle<VkSurfaceKHR> Vulkan::createSurfaceFromWindow(const VulkanInstance 
 std::vector<uint32_t> Vulkan::deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice handle, VkSurfaceKHR surface)
 {
 	auto &vk = vkInstance.vk();
-	auto pdev = VulkanPhysicalDeviceWrapper::fromHandle(vkInstance, handle);
+	auto pdev = VulkanPhysicalDeviceTraits::forDevice(vkInstance, handle);
 	std::vector<uint32_t> queues;
-	for (int i = 0;i < pdev.queueFamilies.size();i++)
+	for (int i = 0;i < pdev.queueFamilyProperties().size();i++)
 	{
-		auto& q = pdev.queueFamilies[i];
+		auto& q = pdev.queueFamilyProperties()[i];
 		if ((q.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) continue;
 
 		VkBool32 supportsPresent;
-		vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle,
+		vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle(),
 			i,
 			surface,
 			&supportsPresent);

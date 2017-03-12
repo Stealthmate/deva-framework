@@ -174,122 +174,104 @@ str += "\n";
 	}
 }
 
-VulkanPhysicalDeviceWrapper VulkanPhysicalDeviceWrapper::fromHandle(const VulkanInstance &vkInstance, VkPhysicalDevice handle)
+VulkanPhysicalDeviceTraits VulkanPhysicalDeviceTraits::forDevice(const VulkanInstance &vkInstance, VkPhysicalDevice handle)
 {
 	auto & vk = vkInstance.vk();
-	VulkanPhysicalDeviceWrapper pdev;
-	pdev.handle = handle;
+	VulkanPhysicalDeviceTraits pdev;
+	pdev.mHandle = handle;
 
 	VkResult result;
-	vk.vkGetPhysicalDeviceProperties(pdev.handle, &pdev.properties);
-	vk.vkGetPhysicalDeviceFeatures(pdev.handle, &pdev.features);
+	vk.vkGetPhysicalDeviceProperties(pdev.mHandle, &pdev.mProperties);
+	vk.vkGetPhysicalDeviceFeatures(pdev.mHandle, &pdev.mFeatures);
 
 	uint32_t queueFamilyCount = 0;
-	vk.vkGetPhysicalDeviceQueueFamilyProperties(pdev.handle, &queueFamilyCount, NULL);
+	vk.vkGetPhysicalDeviceQueueFamilyProperties(pdev.mHandle, &queueFamilyCount, NULL);
 
-	pdev.queueFamilies.clear();
-	pdev.queueFamilies.resize(queueFamilyCount);
-	vk.vkGetPhysicalDeviceQueueFamilyProperties(pdev.handle, &queueFamilyCount, &pdev.queueFamilies[0]);
+	pdev.mQueueFamilyProperties.clear();
+	pdev.mQueueFamilyProperties.resize(queueFamilyCount);
+	vk.vkGetPhysicalDeviceQueueFamilyProperties(pdev.mHandle, &queueFamilyCount, pdev.mQueueFamilyProperties.data());
 
 	uint32_t ext_count = 0;
-	result = vk.vkEnumerateDeviceExtensionProperties(handle, NULL, &ext_count, NULL);
+	result = vk.vkEnumerateDeviceExtensionProperties(pdev.mHandle, NULL, &ext_count, NULL);
 	if (result != VK_SUCCESS)
 		throw DevaException("Could not enumerate device extension properties");
-	pdev.extensions.clear();
-	pdev.extensions.resize(ext_count);
-	result = vk.vkEnumerateDeviceExtensionProperties(handle, NULL, &ext_count, pdev.extensions.data());
+	pdev.mExtensionProperties.clear();
+	pdev.mExtensionProperties.resize(ext_count);
+	result = vk.vkEnumerateDeviceExtensionProperties(pdev.mHandle, NULL, &ext_count, pdev.mExtensionProperties.data());
 	if (result != VK_SUCCESS)
 		throw DevaException("Could not populate device extensions vector");
 
 	uint32_t layer_count = 0;
-	result = vk.vkEnumerateDeviceLayerProperties(handle, &layer_count, NULL);
+	result = vk.vkEnumerateDeviceLayerProperties(pdev.mHandle, &layer_count, NULL);
 	if (result != VK_SUCCESS)
 		throw DevaException("Could not enumerate device layer properties");
-	pdev.layers.clear();
-	pdev.layers.resize(layer_count);
-	result = vk.vkEnumerateDeviceLayerProperties(handle, &layer_count, pdev.layers.data());
+	pdev.mLayerProperties.clear();
+	pdev.mLayerProperties.resize(layer_count);
+	result = vk.vkEnumerateDeviceLayerProperties(pdev.mHandle, &layer_count, pdev.mLayerProperties.data());
 	if (result != VK_SUCCESS)
 		throw DevaException("Could not populate device layer properties");
 
-	vk.vkGetPhysicalDeviceMemoryProperties(handle, &pdev.memoryProperties);
+	vk.vkGetPhysicalDeviceMemoryProperties(pdev.mHandle, &pdev.mMemoryProperties);
 
 	return pdev;
 }
 
-/*
-VkQueueFlags    queueFlags;
-uint32_t        queueCount;
-uint32_t        timestampValidBits;
-VkExtent3D      minImageTransferGranularity;
-*/
+VulkanPhysicalDeviceTraits::VulkanPhysicalDeviceTraits()
+	:mHandle(VK_NULL_HANDLE) {}
+VulkanPhysicalDeviceTraits::VulkanPhysicalDeviceTraits(const VulkanPhysicalDeviceTraits &pdev) = default;
+VulkanPhysicalDeviceTraits::VulkanPhysicalDeviceTraits(VulkanPhysicalDeviceTraits &&pdev) = default;
+VulkanPhysicalDeviceTraits& VulkanPhysicalDeviceTraits::operator=(const VulkanPhysicalDeviceTraits &pdev) = default;
+VulkanPhysicalDeviceTraits& VulkanPhysicalDeviceTraits::operator=(VulkanPhysicalDeviceTraits &&pdev) = default;
+VulkanPhysicalDeviceTraits::~VulkanPhysicalDeviceTraits() = default;
 
-/*
-
-uint32_t                            apiVersion;
-uint32_t                            driverVersion;
-uint32_t                            vendorID;
-uint32_t                            deviceID;
-VkPhysicalDeviceType                deviceType;
-char                                deviceName[VK_MAX_PHYSICAL_DEVICE_NAME_SIZE];
-uint8_t                             pipelineCacheUUID[VK_UUID_SIZE];
-VkPhysicalDeviceLimits              limits;
-VkPhysicalDeviceSparseProperties    sparseProperties;
-*/
-
-/*
-
-
-
-*/
-
-std::string VulkanPhysicalDeviceWrapper::to_string() const
+std::string VulkanPhysicalDeviceTraits::to_string() const
 {
 	std::stringstream strs;
 	strs << "Vulkan Physical Device:";
-	strs << "\n\tSupported API:         " << parseVKVersion(properties.apiVersion);
-	strs << "\n\tDriver Version:        " << properties.driverVersion;
-	strs << "\n\tVendor ID:             " << properties.vendorID;
-	strs << "\n\tDevice ID:             " << properties.deviceID;
-	strs << "\n\tDevice Type:           " << parseDeviceType(properties.deviceType);
-	strs << "\n\tDevice Name:           " << properties.deviceName;
+	strs << "\n\tSupported API:         " << parseVKVersion(mProperties.apiVersion);
+	strs << "\n\tDriver Version:        " << mProperties.driverVersion;
+	strs << "\n\tVendor ID:             " << mProperties.vendorID;
+	strs << "\n\tDevice ID:             " << mProperties.deviceID;
+	strs << "\n\tDevice Type:           " << parseDeviceType(mProperties.deviceType);
+	strs << "\n\tDevice Name:           " << mProperties.deviceName;
 
 	//TODO: Implement pipelineCacheUUID, limits and sparse properties
 
-	for (auto &i : queueFamilies) strs << "\n" << parseQueueFamilyProperties(i);
+	for (auto &i : mQueueFamilyProperties) strs << "\n" << parseQueueFamilyProperties(i);
 
-	strs << "\n" << parseFeatures(features);
-	strs << "\n" << parseExtensions(extensions);
-	strs << "\n" << parseLayers(layers);
+	strs << "\n" << parseFeatures(mFeatures);
+	strs << "\n" << parseExtensions(mExtensionProperties);
+	strs << "\n" << parseLayers(mLayerProperties);
 
 	strs << "\n";
 	return strs.str();
 }
 
-VulkanPhysicalDeviceWrapper::SurfaceProperties VulkanPhysicalDeviceWrapper::getSurfaceProperties(const VulkanInstance &vkInstance, VkSurfaceKHR surface)
+VulkanPhysicalDeviceTraits::SurfaceProperties VulkanPhysicalDeviceTraits::getSurfaceProperties(const VulkanInstance &vkInstance, VkSurfaceKHR surface) const
 {
 	SurfaceProperties prop;
 	auto &vk = vkInstance.vk();
 
 	uint32_t formatCount;
-	if (vk.vkGetPhysicalDeviceSurfaceFormatsKHR(handle, surface, &formatCount, NULL) != VK_SUCCESS)
+	if (vk.vkGetPhysicalDeviceSurfaceFormatsKHR(mHandle, surface, &formatCount, NULL) != VK_SUCCESS)
 		throw DevaExternalFailureException("Vulkan", "Error getting color formats!");
 	prop.formats.resize(formatCount);
-	if (vk.vkGetPhysicalDeviceSurfaceFormatsKHR(handle, surface, &formatCount, prop.formats.data()) != VK_SUCCESS)
+	if (vk.vkGetPhysicalDeviceSurfaceFormatsKHR(mHandle, surface, &formatCount, prop.formats.data()) != VK_SUCCESS)
 		throw DevaExternalFailureException("Vulkan", "Device has no surface formats!");
 
 	DevaExternalFailureException e = DevaExternalFailureException("Vulkan", "Vulkan error");
 
 	VkSurfaceCapabilitiesKHR caps = {};
-	if (vk.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(handle, surface, &caps) != VK_SUCCESS) throw e;
+	if (vk.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mHandle, surface, &caps) != VK_SUCCESS) throw e;
 	prop.capabilities = caps;
 
 	uint32_t presentModeCount = 0;
-	if (vk.vkGetPhysicalDeviceSurfacePresentModesKHR(handle, surface, &presentModeCount, NULL) != VK_SUCCESS) throw e;
+	if (vk.vkGetPhysicalDeviceSurfacePresentModesKHR(mHandle, surface, &presentModeCount, NULL) != VK_SUCCESS) throw e;
 
 	if (presentModeCount < 1) throw e;
 
 	prop.presentModes.resize(presentModeCount);
-	if (vk.vkGetPhysicalDeviceSurfacePresentModesKHR(handle, surface, &presentModeCount, prop.presentModes.data()) != VK_SUCCESS) throw e;
+	if (vk.vkGetPhysicalDeviceSurfacePresentModesKHR(mHandle, surface, &presentModeCount, prop.presentModes.data()) != VK_SUCCESS) throw e;
 
 	return prop;
 }

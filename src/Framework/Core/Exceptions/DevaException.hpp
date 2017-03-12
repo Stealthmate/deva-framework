@@ -17,7 +17,8 @@ namespace DevaFramework
 
 		const std::string description;
 
-		DEVA_FRAMEWORK_API DevaException(std::string description);
+		DEVA_FRAMEWORK_API DevaException(const std::string &description);
+		DEVA_FRAMEWORK_API DevaException(const char * description) : DevaException(std::string(description)) {}
 
 		DEVA_FRAMEWORK_API virtual const char* what() const noexcept final;
 		DEVA_FRAMEWORK_API virtual std::string getStamp() const final;

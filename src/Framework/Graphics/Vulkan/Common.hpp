@@ -20,10 +20,13 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API VulkanHandle<VkSurfaceKHR> createSurfaceFromWindow(const VulkanInstance &vkInstance, const Window &wnd);
 		DEVA_FRAMEWORK_API std::vector<uint32_t> deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice pdev, VkSurfaceKHR surface);
 		DEVA_FRAMEWORK_API std::vector<VkVertexInputAttributeDescription> getAttributeDescriptionsForVertexBuffer(
-			const VertexBuffer &vb, 
+			const VertexBuffer &vb,
 			const std::vector<uint32_t> &locations);
 
 		DEVA_FRAMEWORK_API VulkanHandle<VkSemaphore> createSemaphore(const VulkanDevice &dev);
+
+		template <class T>
+		DEVA_FRAMEWORK_API T vulkanCopyHandle(const T &o1, const T &o2);
 	}
 
 }

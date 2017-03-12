@@ -7,7 +7,7 @@ namespace
 	const std::string DEVA_EXCEPTION = "DevaException:";
 }
 
-DevaException::DevaException(std::string description)
+DevaException::DevaException(const std::string &description)
 	: stamp(DEVA_EXCEPTION), description(description)
 {
 	full_description = stamp + " " + description;

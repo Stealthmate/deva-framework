@@ -10,29 +10,32 @@
 namespace DevaFramework
 {
 
+	//Immutable
+
 	class VulkanDevice
 	{
-
-	private:
-
-		VkDevice mHandle;
-		VulkanDeviceFunctionSet mVk;
-		std::vector<VulkanDeviceQueueWrapper> mQueues;
-
 	public:
-		DEVA_FRAMEWORK_API VulkanDevice();
-		DEVA_FRAMEWORK_API VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysicalDeviceWrapper &pdev, const VkDeviceCreateInfo &createInfo);
-		VulkanDevice(const VulkanDevice &dev) = delete;
-		DEVA_FRAMEWORK_API VulkanDevice(VulkanDevice &&dev);
-		VulkanDevice& operator=(const VulkanDevice &dev) = delete;
-		DEVA_FRAMEWORK_API VulkanDevice& operator=(VulkanDevice &&dev);
+
+		DEVA_FRAMEWORK_API VulkanDevice() noexcept;
+		DEVA_FRAMEWORK_API VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysicalDeviceTraits &pdev, const VkDeviceCreateInfo &createInfo);
+		DEVA_FRAMEWORK_API VulkanDevice(VulkanDevice &&dev) noexcept;
+		DEVA_FRAMEWORK_API VulkanDevice& operator=(VulkanDevice &&dev) noexcept;
 		DEVA_FRAMEWORK_API ~VulkanDevice();
 
-		DEVA_FRAMEWORK_API const VulkanDeviceFunctionSet& vk() const;
-		DEVA_FRAMEWORK_API VkDevice handle() const;
+		DEVA_FRAMEWORK_API VkDevice handle() const noexcept { return mHandle; }
+		DEVA_FRAMEWORK_API const VulkanDeviceFunctionSet& vk() const noexcept { return mVk; }
+		DEVA_FRAMEWORK_API const std::vector<VulkanDeviceQueue>& queues() const noexcept { return mQueues; }
 
-		DEVA_FRAMEWORK_API std::vector<VulkanDeviceQueueWrapper> getQueuesOfFamily(VkQueueFlagBits type) const;
+		DEVA_FRAMEWORK_API std::vector<VulkanDeviceQueue> getQueuesOfFamily(VkQueueFlagBits type) const;
 
+
+	private:
+		VkDevice mHandle;
+		VulkanDeviceFunctionSet mVk;
+		std::vector<VulkanDeviceQueue> mQueues;
+
+		VulkanDevice(const VulkanDevice &dev) = delete;
+		VulkanDevice& operator=(const VulkanDevice &dev) = delete;
 	};
 
 }

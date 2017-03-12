@@ -15,7 +15,7 @@ namespace DevaEngine
 	class VulkanRenderer : public Renderer
 	{
 		DevaFramework::VulkanInstance instance;
-		DevaFramework::VulkanPhysicalDeviceWrapper main_pdev;
+		DevaFramework::VulkanPhysicalDeviceTraits main_pdev;
 		DevaFramework::VulkanDevice main_device;
 
 		VkColorSpaceKHR colorSpace;

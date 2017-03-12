@@ -30,7 +30,7 @@ namespace
 
 #define ERRCHK if( result != VK_SUCCESS ) throw DevaException("DevaFramework::VulkanInstance failed because of Vulkan. Check logs for more info.");
 
-VulkanInstance VulkanInstance::create()
+VulkanInstance VulkanInstance::createDefault()
 {
 	return create(DEFAULT_INSTANCE_CREATE_INFO);
 }
@@ -57,6 +57,8 @@ VulkanInstance VulkanInstance::create(const VkInstanceCreateInfo &info)
 	return VulkanInstance(instance_handle);
 }
 
+VulkanInstance::VulkanInstance() noexcept : mHandle(VK_NULL_HANDLE) {}
+
 void VulkanInstance::populatePDeviceList()
 {
 	VkResult result;
@@ -79,7 +81,7 @@ void VulkanInstance::populatePDeviceList()
 
 	for (uint32_t i = 0; i <= device_count - 1; i++)
 	{
-		this->physical_devices.push_back(VulkanPhysicalDeviceWrapper::fromHandle(*this, deviceHandles[i]));
+		this->physical_devices.emplace_back(VulkanPhysicalDeviceTraits::forDevice(*this, deviceHandles[i]));
 	}
 }
 
@@ -94,24 +96,22 @@ VulkanInstance::VulkanInstance(VkInstance handle) : mHandle(handle)
 	LOG_VULKAN.i("Successfully initialized VulkanInstance");
 }
 
-VulkanInstance::VulkanInstance() : mHandle(VK_NULL_HANDLE) {}
-
-VulkanInstance::VulkanInstance(VulkanInstance &&instance) 
-	: mHandle(instance.mHandle), mVk(instance.mVk), physical_devices(instance.physical_devices)
+VulkanInstance::VulkanInstance(VulkanInstance &&instance) noexcept
+	: mHandle(instance.mHandle), mVk(instance.mVk), physical_devices(std::move(instance.physical_devices))
 {
 	instance.mHandle = VK_NULL_HANDLE;
 	instance.physical_devices.clear();
 }
 
-VulkanInstance& VulkanInstance::operator=(VulkanInstance &&instance)
+VulkanInstance& VulkanInstance::operator=(VulkanInstance &&instance) noexcept
 {
 	this->mHandle = instance.mHandle;
 	instance.mHandle = VK_NULL_HANDLE;
 
-	this->physical_devices = instance.physical_devices;
-	instance.physical_devices.clear();
+	this->physical_devices = std::move(instance.physical_devices);
 
-	mVk = instance.mVk;
+	mVk = std::move(instance.mVk);
+	instance.mVk = {};
 
 	return *this;
 }
@@ -122,17 +122,7 @@ VulkanInstance::~VulkanInstance()
 	destroy();
 }
 
-VkInstance VulkanInstance::handle() const
-{
-	return this->mHandle;
-}
-
-const VulkanInstanceFunctionSet& VulkanInstance::vk() const
-{
-	return mVk;
-}
-
-std::vector<VulkanPhysicalDeviceWrapper> VulkanInstance::getPhysicalDevices() const
+std::vector<VulkanPhysicalDeviceTraits> VulkanInstance::getPhysicalDevices() const
 {
 	return physical_devices;
 }

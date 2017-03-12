@@ -2,16 +2,18 @@
 
 using namespace DevaFramework;
 
-VulkanDevice::VulkanDevice() : mHandle(VK_NULL_HANDLE) {}
+VulkanDevice::VulkanDevice() noexcept : mHandle(VK_NULL_HANDLE) {}
 
-VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysicalDeviceWrapper &pdev, const VkDeviceCreateInfo &createInfo)
+VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysicalDeviceTraits &pdev, const VkDeviceCreateInfo &createInfo)
 {
-	VkResult result = vkInstance.vk().vkCreateDevice(pdev.handle, &createInfo, nullptr, &mHandle);
+	VkResult result = vkInstance.vk().vkCreateDevice(pdev.handle(), &createInfo, nullptr, &mHandle);
 	if (result != VK_SUCCESS)
 	{
 		throw DevaException("Could not create VkDevice!");
 	}
+
 	mVk = VulkanDeviceFunctionSet::load(mHandle, vkInstance);
+
 	uint32_t nqci = createInfo.queueCreateInfoCount;
 	for (uint32_t i = 0;i < nqci;i++)
 	{
@@ -22,50 +24,42 @@ VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysica
 			float prio = createInfo.pQueueCreateInfos[i].pQueuePriorities[j];
 			VkQueue qhandle;
 			mVk.vkGetDeviceQueue(mHandle, qfami, j, &qhandle);
-			mQueues.push_back(VulkanDeviceQueueWrapper(mHandle, qhandle, qfami, j, prio, pdev.queueFamilies[i].queueFlags));
+			VulkanDeviceQueue queue{};
+			queue.mParentDevice = mHandle;
+			queue.mHandle = qhandle;
+			queue.mFamilyIndex = qfami;
+			queue.mIndex = j;
+			queue.mType = pdev.queueFamilyProperties()[i].queueFlags;
+			queue.mPriority = prio;
+			mQueues.push_back(queue);
 		}
 	}
 }
 
-VulkanDevice::VulkanDevice(VulkanDevice &&dev)
+VulkanDevice::VulkanDevice(VulkanDevice &&dev) noexcept
+	:mHandle(dev.mHandle),
+	mVk(dev.mVk),
+	mQueues(dev.mQueues)
 {
-	mHandle = dev.mHandle;
-	mVk = dev.mVk;
-	mQueues = std::move(dev.mQueues);
-
 	dev.mHandle = VK_NULL_HANDLE;
-	dev.mVk = VulkanDeviceFunctionSet();
 }
 
-VulkanDevice& VulkanDevice::operator=(VulkanDevice &&dev)
-{
+VulkanDevice& VulkanDevice::operator=(VulkanDevice &&dev) noexcept {
 	mHandle = dev.mHandle;
 	mVk = dev.mVk;
-	mQueues = std::move(dev.mQueues);
+	mQueues = dev.mQueues;
 
 	dev.mHandle = VK_NULL_HANDLE;
-	dev.mVk = VulkanDeviceFunctionSet();
-
+	
 	return *this;
 }
 
-
-const VulkanDeviceFunctionSet& VulkanDevice::vk() const
+std::vector<VulkanDeviceQueue> VulkanDevice::getQueuesOfFamily(VkQueueFlagBits type) const
 {
-	return mVk;
-}
-
-VkDevice VulkanDevice::handle() const
-{
-	return mHandle;
-}
-
-std::vector<VulkanDeviceQueueWrapper> VulkanDevice::getQueuesOfFamily(VkQueueFlagBits type) const
-{
-	std::vector<VulkanDeviceQueueWrapper> queues;
-	for (auto & q : mQueues)
+	std::vector<VulkanDeviceQueue> queues;
+	for (auto & q : this->mQueues)
 	{
-		if (q.mType & type) queues.push_back(q);
+		if (q.type() & type) queues.push_back(q);
 	}
 	return queues;
 }
@@ -75,5 +69,4 @@ VulkanDevice::~VulkanDevice()
 	if (mHandle != VK_NULL_HANDLE) {
 		mVk.vkDestroyDevice(mHandle, nullptr);
 	}
-	mHandle = VK_NULL_HANDLE;
 }
