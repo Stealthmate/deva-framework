@@ -207,6 +207,8 @@ VulkanHandle<VkPipeline> VulkanGraphicsPipelineBuilder::build(const VulkanDevice
 		throw DevaException("Failed to create graphics pipeline!");
 	}
 
+	vk.vkDestroyPipelineLayout(device, createInfo.layout, nullptr);
+
 	return pl;
 }
 

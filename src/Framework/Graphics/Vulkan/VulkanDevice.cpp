@@ -13,6 +13,7 @@ VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysica
 	}
 
 	mVk = VulkanDeviceFunctionSet::load(mHandle, vkInstance);
+	mPhysicalDeviceTraits = pdev;
 
 	uint32_t nqci = createInfo.queueCreateInfoCount;
 	for (uint32_t i = 0;i < nqci;i++)
@@ -39,7 +40,8 @@ VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysica
 VulkanDevice::VulkanDevice(VulkanDevice &&dev) noexcept
 	:mHandle(dev.mHandle),
 	mVk(dev.mVk),
-	mQueues(dev.mQueues)
+	mQueues(dev.mQueues),
+	mPhysicalDeviceTraits(std::move(dev.mPhysicalDeviceTraits))
 {
 	dev.mHandle = VK_NULL_HANDLE;
 }
@@ -48,6 +50,7 @@ VulkanDevice& VulkanDevice::operator=(VulkanDevice &&dev) noexcept {
 	mHandle = dev.mHandle;
 	mVk = dev.mVk;
 	mQueues = dev.mQueues;
+	mPhysicalDeviceTraits = std::move(dev.mPhysicalDeviceTraits);
 
 	dev.mHandle = VK_NULL_HANDLE;
 	

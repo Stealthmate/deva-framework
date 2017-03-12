@@ -5,6 +5,8 @@
 
 #include <DevaFramework\Graphics\Vulkan\Common.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanCommandPool.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanBuffer.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanMemory.hpp>
 #include <limits>
 
 using namespace DevaFramework;
@@ -204,7 +206,6 @@ VulkanRenderer::VulkanRenderer(const Window &wnd)
 	VulkanPhysicalDeviceTraits gpu;
 	uint32_t queueIndex = 0;
 	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
-	this->main_pdev = gpu;
 	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
 	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties().deviceName));
 
@@ -292,8 +293,7 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 VulkanHandle<VkSemaphore> imageAvailableSemaphore;
 VulkanHandle<VkSemaphore> renderFinishedSemaphore;
 std::vector<VkCommandBuffer> commandBuffers;
-std::vector<VkBuffer> buffers;
-VkDeviceMemory bufmem;
+VulkanMemory memory;
 VkRenderPass renderPass;
 void *devmem;
 void VulkanRenderer::createPipeline()
@@ -379,47 +379,15 @@ void VulkanRenderer::createPipeline()
 		}
 	}
 
+	buffers.push_back(VulkanBuffer::create(main_device, 0, 72, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
+	VulkanBuffer &buffer = buffers[0];
 
-	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.pNext = nullptr;
-	bufferInfo.size = 72;
-	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	buffers.resize(1);
-	if (vk.vkCreateBuffer(device, &bufferInfo, nullptr, buffers.data()) != VK_SUCCESS) {
-		throw DevaException("failed to create vertex buffer!");
-	}
-
-	VkMemoryRequirements memRequirements;
-	vk.vkGetBufferMemoryRequirements(device, buffers[0], &memRequirements);
-
-
-	VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-	uint32_t typeFilter = memRequirements.memoryTypeBits;
-	auto memProperties = main_pdev.memoryProperties();
-	uint32_t index;
-	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-			index = i;
-		}
-	}
-
-	VkMemoryAllocateInfo allocInfo1 = {};
-	allocInfo1.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo1.allocationSize = memRequirements.size;
-	allocInfo1.memoryTypeIndex = index;
-	allocInfo1.pNext = nullptr;
-
-	if (vk.vkAllocateMemory(device, &allocInfo1, nullptr, &bufmem) != VK_SUCCESS)
-		throw DevaException("failed to allocate vertex buffer memory!");
-
-	vk.vkBindBufferMemory(device, buffers[0], bufmem, 0);
-
+	memory = VulkanMemory::forBuffer(buffer, main_device, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	auto VERTEXBUFFER = createVertexBuffer();
-	vk.vkMapMemory(device, bufmem, 0, bufferInfo.size, 0, &devmem);
+	vk.vkMapMemory(device, memory.handle(), 0, buffer.size(), 0, &devmem);
 	memcpy(devmem, VERTEXBUFFER.buffer().data(), VERTEXBUFFER.buffer().size());
 
+	vk.vkBindBufferMemory(device, buffer.handle(), memory.handle(), 0);
 	commandPool = VulkanCommandPool(main_device, renderQueue);
 	commandBuffers.resize(swapchain.framebuffers.size());
 
@@ -471,7 +439,8 @@ void VulkanRenderer::drawFrame()
 		vk.vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		vk.vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 		VkDeviceSize offsets[] = { 0 };
-		vk.vkCmdBindVertexBuffers(commandBuffers[i], 0, static_cast<uint32_t>(buffers.size()), buffers.data(), offsets);
+		VkBuffer bufs[] = { buffers[0].handle() };
+		vk.vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, bufs, offsets);
 		vk.vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(VERTEXBUFFER.vertexCount()), 1, 0, 0);
 		vk.vkCmdEndRenderPass(commandBuffers[i]);
 		if (vk.vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
@@ -528,7 +497,6 @@ void VulkanRenderer::renderExample()
 VulkanRenderer::VulkanRenderer(VulkanRenderer &&renderer) :
 	instance(std::move(renderer.instance)),
 	main_device(std::move(renderer.main_device)),
-	main_pdev(std::move(renderer.main_pdev)),
 	swapchain(std::move(renderer.swapchain)),
 	surface(std::move(renderer.surface)),
 	colorFormat(renderer.colorFormat),
@@ -549,6 +517,11 @@ void VulkanRenderer::destroy() {
 
 	if (inst != VK_NULL_HANDLE) {
 		vkd.vkDeviceWaitIdle(dev);
+		for (auto & b : buffers) {
+			b.destroy();
+		}
+		memory.free();
+		vkd.vkDestroyRenderPass(dev, renderPass, nullptr);
 		imageAvailableSemaphore.replace();
 		renderFinishedSemaphore.replace();
 		vkd.vkDestroySwapchainKHR(dev, this->swapchain.handle, nullptr);
@@ -565,5 +538,6 @@ void VulkanRenderer::destroy() {
 		}
 		this->pipeline.replace();
 		this->commandPool.replace();
+
 	}
 }

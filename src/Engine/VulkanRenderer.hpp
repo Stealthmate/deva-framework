@@ -7,6 +7,7 @@
 #include <DevaFramework/Graphics/Vulkan/VulkanInstance.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanDevice.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanCommandPool.hpp>
+#include <DevaFramework/Graphics/Vulkan/VulkanBuffer.hpp>
 
 #include "VulkanSwapchain.hpp"
 
@@ -15,7 +16,6 @@ namespace DevaEngine
 	class VulkanRenderer : public Renderer
 	{
 		DevaFramework::VulkanInstance instance;
-		DevaFramework::VulkanPhysicalDeviceTraits main_pdev;
 		DevaFramework::VulkanDevice main_device;
 
 		VkColorSpaceKHR colorSpace;
@@ -28,6 +28,7 @@ namespace DevaEngine
 		DevaFramework::VulkanHandle<VkPipeline> pipeline;
 
 		DevaFramework::VulkanCommandPool commandPool;
+		std::vector<DevaFramework::VulkanBuffer> buffers;
 
 		void drawFrame();
 

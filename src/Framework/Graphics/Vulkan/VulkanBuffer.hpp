@@ -6,19 +6,43 @@
 
 namespace DevaFramework {
 
-	class VulkanBuffer : public VulkanHandle<VkBuffer> {
+	//Immutable
 
-		static VulkanBuffer deepCopy(const VulkanBuffer &buffer);
+	class VulkanBuffer {
+	public:
 
-		const VkBufferUsageFlagBits usage;
-		const VkSharingMode sharingMode;
+		DEVA_FRAMEWORK_API static VulkanBuffer create(
+			const VulkanDevice &dev, 
+			VkBufferCreateFlags flags, 
+			VkDeviceSize size, 
+			VkBufferUsageFlags usage, 
+			VkSharingMode sharingMode, 
+			const std::vector<uint32_t> &queues = std::vector<uint32_t>());
 
-		VulkanBuffer(const VulkanDevice &dev);
+		DEVA_FRAMEWORK_API VulkanBuffer();
+		DEVA_FRAMEWORK_API VulkanBuffer(const VulkanDevice &dev);
+		DEVA_FRAMEWORK_API VulkanBuffer(VulkanBuffer &&buffer);
+		DEVA_FRAMEWORK_API VulkanBuffer& operator=(VulkanBuffer &&buffer);
+		DEVA_FRAMEWORK_API ~VulkanBuffer();
+
+		DEVA_FRAMEWORK_API VkBuffer handle() const noexcept { return mHandle; }
+		DEVA_FRAMEWORK_API VkDeviceSize size() const noexcept { return mSize; }
+		DEVA_FRAMEWORK_API VkBufferUsageFlags usage() const noexcept { return mUsage; }
+		DEVA_FRAMEWORK_API VkSharingMode sharingMode() const noexcept { return mSharingMode; }
+		DEVA_FRAMEWORK_API VkMemoryRequirements memoryRequirements() const noexcept { return mMemoryRequirements; }
+
+		DEVA_FRAMEWORK_API void destroy();
+
+	private:
+
+		VulkanHandle<VkBuffer> mHandle;
+		VkDeviceSize mSize;
+		VkBufferUsageFlags mUsage;
+		VkSharingMode mSharingMode;
+		VkMemoryRequirements mMemoryRequirements;
+
 		VulkanBuffer(const VulkanBuffer& buffer) = delete;
-		VulkanBuffer(VulkanBuffer &&buffer);
 		VulkanBuffer& operator=(const VulkanBuffer &buffer) = delete;
-		VulkanBuffer& operator=(VulkanBuffer &&buffer) = delete;
-		~VulkanBuffer();
 	};
 
 }

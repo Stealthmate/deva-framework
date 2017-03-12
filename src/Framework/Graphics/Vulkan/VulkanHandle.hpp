@@ -13,58 +13,62 @@ namespace DevaFramework {
 	template<typename HandleType>
 	class VulkanHandle {
 	public:
-		VulkanHandle() : mHandle(VK_NULL_HANDLE) {
+		VulkanHandle() noexcept : mHandle(VK_NULL_HANDLE) {
 			deleter = [](HandleType handle) {
 				LOG.w(strformat("No deleter specified for handle {} = {}", typeid(HandleType).name(), strm(handle)));
 			};
 		}
-		VulkanHandle(VkInstance instance, std::function<void(VkInstance, HandleType, VkAllocationCallbacks*)> deletef) : VulkanHandle()
+		VulkanHandle(
+			VkInstance instance, 
+			std::function<void(VkInstance, HandleType, VkAllocationCallbacks*)> deletef, 
+			HandleType handle = VK_NULL_HANDLE) noexcept 
+			: mHandle(handle)
 		{
 			this->deleter = [instance, deletef](HandleType obj) {
 				deletef(instance, obj, nullptr);
 			};
 		}
 
-		VulkanHandle(VkDevice device, std::function<void(VkDevice, HandleType, VkAllocationCallbacks*)> deletef) : VulkanHandle()
+		VulkanHandle(
+			VkDevice device, 
+			std::function<void(VkDevice, HandleType, VkAllocationCallbacks*)> deletef,
+			HandleType handle = VK_NULL_HANDLE) noexcept
+			: mHandle(handle)
 		{
 			this->deleter = [device, deletef](HandleType obj) {
 				deletef(device, obj, nullptr);
 			};
 		}
 
-		VulkanHandle(const VulkanHandle<HandleType> &vd) = delete;
-		VulkanHandle(VulkanHandle<HandleType> &&vd) : VulkanHandle()
+		VulkanHandle(VulkanHandle<HandleType> &&vd) noexcept : VulkanHandle()
 		{
 			mHandle = vd.mHandle;
 			deleter = vd.deleter;
-			vd.mHandle = VK_NULL_HANDLE;
-			vd.deleter = [](HandleType) {};
+			vd.invalidate();
 		}
 
-		VulkanHandle<HandleType>& operator=(const VulkanHandle<HandleType> &vd) = delete;
-		VulkanHandle<HandleType>& operator=(VulkanHandle<HandleType> &&vd)
+		VulkanHandle<HandleType>& operator=(VulkanHandle<HandleType> &&vd) noexcept
 		{
 			if (mHandle != vd.mHandle)
 			{
 				cleanup();
 				mHandle = vd.mHandle;
 				deleter = vd.deleter;
-				vd.mHandle = VK_NULL_HANDLE;
-				vd.deleter = [](HandleType) {};
+				vd.invalidate();
 			}
 
 			return *this;
 		}
 
-		operator HandleType() const {
+		operator HandleType() const noexcept {
 			return mHandle;
 		}
 
-		bool operator==(const VulkanHandle<HandleType> &rhs) {
+		bool operator==(const VulkanHandle<HandleType> &rhs) const noexcept {
 			return mHandle == rhs.handle;
 		}
-		
-		bool operator!=(const VulkanHandle<HandleType> &rhs) {
+
+		bool operator!=(const VulkanHandle<HandleType> &rhs) const noexcept {
 			return !this->operator==(rhs);
 		}
 
@@ -83,8 +87,13 @@ namespace DevaFramework {
 			mHandle = newHandle;
 		}
 
-		HandleType handle() {
+		HandleType handle() const noexcept {
 			return mHandle;
+		}
+
+		void invalidate() {
+			mHandle = VK_NULL_HANDLE;
+			deleter = [](HandleType) {};
 		}
 
 	private:
@@ -92,10 +101,12 @@ namespace DevaFramework {
 		HandleType mHandle;
 		std::function<void(HandleType)> deleter;
 
+		VulkanHandle(const VulkanHandle<HandleType> &vd) = delete;
+		VulkanHandle<HandleType>& operator=(const VulkanHandle<HandleType> &vd) = delete;
+
 		void cleanup()
 		{
 			if (mHandle != VK_NULL_HANDLE) {
-				LOG.d(strformat("Destroy handle {} = {}", typeid(HandleType).name(), strm(mHandle)));
 				deleter(mHandle);
 			}
 			mHandle = VK_NULL_HANDLE;

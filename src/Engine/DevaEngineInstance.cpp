@@ -81,7 +81,6 @@ void DevaEngineInstance::destroy() {
 	auto i = instances.find(mID);
 	if (i != instances.end()) {
 		instances.erase(i);
-		LOG.e("WTF");
 	}
 }
 

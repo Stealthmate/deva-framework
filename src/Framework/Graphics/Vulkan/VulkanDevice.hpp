@@ -25,6 +25,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API VkDevice handle() const noexcept { return mHandle; }
 		DEVA_FRAMEWORK_API const VulkanDeviceFunctionSet& vk() const noexcept { return mVk; }
 		DEVA_FRAMEWORK_API const std::vector<VulkanDeviceQueue>& queues() const noexcept { return mQueues; }
+		DEVA_FRAMEWORK_API const VulkanPhysicalDeviceTraits& physicalDeviceTraits() const noexcept { return mPhysicalDeviceTraits; }
 
 		DEVA_FRAMEWORK_API std::vector<VulkanDeviceQueue> getQueuesOfFamily(VkQueueFlagBits type) const;
 
@@ -33,6 +34,7 @@ namespace DevaFramework
 		VkDevice mHandle;
 		VulkanDeviceFunctionSet mVk;
 		std::vector<VulkanDeviceQueue> mQueues;
+		VulkanPhysicalDeviceTraits mPhysicalDeviceTraits;
 
 		VulkanDevice(const VulkanDevice &dev) = delete;
 		VulkanDevice& operator=(const VulkanDevice &dev) = delete;
