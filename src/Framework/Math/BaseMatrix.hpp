@@ -130,7 +130,7 @@ namespace DevaFramework
 			The data inside is read-only and
 			cannot be modified. Can be to set uniform matrices in OpenGL functions.
 		*/
-		operator const T* const() const
+		operator const T* () const
 		{
 			return &data[0];
 		}
@@ -163,7 +163,7 @@ namespace DevaFramework
 
 
 		///@return A string representation of the matrix
-		virtual std::string to_str() const
+		std::string to_str() const
 		{
 			std::string res = "\nMat" + strm(n_vectors) + "x" + strm(vector_length) + ":\n";
 			for (int i = 0;i <= n_vectors - 1;i++)
