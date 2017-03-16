@@ -3,6 +3,8 @@
 
 #include "Config.hpp"
 
+#include "Scene.hpp"
+
 namespace DevaEngine
 {
 	class Renderer
@@ -11,6 +13,8 @@ namespace DevaEngine
 		Renderer();
 
 		virtual void renderExample() = 0;
+
+		virtual void render(const Scene &scene) = 0;
 
 		virtual ~Renderer() {}
 	};

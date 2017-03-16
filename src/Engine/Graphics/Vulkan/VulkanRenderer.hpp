@@ -3,7 +3,7 @@
 
 #include "Config.hpp"
 
-#include "Renderer.hpp"
+#include "..\Renderer.hpp"
 #include <DevaFramework/Graphics/Vulkan/VulkanInstance.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanDevice.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanCommandPool.hpp>
@@ -42,6 +42,8 @@ namespace DevaEngine
 		DEVA_ENGINE_API virtual void createPipeline();
 
 		DEVA_ENGINE_API virtual void renderExample();
+
+		DEVA_ENGINE_API virtual void render(const Scene& scene);
 
 		DEVA_ENGINE_API void destroy();
 		DEVA_ENGINE_API virtual ~VulkanRenderer();

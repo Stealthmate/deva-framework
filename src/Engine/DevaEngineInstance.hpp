@@ -3,7 +3,7 @@
 
 #include "Config.hpp"
 
-#include "VulkanRenderer.hpp"
+#include "Graphics\Vulkan\VulkanRenderer.hpp"
 #include "Input/InputListener.hpp"
 
 #include <DevaFramework\Include\Core.hpp>

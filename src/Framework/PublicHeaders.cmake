@@ -4,6 +4,7 @@ set(
 	${CURDIR}/Core/DevaLogger.cpp
 	${CURDIR}/Core/DevaLogger.hpp
 	${CURDIR}/Core/Exceptions.hpp
+	${CURDIR}/Core/Identifiable.hpp
 	${CURDIR}/Core/Logger.cpp
 	${CURDIR}/Core/Logger.hpp
 	${CURDIR}/Core/TypeInfo.hpp
@@ -12,6 +13,8 @@ set(
 	${CURDIR}/Core/Exceptions/DevaExternalFailureException.cpp
 	${CURDIR}/Core/Exceptions/DevaExternalFailureException.hpp
 	${CURDIR}/Core/Exceptions/DevaInitializationFailureException.hpp
+	${CURDIR}/Core/Exceptions/DevaUnsupportedOperationException.cpp
+	${CURDIR}/Core/Exceptions/DevaUnsupportedOperationException.hpp
 	${CURDIR}/Graphics/Config.hpp
 	${CURDIR}/Graphics/Font.hpp
 	${CURDIR}/Graphics/Image.cpp
@@ -61,6 +64,7 @@ set(
 	${CURDIR}/Graphics/Vulkan/VertexInputBinding.cpp
 	${CURDIR}/Graphics/Vulkan/VertexInputBinding.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanAPI.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanBuffer.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanBuffer.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.hpp
@@ -76,6 +80,8 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanLogicalDevice.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanMemory.cpp
+	${CURDIR}/Graphics/Vulkan/VulkanMemory.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPhysicalDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPhysicalDevice.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipeline.hpp
@@ -98,6 +104,12 @@ set(
 	${CURDIR}/Math/Quaternion.cpp
 	${CURDIR}/Math/Quaternion.hpp
 	${CURDIR}/Math/Vector.hpp
+	${CURDIR}/Math/Geometry/Common.hpp
+	${CURDIR}/Math/Geometry/Config.hpp
+	${CURDIR}/Math/Geometry/Shape.cpp
+	${CURDIR}/Math/Geometry/Shape.hpp
+	${CURDIR}/Math/Geometry/Triangle.cpp
+	${CURDIR}/Math/Geometry/Triangle.hpp
 	${CURDIR}/Memory/Allocator.cpp
 	${CURDIR}/Memory/Allocator.hpp
 	${CURDIR}/Memory/Config.hpp

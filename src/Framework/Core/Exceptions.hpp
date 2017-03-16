@@ -5,5 +5,6 @@
 
 #include "Exceptions\DevaException.hpp"
 #include "Exceptions\DevaExternalFailureException.hpp"
+#include "Exceptions\DevaUnsupportedOperationException.hpp"
 
 #endif //DEVA_FRAMEWORK_SYSTEM_EXCEPTIONS_H

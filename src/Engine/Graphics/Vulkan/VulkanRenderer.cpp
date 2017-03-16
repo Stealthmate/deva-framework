@@ -8,13 +8,15 @@
 #include <DevaFramework\Graphics\Vulkan\VulkanBuffer.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanMemory.hpp>
 #include <limits>
+#include <thread>
 
 using namespace DevaFramework;
 using namespace DevaEngine;
 
 VertexBuffer createVertexBuffer(float f = 0.0f) {
+	//LOG.i(strm(f));
 	ByteBuffer buf(72);
-	buf << +0.0f << -0.5f << +0.0f << +1.0f << +0.0f + f << +1.0f;
+	buf << +0.0f + f << -0.5f << +0.0f << +1.0f << +0.0f + f << +1.0f;
 	buf << +0.5f << +0.5f << +0.0f << +0.0f << +1.0f << +1.0f;
 	buf << -0.5f << +0.5f << +0.0f << +0.0f << +0.0f + f << +1.0f;
 
@@ -207,6 +209,7 @@ VulkanRenderer::VulkanRenderer(const Window &wnd)
 	uint32_t queueIndex = 0;
 	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
 	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
+	ENGINE_LOG.i(main_device.physicalDeviceTraits().to_string());
 	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties().deviceName));
 
 	this->renderQueue = queueIndex;
@@ -289,7 +292,6 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 
 	this->swapchain = VulkanSwapchain::createSwapchain(this->main_device, swapchainCreateInfo);
 }
-
 VulkanHandle<VkSemaphore> imageAvailableSemaphore;
 VulkanHandle<VkSemaphore> renderFinishedSemaphore;
 std::vector<VkCommandBuffer> commandBuffers;
@@ -300,7 +302,7 @@ void VulkanRenderer::createPipeline()
 {
 	auto vert = Vulkan::loadShaderFromFile(this->main_device, "shaders/vert.spv");
 	auto frag = Vulkan::loadShaderFromFile(this->main_device, "shaders/frag.spv");
-
+	
 	VulkanGraphicsPipelineBuilder plb;
 	plb.attachShader(vert, VK_SHADER_STAGE_VERTEX_BIT, "main")
 		.attachShader(frag, VK_SHADER_STAGE_FRAGMENT_BIT, "main")
@@ -396,12 +398,12 @@ void VulkanRenderer::createPipeline()
 }
 
 float f = 0.0f;
-float df = 0.001f;
+float df = 0.01f;
 bool drawn = false;
 
 void VulkanRenderer::drawFrame()
 {
-	if (drawn) return;
+	//if (drawn) return;
 	auto &vk = main_device.vk();
 	auto device = main_device.handle();
 
@@ -539,5 +541,13 @@ void VulkanRenderer::destroy() {
 		this->pipeline.replace();
 		this->commandPool.replace();
 
+	}
+}
+
+void VulkanRenderer::render(const Scene& scene) 
+{
+	auto &objs = scene.getAllObjects();
+	for (auto &object : objs) {
+		
 	}
 }

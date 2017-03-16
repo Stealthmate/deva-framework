@@ -1,6 +1,7 @@
 #include <DevaEngine\DevaEngineInstance.hpp>
 #include <DevaFramework\Graphics\Vulkan\Config.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanHandle.hpp>
+#include <DevaFramework\Math\Vector.hpp>
 
 using namespace DevaEngine;
 using namespace DevaFramework;
