@@ -12,7 +12,7 @@ function(add_approval_test name)
 	endif()
 
 	add_executable(test-${name} ${CURDIR}/test-${name}.cpp ${__OPTIONAL_SRCS})
-	target_link_libraries(test-${name} ${DEVA_ENGINE_LINK_LIBRARIES})
+	SET_LINK_LIBRARIES(test-${name} DEVA_ENGINE_LINK_LIBRARIES_DEBUG DEVA_ENGINE_LINK_LIBRARIES)
 	target_include_directories(test-${name} PUBLIC ${DEVA_ENGINE_PUBLIC_INCLUDE_DIR} ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR})
 
 	set(TEST_LIST ${TEST_LIST} test-${name} PARENT_SCOPE)
@@ -60,7 +60,20 @@ add_custom_target(testsFramework)
 foreach(source IN LISTS TESTS_FRAMEWORK)
 	get_filename_component(name "${source}" NAME_WE)
 	add_executable(${name} ${source})
-	target_link_libraries(${name} deva-Framework)
+	SET_LINK_LIBRARIES(${name} DEVA_FRAMEWORK_LINK_LIBRARIES_DEBUG DEVA_FRAMEWORK_LINK_LIBRARIES)
+	target_include_directories(${name} PUBLIC ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR})
+	add_dependencies(testsFramework ${name})
+endforeach()
+
+file(GLOB TESTS_ENGINE
+  "tests/Engine/test*.cpp"
+)
+
+add_custom_target(testsEngine)
+foreach(source IN LISTS TESTS_ENGINE)
+	get_filename_component(name "${source}" NAME_WE)
+	add_executable(${name} ${source})
+	SET_LINK_LIBRARIES(${name} DEVA_ENGINE_LINK_LIBRARIES_DEBUG DEVA_ENGINE_LINK_LIBRARIES)
 	target_include_directories(${name} PUBLIC ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR})
 	add_dependencies(testsFramework ${name})
 endforeach()

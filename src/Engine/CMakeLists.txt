@@ -10,13 +10,20 @@ message("Generating DevaEngine build files...")
 include(${CURDIR}/SourceList.cmake)
 include(${CURDIR}/PublicHeaders.cmake)
 
-set(SRCS ${DEVA_ENGINE_SOURCE_LIST})
-add_library(deva-Engine ${LIBTYPE} ${SRCS})
-add_dependencies(deva-Engine deva-Framework)
+set(DEVA_ENGINE_LIB deva-Engine)
+set(DEVA_ENGINE_LIB_DEBUG ${DEVA_ENGINE_LIB}${CMAKE_DEBUG_POSTFIX})
 
-set_target_properties(deva-Engine PROPERTIES COMPILE_DEFINITIONS ${DEVA_BUILD_DEFINES})
-target_link_libraries(deva-Engine deva-Framework ${DEVA_FRAMEWORK_DEP})
-target_include_directories(deva-Engine PRIVATE ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR})
+set(DEVA_ENGINE_LINK_LIBRARIES ${DEVA_ENGINE_LIB} ${DEVA_FRAMEWORK_LINK_LIBRARIES})
+set(DEVA_ENGINE_LINK_LIBRARIES_DEBUG ${DEVA_ENGINE_LIB_DEBUG} ${DEVA_FRAMEWORK_LINK_LIBRARIES_DEBUG})
+
+set(SRCS ${DEVA_ENGINE_SOURCE_LIST})
+add_library(${DEVA_ENGINE_LIB} ${LIBTYPE} ${SRCS})
+add_dependencies(${DEVA_ENGINE_LIB} ${DEVA_FRAMEWORK_LIB})
+
+set_target_properties(${DEVA_ENGINE_LIB} PROPERTIES COMPILE_DEFINITIONS ${DEVA_BUILD_DEFINES})
+SET_LINK_LIBRARIES(${DEVA_ENGINE_LIB} DEVA_FRAMEWORK_LINK_LIBRARIES_DEBUG DEVA_FRAMEWORK_LINK_LIBRARIES)
+
+target_include_directories(${DEVA_ENGINE_LIB} PRIVATE ${DEVA_FRAMEWORK_PUBLIC_INCLUDE_DIR})
 
 foreach(source IN LISTS SRCS)
     get_filename_component(source_path "${source}" ABSOLUTE)
