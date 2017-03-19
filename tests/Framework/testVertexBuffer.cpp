@@ -46,8 +46,8 @@ TEST_F(BufferTester, testByteBuffer)
 	bbuf.setPosition(0);
 
 	VertexBuffer vbremapped = VertexBuffer::convertToLayout(*buffer, SEPARATE);
-	ByteBuffer remapped = ByteBuffer(vbremapped.buffer());
-	ByteBuffer init = ByteBuffer(buffer->buffer());
+	ByteBuffer remapped = ByteBuffer(vbremapped.vertexData());
+	ByteBuffer init = ByteBuffer(buffer->vertexData());
 	for (size_t i = 0;i < 9;i++)
 	{
 		float ref;
@@ -58,7 +58,7 @@ TEST_F(BufferTester, testByteBuffer)
 	}
 
 	cout << "Convert INTERLEAVED to SEPARATE works" << endl;
-	remapped = VertexBuffer::convertToLayout(vbremapped, INTERLEAVED).buffer();
+	remapped = VertexBuffer::convertToLayout(vbremapped, INTERLEAVED).vertexData();
 	for (size_t i = 0;i < 9;i++)
 	{
 		float ref;
