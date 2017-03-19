@@ -72,7 +72,8 @@ namespace DevaFramework {
 			return !this->operator==(rhs);
 		}
 
-		virtual ~VulkanHandle()
+		
+		~VulkanHandle()
 		{
 			cleanup();
 		}

@@ -13,7 +13,6 @@ namespace {
 VulkanHandle<VkShaderModule> Vulkan::loadShaderFromFile(const VulkanDevice &dev, const char *filepath)
 {
 	auto src = readBinaryFile(filepath);
-
 	VkShaderModuleCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.codeSize = src.size();
