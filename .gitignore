@@ -12,3 +12,4 @@ dep/**
 shaders/*.spv
 src/include/**
 lib/**
+clang/**
