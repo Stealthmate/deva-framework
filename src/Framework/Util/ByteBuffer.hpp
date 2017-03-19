@@ -23,8 +23,8 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API ByteBuffer(size_t size);
 		DEVA_FRAMEWORK_API ByteBuffer(const std::vector<byte_t> &buffer);
 
-		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count);
-		DEVA_FRAMEWORK_API virtual void read(byte_t* dest, size_t count);
+		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count) override;
+		DEVA_FRAMEWORK_API virtual void read(byte_t* dest, size_t count) override;
 
 		DEVA_FRAMEWORK_API void setPosition(size_t new_pos);
 		DEVA_FRAMEWORK_API size_t getPosition() const;

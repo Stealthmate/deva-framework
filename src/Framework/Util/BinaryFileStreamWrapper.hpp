@@ -18,8 +18,8 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API BinaryFileStreamWrapper();
 		DEVA_FRAMEWORK_API BinaryFileStreamWrapper(const std::string &path, std::ios::openmode openmode = std::ios::in);
 
-		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count);
-		DEVA_FRAMEWORK_API virtual void read(byte_t* data, size_t count);
+		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count) override;
+		DEVA_FRAMEWORK_API virtual void read(byte_t* data, size_t count) override;
 	};
 }
 
