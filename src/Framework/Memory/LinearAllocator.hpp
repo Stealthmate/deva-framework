@@ -17,8 +17,8 @@ class LinearAllocator : public Allocator
 
 public:
 
-    virtual Memory allocate(std::size_t _size) const;
-    virtual bool deallocate(Memory p) const;
+    virtual Memory allocate(std::size_t _size) const override;
+    virtual bool deallocate(Memory p) const override;
 
     LinearAllocator();
     LinearAllocator(std::size_t _size);
@@ -26,7 +26,7 @@ public:
 
     LinearAllocator& operator=(LinearAllocator &&linAlloc);
 
-    virtual ~LinearAllocator();
+    virtual ~LinearAllocator() override;
 };
 
 
