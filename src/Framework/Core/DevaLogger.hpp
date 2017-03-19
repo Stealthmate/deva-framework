@@ -37,7 +37,7 @@ namespace DevaFramework
 	public:
 		DEVA_FRAMEWORK_API DevaLogger(const std::string &stamp);
 
-		inline virtual std::string stamp() const { return this->stampstr; }
+		inline std::string stamp() const { return this->stampstr; }
 
 #define MAKE_LOG_FUNCTION(fname, ll) \
 	DEVA_FRAMEWORK_API inline virtual void fname(const std::string &msg, bool newline = true) const { printStamped(msg, ll, newline); }
@@ -58,7 +58,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API void printStamped(const std::string &msg, LogLevel loglvl, bool newline = false) const;
 
 	protected:
-		DEVA_FRAMEWORK_API virtual const Logger& print(const std::string &msg) const;
+		DEVA_FRAMEWORK_API virtual const Logger& print(const std::string &msg) const override;
 	};
 
 	DEVA_FRAMEWORK_API extern DevaLogger LOG;

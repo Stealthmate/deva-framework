@@ -22,45 +22,45 @@ typedef VertexBuffer::VertexBufferIteratorConst iteratorconst;
 typedef VertexBuffer::Vertex vertex;
 
 
-VertexBuffer VertexBuffer::convertToLayout(const VertexBuffer &buffer, VertexBufferLayout layout)
+VertexBuffer VertexBuffer::convertToLayout(const VertexBuffer &vertexData, VertexBufferLayout layout)
 {
 	std::vector<byte_t> data;
-	data.resize(buffer.buffer().size());
+	data.resize(vertexData.vertexData().size());
 
-	for (int i = 0;i < buffer.vertexCount();i++)
+	for (int i = 0;i < vertexData.vertexCount();i++)
 	{
 		size_t offset = 0;
-		for (int j = 0;j < buffer.elements().size();j++)
+		for (int j = 0;j < vertexData.elements().size();j++)
 		{
 			auto start = data.begin();
 			switch (layout)
 			{
 			case INTERLEAVED:
 			{
-				start += (i * buffer.vertexSize()) + offset;
+				start += (i * vertexData.vertexSize()) + offset;
 			}break;
 			case SEPARATE:
 			{
-				start += (offset * buffer.vertexCount()) + (i*buffer.elements()[j].size);
+				start += (offset * vertexData.vertexCount()) + (i*vertexData.elements()[j].size);
 			}break;
 			}
 
-			std::copy(buffer[i].elements[j], buffer[i].elements[j] + buffer.elements()[j].size, start);
+			std::copy(vertexData[i].elements[j], vertexData[i].elements[j] + vertexData.elements()[j].size, start);
 
-			offset += buffer.elements()[j].size;
+			offset += vertexData.elements()[j].size;
 		}
 	}
 
-	return VertexBuffer(data, buffer.vertexCount(), buffer.elements(), layout);
+	return VertexBuffer(data, vertexData.vertexCount(), vertexData.elements(), layout);
 }
 
 
 //-------VertexBufferIterator-------//
 
-iterator::VertexBufferIterator(VertexBuffer &buffer, size_t index) : buffer(buffer), index(index)
+iterator::VertexBufferIterator(VertexBuffer &vertexData, size_t index) : vertexData(vertexData), index(index)
 {
-	if (index >= buffer.vertexCount()) current = Vertex();
-	else current = buffer[index];
+	if (index >= vertexData.vertexCount()) current = Vertex();
+	else current = vertexData[index];
 }
 
 iterator iterator::operator++()
@@ -68,7 +68,7 @@ iterator iterator::operator++()
 	iterator i = *this;
 
 	i.index++;
-	i.current = buffer[index];
+	i.current = vertexData[index];
 
 	return i;
 }
@@ -78,7 +78,7 @@ iterator iterator::operator+(size_t increment)
 	iterator i = *this;
 
 	i.index += increment;
-	i.current = buffer[index];
+	i.current = vertexData[index];
 
 	return i;
 }
@@ -88,7 +88,7 @@ iterator iterator::operator--()
 	iterator i = *this;
 
 	i.index--;
-	i.current = buffer[index];
+	i.current = vertexData[index];
 
 	return i;
 }
@@ -105,7 +105,7 @@ vertex* iterator::operator->()
 
 bool iterator::operator==(const iterator &iter) const
 {
-	return &buffer == &iter.buffer && index == iter.index;
+	return &vertexData == &iter.vertexData && index == iter.index;
 }
 
 bool iterator::operator!=(const iterator &iter) const
@@ -115,10 +115,10 @@ bool iterator::operator!=(const iterator &iter) const
 
 //------VertexBufferIteratorConst-------//
 
-iteratorconst::VertexBufferIteratorConst(const VertexBuffer &buffer, size_t index) : buffer(buffer), index(index)
+iteratorconst::VertexBufferIteratorConst(const VertexBuffer &vertexData, size_t index) : vertexData(vertexData), index(index)
 {
-	if (index >= buffer.vertexCount()) current = Vertex();
-	else current = buffer[index];
+	if (index >= vertexData.vertexCount()) current = Vertex();
+	else current = vertexData[index];
 }
 
 
@@ -127,7 +127,7 @@ iteratorconst iteratorconst::operator++()
 	iteratorconst i = *this;
 
 	i.index++;
-	i.current = buffer[index];
+	i.current = vertexData[index];
 
 	return i;
 }
@@ -137,7 +137,7 @@ iteratorconst iteratorconst::operator+(size_t increment)
 	iteratorconst i = *this;
 
 	i.index += increment;
-	i.current = buffer[index];
+	i.current = vertexData[index];
 
 	return i;
 }
@@ -147,7 +147,7 @@ iteratorconst iteratorconst::operator--()
 	iteratorconst i = *this;
 
 	i.index--;
-	i.current = buffer[index];
+	i.current = vertexData[index];
 
 	return i;
 }
@@ -165,7 +165,7 @@ const vertex* iteratorconst::operator->() const
 
 bool iteratorconst::operator==(const iteratorconst &iter) const
 {
-	return &buffer == &iter.buffer && index == iter.index;
+	return &vertexData == &iter.vertexData && index == iter.index;
 }
 
 bool iteratorconst::operator!=(const iteratorconst &iter) const
@@ -180,7 +180,7 @@ vertex VertexBuffer::operator[](size_t index)
 	std::vector<byte_t*> ptrs;
 	ptrs.reserve(vertexSize());
 	size_t comp_offset = 0;
-	for (int i = 0;i < mElements.size();i++)
+	for (int i = 0;i < mVertexElementDescriptions.size();i++)
 	{
 		size_t start = 0;
 		switch (mLayout)
@@ -195,7 +195,7 @@ vertex VertexBuffer::operator[](size_t index)
 		}break;
 		}
 
-		ptrs.push_back(&mBuffer[start]);
+		ptrs.push_back(&mVertexData[start]);
 	}
 
 	return Vertex(ptrs);
@@ -206,7 +206,7 @@ const vertex VertexBuffer::operator[](size_t index) const
 	std::vector<byte_t*> ptrs;
 	ptrs.reserve(vertexSize());
 	size_t comp_offset = 0;
-	for (int i = 0;i < mElements.size();i++)
+	for (int i = 0;i < mVertexElementDescriptions.size();i++)
 	{
 		size_t start = 0;
 		switch (mLayout)
@@ -217,12 +217,12 @@ const vertex VertexBuffer::operator[](size_t index) const
 		}break;
 		case SEPARATE:
 		{
-			start += (comp_offset * mVertexCount) + (index*mElements[i].size);
+			start += (comp_offset * mVertexCount) + (index*mVertexElementDescriptions[i].size);
 		}break;
 		}
 
-		ptrs.push_back(const_cast<byte_t*>(&mBuffer[start]));
-		comp_offset += mElements[i].size;
+		ptrs.push_back(const_cast<byte_t*>(&mVertexData[start]));
+		comp_offset += mVertexElementDescriptions[i].size;
 	}
 
 	return Vertex(ptrs);
@@ -232,9 +232,9 @@ VertexBuffer::VertexBuffer(
 	const std::vector<byte_t> &data,
 	size_t vertexCount,
 	const std::vector<VertexDataElementDescription> &elements,
-	VertexBufferLayout layout) : mBuffer(data), mVertexCount(vertexCount), mElements(elements), mLayout(layout) {}
+	VertexBufferLayout layout) : mVertexData(data), mVertexCount(vertexCount), mVertexElementDescriptions(elements), mLayout(layout) {}
 
 size_t VertexBuffer::vertexSize() const
 {
-	return sumComponentSizes(mElements);
+	return sumComponentSizes(mVertexElementDescriptions);
 }

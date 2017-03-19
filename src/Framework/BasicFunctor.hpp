@@ -7,7 +7,8 @@ namespace DevaFramework
 {
 	class BasicFunctor
 	{
-		virtual 
+		
+
 	};
 }
 

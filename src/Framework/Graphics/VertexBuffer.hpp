@@ -3,24 +3,12 @@
 
 #include "Config.hpp"
 
+#include "Model.hpp"
+
 #include <vector>
 
 namespace DevaFramework
 {
-	enum VertexComponentType {
-		INT,
-		UINT,
-		FLOAT,
-		UFLOAT,
-		NORM,
-		UNORM
-	};
-
-	struct VertexDataElementDescription {
-		size_t size;
-		VertexComponentType type;
-		std::vector<size_t> componentBitsizes;
-	};
 
 	enum VertexBufferLayout {
 		INTERLEAVED,
@@ -31,7 +19,7 @@ namespace DevaFramework
 
 	public:
 
-		DEVA_FRAMEWORK_API static VertexBuffer convertToLayout(const VertexBuffer &buffer, VertexBufferLayout layout);
+		DEVA_FRAMEWORK_API static VertexBuffer convertToLayout(const VertexBuffer &vertexData, VertexBufferLayout layout);
 
 		struct Vertex {
 			std::vector<byte_t*> elements;
@@ -41,7 +29,7 @@ namespace DevaFramework
 		};
 
 		class VertexBufferIterator {
-			DEVA_FRAMEWORK_API VertexBufferIterator(VertexBuffer& buffer, size_t index);
+			DEVA_FRAMEWORK_API VertexBufferIterator(VertexBuffer& vertexData, size_t index);
 
 		public:
 			DEVA_FRAMEWORK_API VertexBufferIterator operator++();
@@ -54,7 +42,7 @@ namespace DevaFramework
 			DEVA_FRAMEWORK_API bool operator!=(const VertexBufferIterator &iter) const;
 
 		private:
-			VertexBuffer& buffer;
+			VertexBuffer& vertexData;
 			size_t index;
 			Vertex current;
 
@@ -62,7 +50,7 @@ namespace DevaFramework
 		};
 		class VertexBufferIteratorConst {
 
-			DEVA_FRAMEWORK_API VertexBufferIteratorConst(const VertexBuffer &buffer, size_t index);
+			DEVA_FRAMEWORK_API VertexBufferIteratorConst(const VertexBuffer &vertexData, size_t index);
 
 		public:
 			DEVA_FRAMEWORK_API VertexBufferIteratorConst operator++();
@@ -75,7 +63,7 @@ namespace DevaFramework
 			DEVA_FRAMEWORK_API bool operator!=(const VertexBufferIteratorConst &iter) const;
 
 		private:
-			const VertexBuffer& buffer;
+			const VertexBuffer& vertexData;
 			size_t index;
 			Vertex current;
 
@@ -83,9 +71,9 @@ namespace DevaFramework
 		};
 
 		DEVA_FRAMEWORK_API VertexBuffer(
-			const std::vector<byte_t> &buffer, 
+			const std::vector<byte_t> &vertexData, 
 			size_t vertexCount, 
-			const std::vector<VertexDataElementDescription> &mElements, 
+			const std::vector<VertexDataElementDescription> &mVertexElementDescriptions, 
 			VertexBufferLayout layout);
 
 		DEVA_FRAMEWORK_API VertexBufferIterator begin() { return VertexBufferIterator(*this, 0);  }
@@ -96,19 +84,18 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API Vertex operator[](size_t index);
 		DEVA_FRAMEWORK_API const Vertex operator[](size_t index) const;
 
-		DEVA_FRAMEWORK_API const std::vector<byte_t>& buffer() const { return mBuffer;  }
+		DEVA_FRAMEWORK_API const std::vector<byte_t>& vertexData() const { return mVertexData;  }
 
 		DEVA_FRAMEWORK_API size_t vertexCount() const { return mVertexCount; }
-		DEVA_FRAMEWORK_API std::vector<VertexDataElementDescription> elements() const { return mElements; }
+		DEVA_FRAMEWORK_API std::vector<VertexDataElementDescription> elements() const { return mVertexElementDescriptions; }
 		DEVA_FRAMEWORK_API size_t vertexSize() const;
 		DEVA_FRAMEWORK_API VertexBufferLayout layout() const { return mLayout;  }
 
 	private:
-		std::vector<byte_t> mBuffer;
+		std::vector<byte_t> mVertexData;
 		size_t mVertexCount;
-		std::vector<VertexDataElementDescription> mElements;
+		std::vector<VertexDataElementDescription> mVertexElementDescriptions;
 		VertexBufferLayout mLayout;
-		
 	};
 }
 

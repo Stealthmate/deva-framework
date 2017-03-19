@@ -15,11 +15,13 @@ namespace DevaFramework {
 		lua_State * mState;
 		std::unordered_map<std::string, LuaFunction> customFunctions;
 
+
+		LuaContext(const LuaContext &context) = delete;
+		LuaContext& operator=(const LuaContext &context) = delete;
+
 	public:
 		DEVA_FRAMEWORK_API LuaContext();
-		DEVA_FRAMEWORK_API LuaContext(const LuaContext &context) = delete;
 		DEVA_FRAMEWORK_API LuaContext(LuaContext &&context);
-		DEVA_FRAMEWORK_API LuaContext& operator=(const LuaContext &context) = delete;
 		DEVA_FRAMEWORK_API LuaContext& operator=(LuaContext &&context);
 		DEVA_FRAMEWORK_API ~LuaContext();
 

@@ -66,12 +66,12 @@ LRESULT CALLBACK DevaFramework::WindowsEventHandler(HWND hWnd, UINT uMsg, WPARAM
 		break;
 	case WM_INPUT:
 	{
-		char buffer[sizeof(RAWINPUT)] = {};
+		char vertexData[sizeof(RAWINPUT)] = {};
 		UINT size = sizeof(RAWINPUT);
-		GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, buffer, &size, sizeof(RAWINPUTHEADER));
+		GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, vertexData, &size, sizeof(RAWINPUTHEADER));
 
 		// extract keyboard raw input data
-		RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(buffer);
+		RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(vertexData);
 		WindowEventInfo info;
 		info.inputData = raw;
 		current_wnd.eventObserver->fire(info);
@@ -197,12 +197,12 @@ struct OSHandles_win32 : public OSHandles
 
 	OSHandles_win32(HWND _hwnd, HINSTANCE _hinstance) : _hwnd(_hwnd), _hinstance(_hinstance) {}
 
-	DEVA_FRAMEWORK_API virtual void* win32_hwnd() const
+	DEVA_FRAMEWORK_API virtual void* win32_hwnd() const override
 	{
 		return _hwnd;
 	}
 
-	DEVA_FRAMEWORK_API virtual void* win32_hinstance() const
+	DEVA_FRAMEWORK_API virtual void* win32_hinstance() const override
 	{
 		return _hinstance;
 	}

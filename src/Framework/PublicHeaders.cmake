@@ -8,6 +8,8 @@ set(
 	${CURDIR}/Core/Logger.cpp
 	${CURDIR}/Core/Logger.hpp
 	${CURDIR}/Core/TypeInfo.hpp
+	${CURDIR}/Core/Uuid.cpp
+	${CURDIR}/Core/Uuid.hpp
 	${CURDIR}/Core/Exceptions/DevaException.cpp
 	${CURDIR}/Core/Exceptions/DevaException.hpp
 	${CURDIR}/Core/Exceptions/DevaExternalFailureException.cpp
@@ -24,6 +26,10 @@ set(
 	${CURDIR}/Graphics/Init.cpp
 	${CURDIR}/Graphics/Init.hpp
 	${CURDIR}/Graphics/Master.hpp
+	${CURDIR}/Graphics/Model.cpp
+	${CURDIR}/Graphics/Model.hpp
+	${CURDIR}/Graphics/ModelBuilder.cpp
+	${CURDIR}/Graphics/ModelBuilder.hpp
 	${CURDIR}/Graphics/OpenGL.hpp
 	${CURDIR}/Graphics/VertexBuffer.cpp
 	${CURDIR}/Graphics/VertexBuffer.hpp
@@ -34,7 +40,6 @@ set(
 	${CURDIR}/Graphics/OpenGL/glConfig.hpp
 	${CURDIR}/Graphics/OpenGL/glFunctions.hpp
 	${CURDIR}/Graphics/OpenGL/glTypes.hpp
-	${CURDIR}/Graphics/OpenGL/Model.cpp
 	${CURDIR}/Graphics/OpenGL/Model.hpp
 	${CURDIR}/Graphics/OpenGL/Shader.cpp
 	${CURDIR}/Graphics/OpenGL/Shader.hpp
@@ -89,6 +94,7 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanSurface.hpp
 	${CURDIR}/Graphics/Vulkan/win32_LoadVulkan.cpp
 	${CURDIR}/Include/Core.hpp
+	${CURDIR}/Include/Math.hpp
 	${CURDIR}/Include/Window.hpp
 	${CURDIR}/Math/BaseMatrix.hpp
 	${CURDIR}/Math/BaseVector.hpp
@@ -138,6 +144,8 @@ set(
 	${CURDIR}/Util/Init.cpp
 	${CURDIR}/Util/Init.hpp
 	${CURDIR}/Util/Master.hpp
+	${CURDIR}/Util/Time.cpp
+	${CURDIR}/Util/Time.hpp
 	${CURDIR}/Window/Config.hpp
 	${CURDIR}/Window/ImplWindow.cpp
 	${CURDIR}/Window/Init.cpp
