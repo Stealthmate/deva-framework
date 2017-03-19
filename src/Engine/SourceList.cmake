@@ -2,10 +2,12 @@ set(
 	DEVA_ENGINE_SOURCE_LIST
 	${CURDIR}/Graphics/Camera.hpp
 	${CURDIR}/Graphics/Config.hpp
-	${CURDIR}/Graphics/GraphicsObject.hpp
 	${CURDIR}/Graphics/Renderer.cpp
 	${CURDIR}/Graphics/Renderer.hpp
+	${CURDIR}/Graphics/Scene.cpp
 	${CURDIR}/Graphics/Scene.hpp
+	${CURDIR}/Graphics/SceneBuilder.cpp
+	${CURDIR}/Graphics/SceneBuilder.hpp
 	${CURDIR}/Graphics/GUI/Component.hpp
 	${CURDIR}/Graphics/Vulkan/Config.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipeline.hpp

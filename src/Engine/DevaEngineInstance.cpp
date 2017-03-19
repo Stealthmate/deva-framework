@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "DevaEngineInstance.hpp"
 
 #include <vector>
@@ -13,12 +14,13 @@ namespace
 	{
 	public:
 
-		virtual bool onKeyDown(Key k)
+
+		bool onKeyDown(Key k) override
 		{
 			LOG.i("Ya!\n");
 			return true;
 		}
-		virtual bool onKeyUp(Key k)
+		virtual bool onKeyUp(Key k) override
 		{
 			return true;
 		}
@@ -61,10 +63,45 @@ DevaEngineInstance::DevaEngineInstance(DevaEngineInstance &&instance)
 	instance.mID = UINT64_MAX;
 }
 
+constexpr int FRAMERATEMARK = 1000;
+std::array<long long, FRAMERATEMARK> framerate;
+static int i = 0;
+static double fps = 0;
+static double AVG = 0;
+static long long lastFrame = 0;
+#include <DevaFramework\Util\Time.hpp>
+
+void printframerate() {
+	float avg = 0;
+	float sum = 0;
+	for (int j = 0;j < FRAMERATEMARK;j++) {
+		sum += framerate[j] / 1000000.f;
+		//LOG.d("FRAME " + strm(framerate[j]));
+	}
+	avg = sum / (float)FRAMERATEMARK;
+	LOG.d("Framerate: " + strm(1.f / avg));
+}
+
 bool DevaEngineInstance::update()
 {
+	auto t1 = getSystemTime(TimeUnit::MICROSECONDS);
+	//if (t1 - lastFrame < 12000) return wnd->update();
 	renderer->renderExample();
-	return wnd->update();
+	bool result = wnd->update();
+	auto t2 = getSystemTime(TimeUnit::MICROSECONDS);
+	if (lastFrame == 0) t2 = t2 - t1;
+	auto sec = (t2 - lastFrame) / 1000000.0;
+	lastFrame = t2;
+	AVG = AVG + sec;
+	i++;
+	fps = i / AVG;
+	if (i == FRAMERATEMARK) {
+		LOG.d("SEC " + strm(AVG / i));
+		LOG.d("FPS: " + strm(fps));
+		AVG = 0;
+		i = 0;
+	}
+	return result;
 }
 
 Renderer& DevaEngineInstance::getRenderer()

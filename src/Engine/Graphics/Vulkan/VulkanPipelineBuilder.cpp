@@ -187,7 +187,7 @@ VulkanHandle<VkPipeline> VulkanGraphicsPipelineBuilder::build(const VulkanDevice
 		bd.inputRate = vib.inputRate();
 		bd.stride = vib.stride();
 		bindingDescriptions.push_back(bd);
-		auto & attrs = vib.attributes();
+		auto attrs = vib.attributes();
 		attrDescriptions.insert(attrDescriptions.end(), attrs.begin(), attrs.end());
 	}
 

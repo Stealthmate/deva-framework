@@ -22,7 +22,8 @@ namespace DevaEngine
 		DEVA_ENGINE_API InputFunction(rawfunc vk);
 		DEVA_ENGINE_API InputFunction(lambdafunc& vk);
 
-		DEVA_ENGINE_API virtual bool operator()();
+		DEVA_ENGINE_API 
+			bool operator()();
 	};
 }
 

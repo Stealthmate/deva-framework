@@ -14,7 +14,7 @@ namespace DevaEngine
 
 		virtual void renderExample() = 0;
 
-		virtual void render(const Scene &scene) = 0;
+		virtual std::shared_ptr<Scene> render(std::shared_ptr<Scene> scene) = 0;
 
 		virtual ~Renderer() {}
 	};

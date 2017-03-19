@@ -35,15 +35,15 @@ namespace DevaEngine
 
 		std::unique_ptr<Renderer> renderer;
 		DevaEngineInstance(const DevaEngineInstanceCreateInfo &info, uint64_t id);
+		DevaEngineInstance(const DevaEngineInstance &instance) = delete;
+		DevaEngineInstance& operator=(const DevaEngineInstance &instance) = delete;
+		DevaEngineInstance& operator=(DevaEngineInstance &&instance) = delete;
 		
 
 	public:
 
 		DEVA_ENGINE_API DevaEngineInstance();
 
-		DEVA_ENGINE_API DevaEngineInstance(const DevaEngineInstance &instance) = delete;
-		DEVA_ENGINE_API DevaEngineInstance& operator=(const DevaEngineInstance &instance) = delete;
-		DEVA_ENGINE_API DevaEngineInstance& operator=(DevaEngineInstance &&instance) = delete;
 		DEVA_ENGINE_API DevaEngineInstance(DevaEngineInstance &&instance);
 		DEVA_ENGINE_API ~DevaEngineInstance();
 
