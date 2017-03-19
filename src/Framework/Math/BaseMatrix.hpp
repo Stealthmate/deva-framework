@@ -1,11 +1,11 @@
 #ifndef DEVA_FRAMEWORK_MATH_BASE_MATRIX_H
 #define DEVA_FRAMEWORK_MATH_BASE_MATRIX_H
 
+#include "Config.hpp"
+
 #include <initializer_list>
 #include <string>
-#include <iostream>
-
-#include "Config.hpp"
+#include <array>
 
 namespace DevaFramework
 {
@@ -161,6 +161,12 @@ namespace DevaFramework
 			return result;
 		}
 
+		std::array<byte_t, n_vectors * vector_length * sizeof(T)> asBytes() const
+		{
+			std::array<byte_t, n_vectors * vector_length * sizeof(T)> arr;
+			memcpy(arr.data(), data, arr.max_size());
+			return arr;
+		}
 
 		///@return A string representation of the matrix
 		std::string to_str() const

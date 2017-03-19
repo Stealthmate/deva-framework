@@ -15,7 +15,7 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API const std::tuple<float, float, float>& angles() const noexcept { return mAngles; }
 		DEVA_FRAMEWORK_API const std::tuple<float, float, float>& edges() const noexcept { return mEdges; }
 
-		DEVA_FRAMEWORK_API virtual std::vector<Triangle> triangulate() const;
+		DEVA_FRAMEWORK_API virtual std::vector<Triangle> triangulate() const override;
 
 	private:
 		std::tuple<float, float, float> mAngles;

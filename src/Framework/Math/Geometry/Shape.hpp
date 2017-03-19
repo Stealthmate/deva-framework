@@ -17,7 +17,7 @@ namespace DevaFramework {
 
 		DEVA_FRAMEWORK_API Shape(const std::vector<vec3> &coords);
 
-		DEVA_FRAMEWORK_API virtual const std::vector<vec3>& coords() const noexcept final { return mCoords; }
+		DEVA_FRAMEWORK_API virtual const std::vector<vec3>& coords() const noexcept { return mCoords; }
 
 		DEVA_FRAMEWORK_API virtual std::vector<Triangle> triangulate() const;
 
