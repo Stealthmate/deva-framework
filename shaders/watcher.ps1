@@ -14,7 +14,7 @@ function global:compileShader {
     )
     $date = get-date -format hh:mm:ss
     write-host "$date Compiling $file..." -Foreground "green"
-    $output = glslangValidator.exe -V $file 2>&1
+    $output = glslangValidator.exe -V $file -o ($file -replace("\.(frag|vert)",".spv")) 2>&1
 
     $formattedOutput = @()
     $output | foreach {
@@ -42,7 +42,9 @@ function global:copyShader {
     )
     $date = get-date -format hh:mm:ss
     write-host "$date Copying $shader..."
-    $output = robocopy.exe .\ ..\bin\shaders $shader 2>&1 /NFL /NDL /NJH /NJS /nc /ns /np
+    $output = remove-item ..\bin\shaders\$shader
+    write-host $output
+    $output = robocopy.exe . ..\bin\shaders $shader /NFL /NDL /NJH /NJS /nc /ns /np
     $output = $output.trim()
     if($output)
     {
@@ -56,7 +58,7 @@ $changed = Register-ObjectEvent $watcher "Changed" -Action {
     if($global:shaderNameMask.Match($eventArgs.Name).Success)
     {
         compileShader $eventArgs.Name
-        $shader = $eventArgs.Name.replace("\.(vert|frag)",".spv")
+        $shader = $eventArgs.Name -replace("\.(vert|frag)",".spv")
         copyShader $shader
     }
 }
@@ -64,7 +66,7 @@ $created = Register-ObjectEvent $watcher "Created" -Action {
     if($global:shaderNameMask.Match($eventArgs.Name).Success)
     {
         compileShader $eventArgs.Name
-        $shader = $eventArgs.Name.replace("\.(vert|frag)",".spv")
+        $shader = $eventArgs.Name -replace("\.(vert|frag)",".spv")
         copyShader $shader
     }
 }
