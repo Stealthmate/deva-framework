@@ -34,6 +34,3 @@ foreach(source IN LISTS SRCS)
 		source_group("${source_path_msvc}" FILES "${source}")
 	endif()
 endforeach()
-
-set(GL_HEADER_DIR "../include/GL")
-set(GLBINDING_HEADER_DIR "../include/glbinding")

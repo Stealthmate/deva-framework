@@ -70,7 +70,9 @@ elseif (${COMPILER} STREQUAL MSVC) # For some reason CMake complains about deref
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${REQUIRED_COMPILER_VERSION_MSVC})
 		message( SEND_ERROR "Compiler version is lower than required (${REQUIRED_COMPILER_VERSION_MSVC})! Build may fail!")
 	endif()
-	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /std:c++latest" )
+	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /std:c++latest /EHsc" )
+	set(CMAKE_CXX_FLAGS_DEBUG "/MDd")
+	#message(${CMAKE_CXX_FLAGS})
 endif()
 
 #System dependencies
