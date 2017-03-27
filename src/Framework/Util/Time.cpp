@@ -5,6 +5,7 @@
 using namespace DevaFramework;
 
 namespace {
+	typedef std::chrono::nanoseconds Nanoseconds;
 	typedef std::chrono::microseconds Microseconds;
 	typedef std::chrono::milliseconds Milliseconds;
 	typedef std::chrono::seconds Seconds;
@@ -17,6 +18,7 @@ size_t DevaFramework::getSystemTime(TimeUnit unit) {
 	auto instant = Clock::now();
 
 	switch (unit) {
+	case NANOSECONDS: return std::chrono::time_point_cast<Nanoseconds>(instant).time_since_epoch().count();
 	case MICROSECONDS: return std::chrono::time_point_cast<Microseconds>(instant).time_since_epoch().count();
 	case MILLISECONDS: return std::chrono::time_point_cast<Milliseconds>(instant).time_since_epoch().count();
 	case SECONDS: return std::chrono::time_point_cast<Seconds>(instant).time_since_epoch().count();

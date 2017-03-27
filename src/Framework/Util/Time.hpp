@@ -6,6 +6,7 @@
 namespace DevaFramework {
 
 	enum TimeUnit {
+		NANOSECONDS,
 		MICROSECONDS,
 		MILLISECONDS,
 		SECONDS
