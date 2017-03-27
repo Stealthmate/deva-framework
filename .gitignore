@@ -13,3 +13,5 @@ shaders/*.spv
 src/include/**
 lib/**
 clang/**
+*.dir
+x64/**
