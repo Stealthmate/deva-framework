@@ -3,14 +3,14 @@
 
 #include "Config.hpp"
 
-#include "BinaryWriter.hpp"
-#include "BinaryReader.hpp"
+#include "ByteOutputStream.hpp"
+#include "ByteInputStream.hpp"
 
 #include <fstream>
 
 namespace DevaFramework
 {
-	class BinaryFileStreamWrapper: public BinaryWriter, public BinaryReader
+	class BinaryFileStreamWrapper: public ByteOutputStream, public ByteInputStream
 	{
 	public:
 		std::fstream stream;
@@ -18,8 +18,8 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API BinaryFileStreamWrapper();
 		DEVA_FRAMEWORK_API BinaryFileStreamWrapper(const std::string &path, std::ios::openmode openmode = std::ios::in);
 
-		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count) override;
-		DEVA_FRAMEWORK_API virtual void read(byte_t* data, size_t count) override;
+		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count, size_t offset = 0) override;
+		DEVA_FRAMEWORK_API virtual size_t read(byte_t* data, size_t count, size_t offset = 0) override;
 	};
 }
 

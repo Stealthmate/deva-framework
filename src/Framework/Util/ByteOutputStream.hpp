@@ -5,14 +5,15 @@
 
 namespace DevaFramework
 {
-	class BinaryWriter
+	class ByteOutputStream
 	{
 	public:
-		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count) = 0;
+		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count, size_t offset = 0) = 0;
+		//DEVA_FRAMEWORK_API virtual void flush() = 0;
 	};
 
 #define OVERLOAD_OP_INSERT(type) \
-	inline BinaryWriter& operator<<(BinaryWriter &writer, type data) { writer.write(reinterpret_cast<const byte_t*>(&data), sizeof(type)); return writer; }
+	inline ByteOutputStream& operator<<(ByteOutputStream &writer, type data) { writer.write(reinterpret_cast<const byte_t*>(&data), sizeof(type)); return writer; }
 
 	OVERLOAD_OP_INSERT(int8_t);
 	OVERLOAD_OP_INSERT(uint8_t);

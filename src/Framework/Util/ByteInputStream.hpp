@@ -5,14 +5,15 @@
 
 namespace DevaFramework
 {
-	class BinaryReader
+	class ByteInputStream
 	{
 	public:
-		DEVA_FRAMEWORK_API virtual void read(byte_t* dest, size_t count) = 0;
+		DEVA_FRAMEWORK_API virtual size_t read(byte_t* dest, size_t count, size_t offset = 0) = 0;
+		DEVA_FRAMEWORK_API virtual size_t available() const = 0;
 	};
 
 #define OVERLOAD_OP_EXTRACT(type) \
-	inline BinaryReader& operator >> (BinaryReader &reader, type &dest) { reader.read(reinterpret_cast<byte_t*>(&dest), sizeof(type)); return reader; };
+	inline ByteInputStream& operator >> (ByteInputStream &reader, type &dest) { reader.read(reinterpret_cast<byte_t*>(&dest), sizeof(type)); return reader; };
 
 	OVERLOAD_OP_EXTRACT(int8_t);
 	OVERLOAD_OP_EXTRACT(uint8_t);
