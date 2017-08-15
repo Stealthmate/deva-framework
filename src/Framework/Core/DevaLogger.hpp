@@ -55,7 +55,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API void toggleLevel(LogLevel level, bool enable);
 		DEVA_FRAMEWORK_API void setPrio(LogLevel level);
 
-		DEVA_FRAMEWORK_API void printStamped(const std::string &msg, LogLevel loglvl, bool newline = false) const;
+		DEVA_FRAMEWORK_API void printStamped(const std::string &msg, LogLevel loglvl, bool newline = false, bool omitStamp = false) const;
 
 	protected:
 		DEVA_FRAMEWORK_API virtual const Logger& print(const std::string &msg) const override;

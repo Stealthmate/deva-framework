@@ -29,20 +29,20 @@ DevaLogger::DevaLogger(const std::string &stampstr) : Logger(stampstr) {
 
 const Logger& DevaLogger::print(const std::string &msg) const
 {
-	printStamped(msg, UNSPECIFIED, false);
+	printStamped(msg, UNSPECIFIED, false, true);
 	return *this;
 }
 
 #pragma message("NEED TO FIX THIS FUNCTION -> DevaLogger:46")
 
-void DevaLogger::printStamped(const std::string &msg, LogLevel lvl, bool newline) const {
-	std::string priostamp = STAMPS.find(lvl)->second;
+void DevaLogger::printStamped(const std::string &msg, LogLevel lvl, bool newline, bool omitStamp) const {
+	std::string priostamp = omitStamp ? "" : stamp() + STAMPS.find(lvl)->second;
 	bool shouldPrint = loglvlstates[lvl];
 	if (shouldPrint) {
 		if (lvl > INFO)
-			std::cerr << stamp() << priostamp << msg;
+			std::cerr << priostamp << msg;
 		else
-			std::cout << stamp() << priostamp << msg;
+			std::cout << priostamp << msg;
 		if (newline) std::cout << std::endl;
 	}
 }
