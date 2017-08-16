@@ -17,6 +17,10 @@ size_t internal::ByteBufferStreamBase::getPosition() const {
 	return position;
 }
 
+void internal::ByteBufferStreamBase::revalidate() {
+	position = 0;
+}
+
 ByteBufferInputStream::ByteBufferInputStream(sptr<ByteBuffer> buffer) : ByteBufferStreamBase(buffer) {}
 ByteBufferInputStream::~ByteBufferInputStream() = default;
 

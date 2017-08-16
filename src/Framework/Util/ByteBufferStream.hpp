@@ -8,7 +8,7 @@
 namespace DevaFramework {
 
 	namespace internal {
-		class ByteBufferStreamBase : public ByteBuffer::ByteBufferViewer {
+		class ByteBufferStreamBase : public ByteBufferViewer {
 		public:
 
 			ByteBufferStreamBase(std::shared_ptr<ByteBuffer> buffer);
@@ -16,6 +16,7 @@ namespace DevaFramework {
 
 			DEVA_FRAMEWORK_API void setPosition(size_t pos);
 			DEVA_FRAMEWORK_API size_t getPosition() const;
+			DEVA_FRAMEWORK_API virtual void revalidate();
 
 		protected:
 
