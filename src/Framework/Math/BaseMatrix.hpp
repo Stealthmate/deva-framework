@@ -3,6 +3,9 @@
 
 #include "Config.hpp"
 
+#include "../Core/Serialization/Binary/BinarySerializable.hpp"
+#include "../Util/ByteBuffer.hpp"
+
 #include <initializer_list>
 #include <string>
 #include <array>
@@ -184,6 +187,39 @@ namespace DevaFramework
 		}
 
 	};
+
+
+	template<typename T, unsigned int n, unsigned int m>
+	struct SerialFixedSize<BaseMatrix<T, n, m>> {
+		static constexpr size_t v = n * m * sizeof(T);
+	};
+
+	template<typename T, unsigned int n, unsigned int m>
+	struct BinarySerializer<BaseMatrix<T, n, m>> {
+	public:
+		void operator()(const BaseMatrix<T, n, m> &mat, ByteOutputStream &stream) const {
+			for (int i = 0;i < n;i++) {
+				for (int j = 0;j < m;j++) {
+					stream << mat(i, j);
+				}
+			}
+		}
+	};
+
+	template<typename T, unsigned int n, unsigned int m>
+	struct BinaryDeserializer<BaseMatrix<T, n, m>> {
+	public:
+		BaseMatrix<T, n, m> operator()(ByteInputStream &stream) const {
+			BaseMatrix<T, n, m> mat;
+			for (int i = 0;i < n;i++) {
+				for (int j = 0;j < m;j++) {
+					stream >> mat(i, j);
+				}
+			}
+			return mat;
+		}
+	};
+
 }
 
 
