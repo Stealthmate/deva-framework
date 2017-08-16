@@ -11,9 +11,6 @@
 
 namespace DevaFramework
 {
-	namespace internal {
-		class ByteBufferView;
-	}
 
 	class ByteBuffer
 	{
@@ -21,40 +18,79 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API ByteBuffer();
 		DEVA_FRAMEWORK_API ByteBuffer(size_t size);
-		DEVA_FRAMEWORK_API ByteBuffer(const std::vector<byte_t> &buffer);
+		DEVA_FRAMEWORK_API ByteBuffer(std::unique_ptr<std::vector<byte_t>> buffer);
+		DEVA_FRAMEWORK_API ByteBuffer(ByteBuffer &&buffer);
 		DEVA_FRAMEWORK_API ~ByteBuffer();
 
-		DEVA_FRAMEWORK_API void write(const byte_t* data, size_t count, size_t offset = 0);
-		DEVA_FRAMEWORK_API size_t read(byte_t* dest, size_t count, size_t offset = 0);
+		DEVA_FRAMEWORK_API void write(const byte_t * data, size_t count, size_t pos, size_t offset = 0);
+		DEVA_FRAMEWORK_API size_t read(byte_t* dest, size_t count, size_t pos, size_t offset = 0) const;
 
-		DEVA_FRAMEWORK_API void writeAtPos(const byte_t * data, size_t count, size_t pos, size_t offset = 0);
-		DEVA_FRAMEWORK_API size_t readAtPos(byte_t* dest, size_t count, size_t pos, size_t offset = 0) const;
-
-		DEVA_FRAMEWORK_API void setPosition(size_t new_pos);
-		DEVA_FRAMEWORK_API size_t getPosition() const;
+#define READ_TYPE(type) \
+	inline void read(type *dest, size_t pos) const { read(reinterpret_cast<byte_t*>(dest), sizeof(type), pos); }
+		READ_TYPE(int8_t);
+		READ_TYPE(uint8_t);
+		READ_TYPE(int16_t);
+		READ_TYPE(uint16_t);
+		READ_TYPE(int32_t);
+		READ_TYPE(uint32_t);
+		READ_TYPE(int64_t);
+		READ_TYPE(uint64_t);
+		READ_TYPE(float_t);
+		READ_TYPE(double_t);
+#undef READ_TYPE
+#define WRITE_TYPE(type) \
+	inline void write(type dest, size_t pos) { write(reinterpret_cast<byte_t*>(&dest), sizeof(type), pos); }
+		WRITE_TYPE(int8_t);
+		WRITE_TYPE(uint8_t);
+		WRITE_TYPE(int16_t);
+		WRITE_TYPE(uint16_t);
+		WRITE_TYPE(int32_t);
+		WRITE_TYPE(uint32_t);
+		WRITE_TYPE(int64_t);
+		WRITE_TYPE(uint64_t);
+		WRITE_TYPE(float_t);
+		WRITE_TYPE(double_t);
+#undef WRITE_TYPE
 
 		DEVA_FRAMEWORK_API size_t size() const;
 
 		DEVA_FRAMEWORK_API void resize(size_t new_size);
 
 		DEVA_FRAMEWORK_API const std::vector<byte_t>& buf() const;
-		DEVA_FRAMEWORK_API std::vector<byte_t>& buf();
 
 		DEVA_FRAMEWORK_API const ByteBuffer shallowCopy() const;
 		DEVA_FRAMEWORK_API ByteBuffer shallowCopy();
 		DEVA_FRAMEWORK_API ByteBuffer slice(size_t start, size_t end) const;
 
-		DEVA_FRAMEWORK_API std::weak_ptr<ByteInputStream> asReadOnly(size_t start = 0, size_t end = 0) const;
-		DEVA_FRAMEWORK_API std::weak_ptr<ByteOutputStream> asWriteOnly(size_t start = 0, size_t end = 0, bool autoexpand = false);
+		class ByteBufferViewer {
+		public:
+			DEVA_FRAMEWORK_API void invalidate();
 
+			DEVA_FRAMEWORK_API ByteBufferViewer(std::shared_ptr<ByteBuffer> buffer);
+			DEVA_FRAMEWORK_API virtual ~ByteBufferViewer();
 
+			DEVA_FRAMEWORK_API bool valid() const;
+
+		protected:
+
+			DEVA_FRAMEWORK_API ByteBuffer& buffer();
+			DEVA_FRAMEWORK_API const ByteBuffer& buffer() const;
+
+		private:
+			std::weak_ptr<ByteBuffer> mBuffer;
+			bool mValid;
+		};
+
+		DEVA_FRAMEWORK_API void subscribeViewer(ByteBufferViewer *viewer) const;
+		DEVA_FRAMEWORK_API void unsubscribeViewer(ByteBufferViewer *viewer) const;
 	private:
 
-		std::vector<byte_t> buffer;
-		size_t position;
+		std::unique_ptr<std::vector<byte_t>> buffer;
 
-		mutable std::vector<std::shared_ptr<internal::ByteBufferView>> viewers;
+		mutable std::vector<ByteBufferViewer*> viewers;
+
 	};
+
 }
 
 #endif //DEVA_FRAMEWORK_UTIL_BYTE_BUFFER_H

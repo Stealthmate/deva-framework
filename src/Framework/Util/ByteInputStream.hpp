@@ -25,9 +25,7 @@ namespace DevaFramework
 	OVERLOAD_OP_EXTRACT(uint64_t);
 	OVERLOAD_OP_EXTRACT(float);
 	OVERLOAD_OP_EXTRACT(double);
-
 #undef OVERLOAD_OP_EXTRACT
-
 }
 
 
