@@ -3,7 +3,7 @@
 
 #include "Config.hpp"
 #include "ByteBufferStream.hpp"
-#include "../Core/Serializable.hpp"
+#include "../Core/Serialization/Binary/BinarySerializable.hpp"
 #include <vector>
 #include <tuple>
 #include <string>
