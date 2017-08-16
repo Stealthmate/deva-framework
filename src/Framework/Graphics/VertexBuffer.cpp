@@ -24,15 +24,18 @@ typedef VertexBuffer::Vertex vertex;
 
 VertexBuffer VertexBuffer::convertToLayout(const VertexBuffer &vertexData, VertexBufferLayout layout)
 {
-	std::vector<byte_t> data;
-	data.resize(vertexData.vertexData().size());
+	if (!vertexData.isActive()) {
+		throw DevaException("Buffer has been released");
+	}
+
+	auto data = std::make_unique<std::vector<byte_t>>(vertexData.vertexData().size());
 
 	for (int i = 0;i < vertexData.vertexCount();i++)
 	{
 		size_t offset = 0;
 		for (int j = 0;j < vertexData.elements().size();j++)
 		{
-			auto start = data.begin();
+			auto start = data->begin();
 			switch (layout)
 			{
 			case INTERLEAVED:
@@ -51,7 +54,7 @@ VertexBuffer VertexBuffer::convertToLayout(const VertexBuffer &vertexData, Verte
 		}
 	}
 
-	return VertexBuffer(data, vertexData.vertexCount(), vertexData.elements(), layout);
+	return VertexBuffer(std::move(data), vertexData.vertexCount(), vertexData.elements(), layout);
 }
 
 
@@ -177,6 +180,10 @@ bool iteratorconst::operator!=(const iteratorconst &iter) const
 
 vertex VertexBuffer::operator[](size_t index)
 {
+	if (!isActive()) {
+		throw DevaException("Buffer has been released");
+	}
+
 	std::vector<byte_t*> ptrs;
 	ptrs.reserve(vertexSize());
 	size_t comp_offset = 0;
@@ -195,7 +202,7 @@ vertex VertexBuffer::operator[](size_t index)
 		}break;
 		}
 
-		ptrs.push_back(&mVertexData[start]);
+		ptrs.push_back(&(*mVertexData)[start]);
 	}
 
 	return Vertex(ptrs);
@@ -203,6 +210,10 @@ vertex VertexBuffer::operator[](size_t index)
 
 const vertex VertexBuffer::operator[](size_t index) const
 {
+	if (!isActive()) {
+		throw DevaException("Buffer has been released");
+	}
+
 	std::vector<byte_t*> ptrs;
 	ptrs.reserve(vertexSize());
 	size_t comp_offset = 0;
@@ -221,7 +232,7 @@ const vertex VertexBuffer::operator[](size_t index) const
 		}break;
 		}
 
-		ptrs.push_back(const_cast<byte_t*>(&mVertexData[start]));
+		ptrs.push_back(const_cast<byte_t*>(&(*mVertexData)[start]));
 		comp_offset += mVertexElementDescriptions[i].size;
 	}
 
@@ -229,12 +240,24 @@ const vertex VertexBuffer::operator[](size_t index) const
 }
 
 VertexBuffer::VertexBuffer(
-	const std::vector<byte_t> &data,
+	std::unique_ptr<std::vector<byte_t>> data,
 	size_t vertexCount,
 	const std::vector<VertexDataElementDescription> &elements,
-	VertexBufferLayout layout) : mVertexData(data), mVertexCount(vertexCount), mVertexElementDescriptions(elements), mLayout(layout) {}
+	VertexBufferLayout layout) : mVertexData(std::move(data)), mVertexCount(vertexCount), mVertexElementDescriptions(elements), mLayout(layout) {}
 
 size_t VertexBuffer::vertexSize() const
 {
+	if (!isActive()) {
+		throw DevaException("Buffer has been released");
+	}
+
 	return sumComponentSizes(mVertexElementDescriptions);
+}
+
+bool VertexBuffer::isActive() const {
+	return !!mVertexData;
+}
+
+std::unique_ptr<std::vector<byte_t>> VertexBuffer::release() {
+	return std::move(mVertexData);
 }

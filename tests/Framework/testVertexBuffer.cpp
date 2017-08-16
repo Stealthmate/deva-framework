@@ -1,5 +1,5 @@
 #include <DevaFramework\Graphics\VertexBuffer.hpp>
-#include <DevaFramework\Util\ByteBuffer.hpp>
+#include <DevaFramework\Util\ByteBufferStream.hpp>
 #include <gtest\gtest.h>
 
 using namespace DevaFramework;
@@ -12,16 +12,17 @@ protected:
 
 	void SetUp() {
 
-		ByteBuffer bbuf(60);
-		*bbuf.asWriteOnly().lock() << 1.f << 1.1f << 1.2f << 1.3f << 1.4f << 1.5f;
-		*bbuf.asWriteOnly().lock() << 2.1f << 2.2f << 2.3f << 2.4f << 2.5f;
-		*bbuf.asWriteOnly().lock() << 3.1f << 3.2f << 3.3f << 3.4f << 3.5f;
+		auto bbuf = std::make_shared<ByteBuffer>(60);
+		auto ostr = ByteBufferOutputStream(bbuf);
+		ostr << 1.f << 1.1f << 1.2f << 1.3f << 1.4f << 1.5f;
+		ostr << 2.1f << 2.2f << 2.3f << 2.4f << 2.5f;
+		ostr << 3.1f << 3.2f << 3.3f << 3.4f << 3.5f;
 		vector<VertexDataElementDescription> elements;
 		vector<size_t> components = { 32, 32, 32 };
 		elements.push_back({ 3 * 4, FLOAT, components });
 		components = { 32, 32 };
 		elements.push_back({ 2 * 4, FLOAT, components });
-		buffer = new VertexBuffer(bbuf.buf(), 3, elements, INTERLEAVED);
+		buffer = new VertexBuffer(bbuf->release(), 3, elements, INTERLEAVED);
 	}
 
 	~BufferTester()
@@ -36,35 +37,36 @@ TEST_F(BufferTester, testByteBuffer)
 	EXPECT_EQ(buffer->vertexSize(), 20);
 	EXPECT_EQ(buffer->layout(), INTERLEAVED);
 
-	ByteBuffer bbuf(60);
-	*bbuf.asWriteOnly().lock() << 1.1f << 1.2f << 1.3f;
-	*bbuf.asWriteOnly().lock() << 2.1f << 2.2f << 2.3f;
-	*bbuf.asWriteOnly().lock() << 3.1f << 3.2f << 3.3f;
-	*bbuf.asWriteOnly().lock() << 1.4f << 1.5f;
-	*bbuf.asWriteOnly().lock() << 2.4f << 2.5f;
-	*bbuf.asWriteOnly().lock() << 3.4f << 3.5f;
+	auto bbuf = std::make_shared<ByteBuffer>(60);
+	auto ostr = ByteBufferOutputStream(bbuf);
+	ostr << 1.1f << 1.2f << 1.3f;
+	ostr << 2.1f << 2.2f << 2.3f;
+	ostr << 3.1f << 3.2f << 3.3f;
+	ostr << 1.4f << 1.5f;
+	ostr << 2.4f << 2.5f;
+	ostr << 3.4f << 3.5f;
 	//*bbuf.asWriteOnly().lock().setPosition(0);
 
 	VertexBuffer vbremapped = VertexBuffer::convertToLayout(*buffer, SEPARATE);
-	ByteBuffer remapped = ByteBuffer(vbremapped.vertexData());
-	ByteBuffer init = ByteBuffer(buffer->vertexData());
+	ByteBuffer remapped = ByteBuffer(vbremapped.release());
+	ByteBuffer init = ByteBuffer(buffer->release());
 	for (size_t i = 0;i < 9;i++)
 	{
 		float ref;
-		*bbuf.asReadOnly().lock() >> ref;
+		bbuf->read(&ref, i * sizeof(float));
 		float curr;
-		*remapped.asReadOnly().lock() >> curr;
+		remapped.read(&curr, i * sizeof(float));
 		ASSERT_EQ(ref, curr);
 	}
 
 	cout << "Convert INTERLEAVED to SEPARATE works" << endl;
-	remapped = VertexBuffer::convertToLayout(vbremapped, INTERLEAVED).vertexData();
+	remapped = VertexBuffer::convertToLayout(vbremapped, INTERLEAVED).release();
 	for (size_t i = 0;i < 9;i++)
 	{
 		float ref;
-		*init.asReadOnly().lock() >> ref;
+		init.read(&ref, i * sizeof(float));
 		float curr;
-		*remapped.asReadOnly().lock() >> curr;
+		remapped.read(&curr, i * sizeof(float));
 		ASSERT_EQ(ref, curr);
 	}
 
