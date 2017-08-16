@@ -4,7 +4,6 @@ set(
 	${CURDIR}/Core/DevaLogger.cpp
 	${CURDIR}/Core/DevaLogger.hpp
 	${CURDIR}/Core/Exceptions.hpp
-	${CURDIR}/Core/Identifiable.hpp
 	${CURDIR}/Core/Logger.cpp
 	${CURDIR}/Core/Logger.hpp
 	${CURDIR}/Core/TypeInfo.hpp
@@ -17,6 +16,11 @@ set(
 	${CURDIR}/Core/Exceptions/DevaInitializationFailureException.hpp
 	${CURDIR}/Core/Exceptions/DevaUnsupportedOperationException.cpp
 	${CURDIR}/Core/Exceptions/DevaUnsupportedOperationException.hpp
+	${CURDIR}/Core/Serialization/Config.hpp
+	${CURDIR}/Core/Serialization/Serializable.cpp
+	${CURDIR}/Core/Serialization/Serializable.hpp
+	${CURDIR}/Core/Serialization/Binary/BinarySerialContainer.hpp
+	${CURDIR}/Core/Serialization/Binary/Config.hpp
 	${CURDIR}/Graphics/Config.hpp
 	${CURDIR}/Graphics/Font.hpp
 	${CURDIR}/Graphics/Image.cpp
@@ -95,6 +99,7 @@ set(
 	${CURDIR}/Graphics/Vulkan/win32_LoadVulkan.cpp
 	${CURDIR}/Include/Core.hpp
 	${CURDIR}/Include/Math.hpp
+	${CURDIR}/Include/Util.hpp
 	${CURDIR}/Include/Window.hpp
 	${CURDIR}/Math/BaseMatrix.hpp
 	${CURDIR}/Math/BaseVector.hpp
@@ -132,10 +137,12 @@ set(
 	${CURDIR}/Scripting/Lua/LuaException.hpp
 	${CURDIR}/Util/BinaryFileStreamWrapper.cpp
 	${CURDIR}/Util/BinaryFileStreamWrapper.hpp
-	${CURDIR}/Util/BinaryReader.hpp
-	${CURDIR}/Util/BinaryWriter.hpp
 	${CURDIR}/Util/ByteBuffer.cpp
 	${CURDIR}/Util/ByteBuffer.hpp
+	${CURDIR}/Util/ByteBufferStream.cpp
+	${CURDIR}/Util/ByteBufferStream.hpp
+	${CURDIR}/Util/ByteInputStream.hpp
+	${CURDIR}/Util/ByteOutputStream.hpp
 	${CURDIR}/Util/Common.cpp
 	${CURDIR}/Util/Common.hpp
 	${CURDIR}/Util/Config.hpp
@@ -144,6 +151,9 @@ set(
 	${CURDIR}/Util/Init.cpp
 	${CURDIR}/Util/Init.hpp
 	${CURDIR}/Util/Master.hpp
+	${CURDIR}/Util/MultiTypeVector.hpp
+	${CURDIR}/Util/Observer.cpp
+	${CURDIR}/Util/Observer.hpp
 	${CURDIR}/Util/Time.cpp
 	${CURDIR}/Util/Time.hpp
 	${CURDIR}/Window/Config.hpp

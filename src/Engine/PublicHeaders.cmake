@@ -2,6 +2,9 @@ set(
 	DEVA_ENGINE_PUBLIC_HEADERS
 	${CURDIR}/Graphics/Camera.hpp
 	${CURDIR}/Graphics/Config.hpp
+	${CURDIR}/Graphics/DrawableObject.cpp
+	${CURDIR}/Graphics/DrawableObject.hpp
+	${CURDIR}/Graphics/DrawableObjectBuilder.hpp
 	${CURDIR}/Graphics/Renderer.cpp
 	${CURDIR}/Graphics/Renderer.hpp
 	${CURDIR}/Graphics/Scene.cpp
