@@ -13,9 +13,9 @@ protected:
 	void SetUp() {
 
 		ByteBuffer bbuf(60);
-		bbuf << 1.1f << 1.2f << 1.3f << 1.4f << 1.5f;
-		bbuf << 2.1f << 2.2f << 2.3f << 2.4f << 2.5f;
-		bbuf << 3.1f << 3.2f << 3.3f << 3.4f << 3.5f;
+		*bbuf.asWriteOnly().lock() << 1.f << 1.1f << 1.2f << 1.3f << 1.4f << 1.5f;
+		*bbuf.asWriteOnly().lock() << 2.1f << 2.2f << 2.3f << 2.4f << 2.5f;
+		*bbuf.asWriteOnly().lock() << 3.1f << 3.2f << 3.3f << 3.4f << 3.5f;
 		vector<VertexDataElementDescription> elements;
 		vector<size_t> components = { 32, 32, 32 };
 		elements.push_back({ 3 * 4, FLOAT, components });
@@ -37,13 +37,13 @@ TEST_F(BufferTester, testByteBuffer)
 	EXPECT_EQ(buffer->layout(), INTERLEAVED);
 
 	ByteBuffer bbuf(60);
-	bbuf << 1.1f << 1.2f << 1.3f;
-	bbuf << 2.1f << 2.2f << 2.3f;
-	bbuf << 3.1f << 3.2f << 3.3f;
-	bbuf << 1.4f << 1.5f;
-	bbuf << 2.4f << 2.5f;
-	bbuf << 3.4f << 3.5f;
-	bbuf.setPosition(0);
+	*bbuf.asWriteOnly().lock() << 1.1f << 1.2f << 1.3f;
+	*bbuf.asWriteOnly().lock() << 2.1f << 2.2f << 2.3f;
+	*bbuf.asWriteOnly().lock() << 3.1f << 3.2f << 3.3f;
+	*bbuf.asWriteOnly().lock() << 1.4f << 1.5f;
+	*bbuf.asWriteOnly().lock() << 2.4f << 2.5f;
+	*bbuf.asWriteOnly().lock() << 3.4f << 3.5f;
+	//*bbuf.asWriteOnly().lock().setPosition(0);
 
 	VertexBuffer vbremapped = VertexBuffer::convertToLayout(*buffer, SEPARATE);
 	ByteBuffer remapped = ByteBuffer(vbremapped.vertexData());
@@ -51,9 +51,9 @@ TEST_F(BufferTester, testByteBuffer)
 	for (size_t i = 0;i < 9;i++)
 	{
 		float ref;
-		bbuf >> ref;
+		*bbuf.asReadOnly().lock() >> ref;
 		float curr;
-		remapped >> curr;
+		*remapped.asReadOnly().lock() >> curr;
 		ASSERT_EQ(ref, curr);
 	}
 
@@ -62,9 +62,9 @@ TEST_F(BufferTester, testByteBuffer)
 	for (size_t i = 0;i < 9;i++)
 	{
 		float ref;
-		init >> ref;
+		*init.asReadOnly().lock() >> ref;
 		float curr;
-		remapped >> curr;
+		*remapped.asReadOnly().lock() >> curr;
 		ASSERT_EQ(ref, curr);
 	}
 
