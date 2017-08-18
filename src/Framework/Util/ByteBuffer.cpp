@@ -3,20 +3,41 @@
 
 using namespace DevaFramework;
 
-internal::ByteBufferViewer::ByteBufferViewer(std::shared_ptr<ByteBuffer> buffer) : mBuffer(buffer), mValid(true) {
+class internal::ByteBufferMessage {
+
+public:
+
+	enum EventType {
+		BUFFER_RESIZED
+	};
+
+	ByteBufferMessage(EventType evttype) : evttype(evttype) {}
+
+
+	const EventType evttype;
+};
+
+using internal::ByteBufferMessage;
+using internal::ByteBufferViewer;
+
+ByteBufferViewer::ByteBufferViewer(std::shared_ptr<ByteBuffer> buffer) : mBuffer(buffer), mValid(true) {
 	DevaFramework::registerObserver(*buffer, *this);
 }
 
-void internal::ByteBufferViewer::invalidate() {
+void ByteBufferViewer::invalidate() {
 	mValid = false;
 }
 
-void internal::ByteBufferViewer::destroy() {
+void ByteBufferViewer::onNotify(ObservedObject& buf, const ByteBufferMessage &msg) {
+	invalidate();
+}
+
+void ByteBufferViewer::destroy() {
 	invalidate();
 	mBuffer.reset();
 }
 
-ByteBuffer& internal::ByteBufferViewer::buffer() {
+ByteBuffer& ByteBufferViewer::buffer() {
 	if (!mValid) {
 		throw DevaException("Buffer is no longer valid");
 	}
@@ -26,7 +47,7 @@ ByteBuffer& internal::ByteBufferViewer::buffer() {
 	
 }
 
-const ByteBuffer& internal::ByteBufferViewer::buffer() const {
+const ByteBuffer& ByteBufferViewer::buffer() const {
 	if (!mValid) {
 		throw DevaException("Buffer is no longer valid");
 	}
@@ -35,57 +56,53 @@ const ByteBuffer& internal::ByteBufferViewer::buffer() const {
 	return *p;
 }
 
-internal::ByteBufferViewer::~ByteBufferViewer() {
+ByteBufferViewer::~ByteBufferViewer() {
 	mValid = false;
 }
 
 ByteBuffer::ByteBuffer() : ByteBuffer(0) {}
 
-ByteBuffer::ByteBuffer(size_t size) : ByteBuffer(std::make_unique<std::vector<byte_t>>(size)) {}
+ByteBuffer::ByteBuffer(size_t size) : ByteBuffer(std::vector<byte_t>(size)) {}
 
-ByteBuffer::ByteBuffer(std::unique_ptr<std::vector<byte_t>> buffer) : buffer(std::move(buffer)) {}
+ByteBuffer::ByteBuffer(std::vector<byte_t>&& buffer) : buffer(std::move(buffer)) {}
 
 ByteBuffer& ByteBuffer::operator=(ByteBuffer &&rhs) = default;
 
 size_t ByteBuffer::size() const
 {
-	if (!buffer) return 0;
-	return this->buffer->size();
-}
-
-bool ByteBuffer::isActive() const {
-	return !!buffer;
+	if (!isDataValid()) return 0;
+	return buffer.size();
 }
 
 void ByteBuffer::write(const byte_t* data, size_t count, size_t pos, size_t offset)
 {
-	if (!isActive()) {
+	if (!isDataValid()) {
 		throw DevaException("Buffer has been released");
 	}
 
-	if (count + pos > buffer->size())
+	if (count + pos > buffer.size())
 		throw DevaException
-		("Attempted to write beyond buffer size. (" + strm(count + pos) + " > " + strm(buffer->size()) + ")");
+		("Attempted to write beyond buffer size. (" + strm(count + pos) + " > " + strm(buffer.size()) + ")");
 
 	for (int i = 0;i <= count - 1;i++)
 	{
-		(*buffer)[pos + i] = data[offset + i];
+		buffer[pos + i] = data[offset + i];
 	}
 }
 
 size_t ByteBuffer::read(byte_t* dest, size_t count, size_t pos, size_t offset) const
 {
-	if (!isActive()) {
+	if (!isDataValid()) {
 		throw DevaException("Buffer has been released");
 	}
 
-	if (pos >= buffer->size())
-		throw DevaInvalidArgumentException("Position " + strm(pos) + " larger than buffer size " + strm(buffer->size()));
+	if (pos >= buffer.size())
+		throw DevaInvalidArgumentException("Position " + strm(pos) + " larger than buffer size " + strm(buffer.size()));
 
 	size_t i = 0;
-	for (i = pos; i < std::min(pos + count, buffer->size()); i++)
+	for (i = pos; i < std::min(pos + count, buffer.size()); i++)
 	{
-		dest[offset + i - pos] = (*buffer)[i];
+		dest[offset + i - pos] = buffer[i];
 	}
 
 	return i - pos;
@@ -94,24 +111,25 @@ size_t ByteBuffer::read(byte_t* dest, size_t count, size_t pos, size_t offset) c
 
 void ByteBuffer::resize(size_t new_size)
 {
-	if (!isActive()) {
+	if (!isDataValid()) {
 		throw DevaException("Buffer has been released");
 	}
 
-	buffer->resize(new_size);
+	buffer.resize(new_size);
+	notifyObservers({ByteBufferMessage::EventType::BUFFER_RESIZED});
 
 }
 
 const std::vector<byte_t>& ByteBuffer::buf() const
 {
-	if (!isActive()) {
+	if (!isDataValid()) {
 		throw DevaException("Buffer has been released");
 	}
 
-	return *buffer;
+	return buffer;
 }
 
-std::unique_ptr<std::vector<byte_t>> ByteBuffer::release() {
+std::vector<byte_t> ByteBuffer::onRelease() {
 	return std::move(buffer);
 }
 

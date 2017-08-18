@@ -2,6 +2,7 @@
 #define DEVA_FRAMEWORK_GRAPHICS_VERTEX_BUFFER_HPP
 
 #include "Config.hpp"
+#include "../Core/DataHolder.hpp"
 
 #include "Model.hpp"
 
@@ -15,8 +16,7 @@ namespace DevaFramework
 		SEPARATE
 	};
 
-	class VertexBuffer {
-
+	class VertexBuffer : public DataHolder<std::vector<byte_t>> {
 	public:
 
 		DEVA_FRAMEWORK_API static VertexBuffer convertToLayout(const VertexBuffer &vertexData, VertexBufferLayout layout);
@@ -29,8 +29,6 @@ namespace DevaFramework
 		};
 
 		class VertexBufferIterator {
-			DEVA_FRAMEWORK_API VertexBufferIterator(VertexBuffer& vertexData, size_t index);
-
 		public:
 			DEVA_FRAMEWORK_API VertexBufferIterator operator++();
 			DEVA_FRAMEWORK_API VertexBufferIterator operator--();
@@ -42,6 +40,9 @@ namespace DevaFramework
 			DEVA_FRAMEWORK_API bool operator!=(const VertexBufferIterator &iter) const;
 
 		private:
+
+			DEVA_FRAMEWORK_API VertexBufferIterator(VertexBuffer& vertexData, size_t index);
+
 			VertexBuffer& vertexData;
 			size_t index;
 			Vertex current;
@@ -71,7 +72,7 @@ namespace DevaFramework
 		};
 
 		DEVA_FRAMEWORK_API VertexBuffer(
-			std::unique_ptr<std::vector<byte_t>> vertexData, 
+			std::vector<byte_t>&& vertexData, 
 			size_t vertexCount, 
 			const std::vector<VertexDataElementDescription> &mVertexElementDescriptions, 
 			VertexBufferLayout layout);
@@ -84,17 +85,19 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API Vertex operator[](size_t index);
 		DEVA_FRAMEWORK_API const Vertex operator[](size_t index) const;
 
-		DEVA_FRAMEWORK_API const std::vector<byte_t>& vertexData() const { return *mVertexData;  }
+		DEVA_FRAMEWORK_API const std::vector<byte_t>& vertexData() const { return mVertexData;  }
 		DEVA_FRAMEWORK_API std::unique_ptr<std::vector<byte_t>> release();
 
-		DEVA_FRAMEWORK_API bool isActive() const;
 		DEVA_FRAMEWORK_API size_t vertexCount() const { return mVertexCount; }
 		DEVA_FRAMEWORK_API std::vector<VertexDataElementDescription> elements() const { return mVertexElementDescriptions; }
 		DEVA_FRAMEWORK_API size_t vertexSize() const;
 		DEVA_FRAMEWORK_API VertexBufferLayout layout() const { return mLayout;  }
 
+	protected:
+		DEVA_FRAMEWORK_API virtual std::vector<byte_t> onRelease() override;
+
 	private:
-		std::unique_ptr<std::vector<byte_t>> mVertexData;
+		std::vector<byte_t> mVertexData;
 		size_t mVertexCount;
 		std::vector<VertexDataElementDescription> mVertexElementDescriptions;
 		VertexBufferLayout mLayout;

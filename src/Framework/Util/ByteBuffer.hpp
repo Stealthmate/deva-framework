@@ -2,7 +2,7 @@
 #define DEVA_FRAMEWORK_UTIL_BYTE_BUFFER_H
 
 #include "Config.hpp"
-
+#include "../Core/DataHolder.hpp"
 #include "ByteOutputStream.hpp"
 #include "ByteInputStream.hpp"
 #include "Observer.hpp"
@@ -15,13 +15,18 @@ namespace DevaFramework
 	class ByteBuffer;
 
 	namespace internal {
-		class ByteBufferViewer : public Observer<ByteBuffer> {
+
+		class ByteBufferMessage;
+
+		class ByteBufferViewer : public Observer<ByteBufferMessage> {
 		public:
 
 			DEVA_FRAMEWORK_API ByteBufferViewer(std::shared_ptr<ByteBuffer> buffer);
 			DEVA_FRAMEWORK_API virtual ~ByteBufferViewer();
 
 			DEVA_FRAMEWORK_API bool valid() const;
+
+			DEVA_FRAMEWORK_API virtual void onNotify(ObservedObject &buffer, const ObservedMessage &message) override;
 
 		protected:
 
@@ -40,13 +45,13 @@ namespace DevaFramework
 		};
 	}
 	
-	class ByteBuffer : public Observable<ByteBuffer>
+	class ByteBuffer : public Observable<internal::ByteBufferMessage>, public DataHolder<std::vector<byte_t>>
 	{
 	public:
 
 		DEVA_FRAMEWORK_API ByteBuffer();
 		DEVA_FRAMEWORK_API ByteBuffer(size_t size);
-		DEVA_FRAMEWORK_API ByteBuffer(std::unique_ptr<std::vector<byte_t>> buffer);
+		DEVA_FRAMEWORK_API ByteBuffer(std::vector<byte_t>&& buffer);
 		DEVA_FRAMEWORK_API ByteBuffer(ByteBuffer &&buffer);
 
 		DEVA_FRAMEWORK_API ByteBuffer& operator=(ByteBuffer &&buffer);
@@ -84,20 +89,21 @@ namespace DevaFramework
 #undef WRITE_TYPE
 
 		DEVA_FRAMEWORK_API size_t size() const;
-		DEVA_FRAMEWORK_API bool isActive() const;
 
 		DEVA_FRAMEWORK_API void resize(size_t new_size);
 
 		DEVA_FRAMEWORK_API const std::vector<byte_t>& buf() const;
-		DEVA_FRAMEWORK_API std::unique_ptr<std::vector<byte_t>> release();
 
 		DEVA_FRAMEWORK_API const ByteBuffer shallowCopy() const;
 		DEVA_FRAMEWORK_API ByteBuffer shallowCopy();
 		DEVA_FRAMEWORK_API ByteBuffer slice(size_t start, size_t end) const;
 
+	protected:
+		DEVA_FRAMEWORK_API virtual std::vector<byte_t> onRelease() override;
+
 	private:
 
-		std::unique_ptr<std::vector<byte_t>> buffer;
+		std::vector<byte_t> buffer;
 
 	};
 
