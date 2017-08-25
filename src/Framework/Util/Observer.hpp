@@ -9,6 +9,7 @@ namespace DevaFramework {
 
 	template<typename T> class Observable;
 	template<typename T> class Observer;
+
 	template<typename T> void registerObserver(Observable<T> &observable, Observer<T> &observer) {
 		observable.registerObserver(observer);
 		observer.addTarget(observable);
@@ -18,37 +19,44 @@ namespace DevaFramework {
 		observer.removeTarget(observable);
 	}
 
-	template<typename ObservableType>
+	template<typename ObservedMessageType>
 	class Observer {
 	public:
+
+		typedef ObservedMessageType ObservedMessage;
+		typedef Observable<ObservedMessageType> ObservedObject;
+
 		virtual ~Observer() {
-			for (auto & t : targets) {
-				unregisterObserver(*t, *this);
+			while(targets.size() > 0) {
+				unregisterObserver(**targets.begin(), *this);
 			}
 		}
-		
-		void onObservableDestroy(Observable<ObservableType> *o) {
+
+		virtual void onObservableDestroy(Observable<ObservedMessageType> *o) {
 			targets.erase(std::find(targets.begin(), targets.end(), o));
 		}
-	private:
-		std::list<Observable<ObservableType>*> targets;
 
-		void addTarget(Observable<ObservableType> &t) {
+		virtual void onNotify(ObservedObject &o, const ObservedMessageType & msg) = 0;
+
+	private:
+		std::list<Observable<ObservedMessageType>*> targets;
+
+		void addTarget(Observable<ObservedMessageType> &t) {
 			targets.push_back(&t);
 		}
 
-		void removeTarget(Observable<ObservableType> &t) {
+		void removeTarget(Observable<ObservedMessageType> &t) {
 			targets.erase(std::find(targets.begin(), targets.end(), &t));
 		}
 
-		friend void DevaFramework::registerObserver(Observable<ObservableType>&, Observer<ObservableType>&);
-		friend void DevaFramework::unregisterObserver(Observable<ObservableType> &, Observer<ObservableType>&);
+		friend void DevaFramework::registerObserver(Observable<ObservedMessageType>&, Observer<ObservedMessageType>&);
+		friend void DevaFramework::unregisterObserver(Observable<ObservedMessageType> &, Observer<ObservedMessageType>&);
 	};
 
-	template<typename ObservableType>
+	template<typename ObservedMessageType>
 	class Observable {
 	public:
-		typedef Observer<ObservableType>* ObserverPtr;
+		typedef Observer<ObservedMessageType>* ObserverPtr;
 
 		const std::list<ObserverPtr>& getObservers() const {
 			return mObservers;
@@ -60,18 +68,24 @@ namespace DevaFramework {
 			}
 		}
 
+		void notifyObservers(const ObservedMessageType &message) {
+			for (auto o : mObservers) {
+				o->onNotify(*this, message);
+			}
+		}
+
 	private:
 		std::list<ObserverPtr> mObservers;
 
-		void registerObserver(Observer<ObservableType> &o) {
+		void registerObserver(Observer<ObservedMessageType> &o) {
 			mObservers.push_back(&o);
 		}
-		void unregisterObserver(const Observer<ObservableType> &o) {
+		void unregisterObserver(const Observer<ObservedMessageType> &o) {
 			mObservers.erase(std::find(mObservers.begin(), mObservers.end(), &o));
 		}
 
-		friend void DevaFramework::registerObserver(Observable<ObservableType>&, Observer<ObservableType>&);
-		friend void DevaFramework::unregisterObserver(Observable<ObservableType> &, Observer<ObservableType>&);
+		friend void DevaFramework::registerObserver(Observable<ObservedMessageType>&, Observer<ObservedMessageType>&);
+		friend void DevaFramework::unregisterObserver(Observable<ObservedMessageType> &, Observer<ObservedMessageType>&);
 	};
 }
 
