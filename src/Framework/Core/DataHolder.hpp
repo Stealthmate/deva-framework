@@ -15,6 +15,8 @@ namespace DevaFramework {
 		}
 
 	protected:
+		DataHolder() : mIsDataValid(true) {}
+
 		virtual DataType onRelease() = 0;
 
 		bool isDataValid() const {
