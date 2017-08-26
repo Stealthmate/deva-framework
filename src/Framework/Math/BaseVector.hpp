@@ -19,11 +19,10 @@ namespace DevaFramework
 	class BaseVector : public BaseMatrix<T, vector_length, 1> //ACTUALLY N_VECTORS!!!!!!!! 
 	{
 		typedef BaseMatrix<T, vector_length, 1> super;
-		typedef BaseVector<T, vector_length> Vector;//Easier naming
+		typedef BaseVector<T, vector_length> Vector;
 
 	public:
 
-		///Empty default constructor, calls BaseMatrix()
 		BaseVector() : BaseMatrix<T, vector_length, 1>() {}
 
 		/**
@@ -33,7 +32,7 @@ namespace DevaFramework
 
 			@throws std::invalid_argument - if the number of values in \b values is not equal to \b vector_length
 		*/
-		BaseVector(const std::initializer_list<T> &values)
+		constexpr BaseVector(const std::initializer_list<T> &values)
 		{
 			if (values.size() != vector_length)
 			{
@@ -41,13 +40,10 @@ namespace DevaFramework
 					"Tried to create vector with " + strm(vector_length) + " values, but passed " + strm(values.size()));
 			}
 			auto val_i = values.begin();
-			if (values.size() >= vector_length)
+			for (int i = 0;i < vector_length;i++)
 			{
-				for (int i = 0;i <= vector_length;i++)
-				{
-					this->data[i] = *val_i;
-					val_i++;
-				}
+				this->data[i] = *val_i;
+				val_i++;
 			}
 		}
 
@@ -58,6 +54,7 @@ namespace DevaFramework
 		*/
 		T& operator[](int i)
 		{
+			assert(i < vector_length);
 			return super::operator()(0, i);
 		}
 
@@ -68,7 +65,8 @@ namespace DevaFramework
 		*/
 		const T& operator[](int i) const
 		{
-			return super::operator()(0, 1);
+			assert(i < vector_length);
+			return super::operator()(0, i);
 		}
 
 		/**
