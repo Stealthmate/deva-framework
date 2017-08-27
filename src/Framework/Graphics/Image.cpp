@@ -31,12 +31,12 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 
 	if (raw.color_type == COLOR_TYPE_RGBA && raw.bitdepth == 8)
 	{
-		img.data = (byte_t*)raw.data;
+		img.data = std::move(raw.data);
 		return img;
 	}
 	else if (raw.bitdepth == 8)
 	{
-		byte_t* new_data = new byte_t[raw.width*raw.height*DEVA_IMAGE_BITS_PER_PIXEL];
+		std::vector<byte_t> new_data(raw.width*raw.height*DEVA_IMAGE_BITS_PER_PIXEL);
 		for (unsigned int i = 0;i <= raw.height - 1;i++)
 		{
 			for (unsigned int j = 0;j < raw.width - 1;j++)
@@ -49,8 +49,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 			}
 		}
 
-		img.data = new_data;
-		delete raw.data;
+		img.data = std::move(new_data);
 
 		return img;
 	}
@@ -59,60 +58,24 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 
 Image::Image()
 {
-	this->data = 0;
 	this->width = 0;
 	this->height = 0;
 }
 
-Image::Image(const Image &img) : width(img.width), height(img.height)
-{
-	unsigned long int image_size = width * height * DEVA_IMAGE_BITS_PER_PIXEL / 8;
+Image::Image(const Image &img) = default;
 
-	this->data = new byte_t[image_size];
+Image::Image(Image &&img) = default;
 
-	for (unsigned int i = 0; i < image_size; i++) this->data[i] = img.data[i];
-}
+Image& Image::operator=(const Image& img) = default;
 
-Image::Image(Image &&img) : width(img.width), height(img.height)
-{
-	this->data = img.data;
-	img.data = 0;
-}
+Image& Image::operator=(Image &&img) = default;
 
-Image& Image::operator=(const Image& img)
-{
-	this->width = img.width;
-	this->height = img.height;
-	unsigned long int image_size = width * height * DEVA_IMAGE_BITS_PER_PIXEL / 8;
-
-	if (!this->data) delete[] this->data;
-
-	this->data = new byte_t[image_size];
-
-	for (unsigned int i = 0; i < image_size; i++) this->data[i] = img.data[i];
-
-	return *this;
-}
-
-Image& Image::operator=(Image &&img)
-{
-	this->width = img.width;
-	this->height = img.height;
-	unsigned long int image_size = width * height * DEVA_IMAGE_BITS_PER_PIXEL / 8;
-
-	if (!this->data) delete[] this->data;
-
-	this->data = img.data;
-
-	img.data = 0;
-	return *this;
-}
-
-byte_t * const Image::getData() const {
+const std::vector<byte_t>& Image::getData() const {
 	return this->data;
 }
 
-Image::~Image()
-{
-	if (this->data) delete[] this->data;
+std::vector<byte_t> Image::onRelease() {
+	return std::move(data);
 }
+
+Image::~Image() = default;

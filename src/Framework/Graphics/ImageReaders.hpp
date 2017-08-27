@@ -16,7 +16,7 @@ struct RawImage
 
     unsigned short error = 0;
 
-    char* data = 0;
+	std::vector<byte_t> data;
     unsigned int width = 0;
     unsigned int height = 0;
     unsigned int channels = 0;
