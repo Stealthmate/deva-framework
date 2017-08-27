@@ -18,6 +18,6 @@ out gl_PerVertex {
 void main() {
     gl_Position = inPosition;
     //fragColor = inPosition.xyz;
-    fragColor = inColor;
+    fragColor = vec3(0.5, inPosition.w, 0.f);
     //fragColor = inColor;
 }
