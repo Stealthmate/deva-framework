@@ -29,6 +29,8 @@ set(
 	${CURDIR}/Input/KeyboardListener.cpp
 	${CURDIR}/Input/KeyboardListener.hpp
 	${CURDIR}/Input/MouseListener.hpp
+	${CURDIR}/MinecraftClone/Block.cpp
+	${CURDIR}/MinecraftClone/Block.hpp
 	${CURDIR}/Config.hpp
 	${CURDIR}/DevaEngineInstance.cpp
 	${CURDIR}/DevaEngineInstance.hpp

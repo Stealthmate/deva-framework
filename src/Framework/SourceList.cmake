@@ -1,6 +1,7 @@
 set(
 	DEVA_FRAMEWORK_SOURCE_LIST
 	${CURDIR}/Core/Config.hpp
+	${CURDIR}/Core/DataHolder.hpp
 	${CURDIR}/Core/DevaLogger.cpp
 	${CURDIR}/Core/DevaLogger.hpp
 	${CURDIR}/Core/Exceptions.hpp
@@ -20,6 +21,7 @@ set(
 	${CURDIR}/Core/Serialization/Serializable.cpp
 	${CURDIR}/Core/Serialization/Serializable.hpp
 	${CURDIR}/Core/Serialization/Binary/BinarySerialContainer.hpp
+	${CURDIR}/Core/Serialization/Binary/BinarySerializable.hpp
 	${CURDIR}/Core/Serialization/Binary/Config.hpp
 	${CURDIR}/Graphics/Config.hpp
 	${CURDIR}/Graphics/Font.hpp
