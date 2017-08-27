@@ -11,7 +11,7 @@ namespace DevaFramework {
 		class ByteBufferStreamBase : public ByteBufferViewer {
 		public:
 
-			ByteBufferStreamBase(std::shared_ptr<ByteBuffer> buffer);
+			DEVA_FRAMEWORK_API ByteBufferStreamBase(ByteBuffer &buffer);
 			DEVA_FRAMEWORK_API virtual ~ByteBufferStreamBase();
 
 			DEVA_FRAMEWORK_API void setPosition(size_t pos);
@@ -26,7 +26,7 @@ namespace DevaFramework {
 
 	class ByteBufferInputStream : public internal::ByteBufferStreamBase, public ByteInputStream {
 	public:
-		DEVA_FRAMEWORK_API ByteBufferInputStream(std::shared_ptr<ByteBuffer> buffer);
+		DEVA_FRAMEWORK_API ByteBufferInputStream(ByteBuffer &buffer);
 		DEVA_FRAMEWORK_API virtual ~ByteBufferInputStream();
 
 		DEVA_FRAMEWORK_API virtual size_t read(byte_t* dest, size_t count, size_t offset = 0);
@@ -35,7 +35,7 @@ namespace DevaFramework {
 
 	class ByteBufferOutputStream : public internal::ByteBufferStreamBase, public ByteOutputStream {
 	public:
-		DEVA_FRAMEWORK_API ByteBufferOutputStream(std::shared_ptr<ByteBuffer> buffer);
+		DEVA_FRAMEWORK_API ByteBufferOutputStream(ByteBuffer &buffer);
 		DEVA_FRAMEWORK_API virtual ~ByteBufferOutputStream();
 
 		DEVA_FRAMEWORK_API virtual void write(const byte_t* data, size_t count, size_t offset = 0);
