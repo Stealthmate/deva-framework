@@ -20,8 +20,8 @@ public:
 using internal::ByteBufferMessage;
 using internal::ByteBufferViewer;
 
-ByteBufferViewer::ByteBufferViewer(std::shared_ptr<ByteBuffer> buffer) : mBuffer(buffer), mValid(true) {
-	DevaFramework::registerObserver(*buffer, *this);
+ByteBufferViewer::ByteBufferViewer(ByteBuffer &buffer) : mBuffer(buffer), mValid(true) {
+	DevaFramework::registerObserver(buffer, *this);
 }
 
 void ByteBufferViewer::invalidate() {
@@ -32,18 +32,15 @@ void ByteBufferViewer::onNotify(ObservedObject& buf, const ByteBufferMessage &ms
 	invalidate();
 }
 
-void ByteBufferViewer::destroy() {
+void ByteBufferViewer::onObservableDestroy(Observable<ByteBufferMessage> *o) {
 	invalidate();
-	mBuffer.reset();
 }
 
 ByteBuffer& ByteBufferViewer::buffer() {
 	if (!mValid) {
 		throw DevaException("Buffer is no longer valid");
 	}
-	auto p = mBuffer.lock();
-
-	return *p;
+	return mBuffer;
 	
 }
 
@@ -51,9 +48,7 @@ const ByteBuffer& ByteBufferViewer::buffer() const {
 	if (!mValid) {
 		throw DevaException("Buffer is no longer valid");
 	}
-	auto p = mBuffer.lock();
-
-	return *p;
+	return mBuffer;
 }
 
 ByteBufferViewer::~ByteBufferViewer() {
@@ -62,10 +57,13 @@ ByteBufferViewer::~ByteBufferViewer() {
 
 ByteBuffer::ByteBuffer() : ByteBuffer(0) {}
 
-ByteBuffer::ByteBuffer(size_t size) : ByteBuffer(std::vector<byte_t>(size)) {}
+ByteBuffer::ByteBuffer(size_t size) : buffer(size) {}
 
-ByteBuffer::ByteBuffer(std::vector<byte_t>&& buffer) : buffer(std::move(buffer)) {}
+ByteBuffer::ByteBuffer(std::vector<byte_t> buffer) : buffer(std::move(buffer)) {}
 
+ByteBuffer::ByteBuffer(const ByteBuffer &buffer) = default;
+ByteBuffer& ByteBuffer::operator=(const ByteBuffer &rhs) = default;
+ByteBuffer::ByteBuffer(ByteBuffer &&buffer) = default;
 ByteBuffer& ByteBuffer::operator=(ByteBuffer &&rhs) = default;
 
 size_t ByteBuffer::size() const

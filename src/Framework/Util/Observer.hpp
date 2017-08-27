@@ -32,9 +32,7 @@ namespace DevaFramework {
 			}
 		}
 
-		virtual void onObservableDestroy(Observable<ObservedMessageType> *o) {
-			targets.erase(std::find(targets.begin(), targets.end(), o));
-		}
+		virtual void onObservableDestroy(Observable<ObservedMessageType> *o) {}
 
 		virtual void onNotify(ObservedObject &o, const ObservedMessageType & msg) = 0;
 
@@ -49,8 +47,14 @@ namespace DevaFramework {
 			targets.erase(std::find(targets.begin(), targets.end(), &t));
 		}
 
+		void onObservableDestroyInternal(Observable<ObservedMessageType> *o) {
+
+			targets.erase(std::find(targets.begin(), targets.end(), o));
+		}
+
 		friend void DevaFramework::registerObserver(Observable<ObservedMessageType>&, Observer<ObservedMessageType>&);
 		friend void DevaFramework::unregisterObserver(Observable<ObservedMessageType> &, Observer<ObservedMessageType>&);
+		friend class Observable<ObservedMessageType>;
 	};
 
 	template<typename ObservedMessageType>

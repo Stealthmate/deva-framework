@@ -21,12 +21,13 @@ namespace DevaFramework
 		class ByteBufferViewer : public Observer<ByteBufferMessage> {
 		public:
 
-			DEVA_FRAMEWORK_API ByteBufferViewer(std::shared_ptr<ByteBuffer> buffer);
+			DEVA_FRAMEWORK_API ByteBufferViewer(ByteBuffer &buffer);
 			DEVA_FRAMEWORK_API virtual ~ByteBufferViewer();
 
 			DEVA_FRAMEWORK_API bool valid() const;
 
-			DEVA_FRAMEWORK_API virtual void onNotify(ObservedObject &buffer, const ObservedMessage &message) override;
+			DEVA_FRAMEWORK_API virtual void onNotify(Observable<ByteBufferMessage> &buffer, const ByteBufferMessage &message) override;
+			DEVA_FRAMEWORK_API virtual void onObservableDestroy(Observable<ByteBufferMessage> *o) override;
 
 		protected:
 
@@ -34,13 +35,12 @@ namespace DevaFramework
 			DEVA_FRAMEWORK_API const ByteBuffer& buffer() const;
 			DEVA_FRAMEWORK_API void invalidate();
 			DEVA_FRAMEWORK_API virtual void revalidate() = 0;
-			DEVA_FRAMEWORK_API void destroy();
 
 		private:
 
 			friend class ByteBuffer;
 
-			std::weak_ptr<ByteBuffer> mBuffer;
+			ByteBuffer &mBuffer;
 			bool mValid;
 		};
 	}
@@ -51,9 +51,12 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API ByteBuffer();
 		DEVA_FRAMEWORK_API ByteBuffer(size_t size);
-		DEVA_FRAMEWORK_API ByteBuffer(std::vector<byte_t>&& buffer);
-		DEVA_FRAMEWORK_API ByteBuffer(ByteBuffer &&buffer);
+		DEVA_FRAMEWORK_API ByteBuffer(std::vector<byte_t> buffer);
 
+		DEVA_FRAMEWORK_API ByteBuffer(const ByteBuffer &buffer);
+		DEVA_FRAMEWORK_API ByteBuffer& operator=(const ByteBuffer &buffer);
+
+		DEVA_FRAMEWORK_API ByteBuffer(ByteBuffer &&buffer);
 		DEVA_FRAMEWORK_API ByteBuffer& operator=(ByteBuffer &&buffer);
 
 		DEVA_FRAMEWORK_API ~ByteBuffer();
@@ -94,9 +97,7 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API const std::vector<byte_t>& buf() const;
 
-		DEVA_FRAMEWORK_API const ByteBuffer shallowCopy() const;
-		DEVA_FRAMEWORK_API ByteBuffer shallowCopy();
-		DEVA_FRAMEWORK_API ByteBuffer slice(size_t start, size_t end) const;
+		DEVA_FRAMEWORK_API ByteBuffer clone();
 
 	protected:
 		DEVA_FRAMEWORK_API virtual std::vector<byte_t> onRelease() override;
