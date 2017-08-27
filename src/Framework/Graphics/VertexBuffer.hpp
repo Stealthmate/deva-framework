@@ -86,7 +86,6 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API const Vertex operator[](size_t index) const;
 
 		DEVA_FRAMEWORK_API const std::vector<byte_t>& vertexData() const { return mVertexData;  }
-		DEVA_FRAMEWORK_API std::unique_ptr<std::vector<byte_t>> release();
 
 		DEVA_FRAMEWORK_API size_t vertexCount() const { return mVertexCount; }
 		DEVA_FRAMEWORK_API std::vector<VertexDataElementDescription> elements() const { return mVertexElementDescriptions; }
