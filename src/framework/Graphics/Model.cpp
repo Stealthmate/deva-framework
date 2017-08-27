@@ -16,16 +16,30 @@ namespace {
 }
 
 Model::Model(
-	const std::vector<byte_t> &vertexData,
+	std::vector<byte_t> vertexData,
 	size_t vertexCount,
 	const std::vector<VertexDataElementDescription> &vertexElementDescriptions,
 	const std::vector<uint32_t> &faceIndices) 
-	: mVertexData(vertexData), 
+	: mVertexData(std::move(vertexData)), 
 	mVertexCount(vertexCount), 
+	mVertexElementDescriptions(vertexElementDescriptions),
+	mFaceIndices(faceIndices) {}
+
+Model::Model(
+	ByteBuffer vertexData,
+	size_t vertexCount,
+	const std::vector<VertexDataElementDescription> &vertexElementDescriptions,
+	const std::vector<uint32_t> &faceIndices)
+	: mVertexData(std::move(vertexData.release())),
+	mVertexCount(vertexCount),
 	mVertexElementDescriptions(vertexElementDescriptions),
 	mFaceIndices(faceIndices) {}
 
 size_t Model::vertexSize() const 
 {
 	return sumComponentSizes(mVertexElementDescriptions);
+}
+
+ByteBuffer Model::onRelease() {
+	return std::move(mVertexData.release());
 }

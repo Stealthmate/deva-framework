@@ -28,10 +28,10 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API TexturedModelBuilder& addVertex(const vec4 &vertex, const vec3 &texCoords);
 		DEVA_FRAMEWORK_API TexturedModelBuilder& addFace(const FaceIndexTriplet &face);
 
-		DEVA_FRAMEWORK_API Model build() const;
+		DEVA_FRAMEWORK_API Model build();
 
 	private:
-		std::vector<std::tuple<vec4, vec3>> vertexTexCoords;
+		PackedVector<float, float, float, float, float, float, float> vertexTexCoords;
 		std::vector<uint32_t> faces;
 	};
 

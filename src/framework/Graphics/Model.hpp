@@ -4,6 +4,7 @@
 #include "Config.hpp"
 
 #include "..\Include\Math.hpp"
+#include "..\Util\MultiTypeVector.hpp"
 
 #include <vector>
 
@@ -24,23 +25,32 @@ namespace DevaFramework
 		std::vector<size_t> componentBitsizes;
 	};
 
-	class Model {
+	class Model : public DataHolder<ByteBuffer> {
 	public:
 
 		DEVA_FRAMEWORK_API Model(
-			const std::vector<byte_t> &vertexData,
+			std::vector<byte_t> vertexData,
+			size_t vertexCount,
+			const std::vector<VertexDataElementDescription> &vertexElementDescriptions,
+			const std::vector<uint32_t> &faceIndices);
+		DEVA_FRAMEWORK_API Model(
+			ByteBuffer vertexData,
 			size_t vertexCount,
 			const std::vector<VertexDataElementDescription> &vertexElementDescriptions,
 			const std::vector<uint32_t> &faceIndices);
 
-		DEVA_FRAMEWORK_API const std::vector<byte_t>& vertexData() const { return mVertexData; }
+		DEVA_FRAMEWORK_API const std::vector<byte_t>& vertexData() const { return mVertexData.buf(); }
 		DEVA_FRAMEWORK_API size_t vertexCount() const { return mVertexCount; }
 		DEVA_FRAMEWORK_API const std::vector<VertexDataElementDescription>& elements() const { return mVertexElementDescriptions; }
 		DEVA_FRAMEWORK_API size_t vertexSize() const;
 		DEVA_FRAMEWORK_API const std::vector<uint32_t>& faceIndices() const { return mFaceIndices; }
 
+	protected:
+
+		DEVA_FRAMEWORK_API virtual ByteBuffer onRelease() override;
+
 	private:
-		std::vector<byte_t> mVertexData;
+		ByteBuffer mVertexData;
 		size_t mVertexCount;
 		std::vector<VertexDataElementDescription> mVertexElementDescriptions;
 

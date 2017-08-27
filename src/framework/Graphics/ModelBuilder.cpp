@@ -47,8 +47,7 @@ Model BasicModelBuilder::build() const
 }
 
 TexturedModelBuilder& TexturedModelBuilder::addVertex(const vec4 &vertex, const vec3 &texCoords) {
-	vertexTexCoords.push_back({vertex, texCoords});
-
+	vertexTexCoords.push_back({ vertex[0], vertex[1], vertex[2], vertex[3], texCoords[0], texCoords[1], texCoords[2] });
 	return *this;
 }
 
@@ -60,15 +59,8 @@ TexturedModelBuilder&::TexturedModelBuilder::addFace(const FaceIndexTriplet &fac
 	return *this;
 }
 
-Model TexturedModelBuilder::build() const
+Model TexturedModelBuilder::build()
 {
-	std::vector<byte_t> vertexData;
-	for (auto &v : vertexTexCoords) {
-		auto bytes = concatenateArrays(std::get<0>(v).asBytes(), std::get<1>(v).asBytes());
-		for (auto b : bytes)
-			vertexData.push_back(b);
-	}
-
 	VertexDataElementDescription eld;
 	size_t bitsize = sizeof(float) * 8;
 	eld.componentBitsizes = { bitsize, bitsize, bitsize, bitsize };
@@ -80,5 +72,5 @@ Model TexturedModelBuilder::build() const
 	eldtex.size = 3 * sizeof(float);
 	eldtex.type = VertexComponentType::FLOAT;
 
-	return Model(vertexData, vertexTexCoords.size(), { eld, eldtex }, faces);
+	return Model(std::move(vertexTexCoords.release()), vertexTexCoords.size(), { eld, eldtex }, faces);
 }
