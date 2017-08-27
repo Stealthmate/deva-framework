@@ -3,53 +3,54 @@
 
 #include "Config.hpp"
 #include <DevaFramework\Graphics\Model.hpp>
+#include <DevaFramework\Include\Util.hpp>
+#include "DrawableObject.hpp"
 #include "Camera.hpp"
 
+#include <unordered_set>
 #include <set>
 
 namespace DevaEngine
 {
-	class Scene
+	class Scene;
+	typedef DevaFramework::Uuid SceneObjectID;
+
+	namespace Observers {
+		class SceneObservedMessage;
+		class SceneObserver : public DevaFramework::Observer<SceneObservedMessage> {
+		public:
+
+			DEVA_ENGINE_API virtual void onNotify(ObservedObject &obj, const ObservedMessage &message) override final;
+
+			virtual void onNewObject(const Scene &scene, const SceneObjectID &id, const DrawableObject &object) = 0;
+			virtual void onObjectUpdated(const Scene &scene, const SceneObjectID &id, const DrawableObject &object) = 0;
+			virtual void onObjectRemoved(const Scene &scene, const SceneObjectID &id, const DrawableObject &object) = 0;
+		};
+	}
+
+	class Scene : public DevaFramework::Observable<Observers::SceneObservedMessage>
 	{
 	public:
-		typedef DevaFramework::Uuid ObjectID;
-
-		class SceneUpdateListener {
-		public:
-			virtual void onNewObject(const ObjectID &id, const DevaFramework::Model &object) = 0;
-			virtual void onObjectUpdated(const ObjectID &id, const DevaFramework::Model &object) = 0;
-			virtual void onObjectRemoved(const ObjectID &id, const DevaFramework::Model &object) = 0;
-		};
-
+		typedef Observers::SceneObserver SceneUpdateObserver;
+		typedef std::shared_ptr<DrawableObject> ObjectPtr;
 
 		DEVA_ENGINE_API Scene();
 
-		DEVA_ENGINE_API const DevaFramework::Model& getObject(const ObjectID &id) const;
-		DEVA_ENGINE_API const std::unordered_map<ObjectID, std::unique_ptr<DevaFramework::Model>>& getAllObjects() const { return objects; }
+		DEVA_ENGINE_API std::unordered_set<SceneObjectID> getAllObjectIDs() const;
 
-		DEVA_ENGINE_API ObjectID addObject(std::unique_ptr<DevaFramework::Model> object);
-		DEVA_ENGINE_API Scene& updateObject(const ObjectID &id);
-		DEVA_ENGINE_API std::unique_ptr<DevaFramework::Model> removeObject(const ObjectID &id);
-
-		/*DEVA_ENGINE_API const Camera& getPrimaryCamera() const { return Camera(); }
-
-		DEVA_ENGINE_API Camera& getPrimaryCamera() { return Camera(); }
-
-		DEVA_ENGINE_API ObjectID addCamera(std::unique_ptr<Camera> camera) { return DevaFramework::Uuid(); }
-		DEVA_ENGINE_API void setPrimaryCamera(ObjectID cameraID) {}
-		DEVA_ENGINE_API void destroyCamera(ObjectID cameraID) {}*/
-
-		DEVA_ENGINE_API void registerUpdateListener(std::shared_ptr<SceneUpdateListener> lstnr) const;
-		DEVA_ENGINE_API void unregisterUpdateListener(std::shared_ptr<SceneUpdateListener> lstnr) const;
+		DEVA_ENGINE_API SceneObjectID addObject(ObjectPtr object);
+		DEVA_ENGINE_API DrawableObject& getObject(const SceneObjectID &id);
+		DEVA_ENGINE_API const DrawableObject& getObject(const SceneObjectID &id) const;
+		DEVA_ENGINE_API SceneObjectID findObjectID(const DrawableObject &object) const;
+		DEVA_ENGINE_API ObjectPtr removeObject(const SceneObjectID &id);
 
 	private:
 
-		std::unordered_map<ObjectID, std::unique_ptr<DevaFramework::Model>> objects;
-		std::unordered_map<ObjectID, Camera> cameras;
-
-		mutable std::set<std::shared_ptr<SceneUpdateListener>> mUpdateListeners;
-
+		std::unordered_map<SceneObjectID, ObjectPtr> objects;
+		std::shared_ptr<DrawableObject::DrawableObjectUpdateObserver> objectObserver;
 	};
+
+	
 }
 
 

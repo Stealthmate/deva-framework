@@ -10,12 +10,12 @@ namespace DevaEngine {
 	class SceneBuilder {
 	public:
 
-		DEVA_ENGINE_API SceneBuilder& addObject(const Scene::ObjectID& id, std::unique_ptr<DevaFramework::Model> object);
+		DEVA_ENGINE_API SceneBuilder& addObject(const SceneObjectID& id, std::unique_ptr<DevaFramework::Model> object);
 
 		DEVA_ENGINE_API Scene build();
 
 	private:
-		std::unordered_map<Scene::ObjectID, std::unique_ptr<DevaFramework::Model>> objects;
+		std::unordered_map<SceneObjectID, std::unique_ptr<DevaFramework::Model>> objects;
 
 	};
 

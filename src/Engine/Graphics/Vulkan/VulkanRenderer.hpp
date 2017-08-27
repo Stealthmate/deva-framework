@@ -19,7 +19,7 @@ namespace DevaEngine
 		class BufferMemoryIndex;
 		friend class ImplSceneUpdateListener;
 
-		std::shared_ptr<Scene::SceneUpdateListener> sceneListener;
+		std::shared_ptr<Scene::SceneUpdateObserver> sceneListener;
 		std::unique_ptr<BufferMemoryIndex> bufmemIndex;
 
 		std::shared_ptr<Scene> currentScene;
@@ -42,8 +42,8 @@ namespace DevaEngine
 
 		void drawFrame();
 
-		void loadModel(const Scene::ObjectID &id, const DevaFramework::Model &model);
-		void unloadModel(const Scene::ObjectID &id);
+		void loadModel(const SceneObjectID&id, const DevaFramework::Model &model);
+		void unloadModel(const SceneObjectID &id);
 
 		void freeBuffer(const DevaFramework::Vulkan::VulkanBufferID &buffer);
 

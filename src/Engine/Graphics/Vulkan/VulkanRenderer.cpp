@@ -248,26 +248,26 @@ namespace DevaEngine {
 		}
 	};
 
-	class ImplSceneUpdateListener : public Scene::SceneUpdateListener {
+	class ImplSceneUpdateListener : public Scene::SceneUpdateObserver {
 	public:
 
 		VulkanRenderer& renderer;
 
 		ImplSceneUpdateListener(VulkanRenderer& renderer) : renderer(renderer) {}
 
-		virtual void onNewObject(const Scene::ObjectID &id, const DevaFramework::Model &object) override;
-		virtual void onObjectUpdated(const Scene::ObjectID &id, const DevaFramework::Model &object) override;
-		virtual void onObjectRemoved(const Scene::ObjectID &id, const DevaFramework::Model &object) override;
+		virtual void onNewObject(const Scene &scene, const SceneObjectID &id, const DrawableObject &object);
+		virtual void onObjectUpdated(const Scene &scene, const SceneObjectID &id, const DrawableObject &object);
+		virtual void onObjectRemoved(const Scene &scene, const SceneObjectID &id, const DrawableObject &object);
 	};
 }
 
 VertexBuffer createVertexBuffer(float f = 0.0f) {
 	//LOG.i(strm(f));
-	ByteBuffer buf(72);
-	buf << +0.0f + f << -0.5f << +0.0f << +1.0f << +0.0f + f << +1.0f;
-	buf << +0.5f << +0.5f << +0.0f << +0.0f << +1.0f << +1.0f;
-	buf << -0.5f << +0.5f << +0.0f << +0.0f << +0.0f + f << +1.0f;
-
+	auto buf = ByteBuffer(72);
+	auto ostr = ByteBufferOutputStream(buf);
+	ostr << +0.0f + f << -0.5f << +0.0f << +1.0f << +0.0f + f << +1.0f;
+	ostr << +0.5f << +0.5f << +0.0f << +0.0f << +1.0f << +1.0f;
+	ostr << -0.5f << +0.5f << +0.0f << +0.0f << +0.0f + f << +1.0f;
 
 	std::vector<VertexDataElementDescription> elements;
 	VertexDataElementDescription desc;
@@ -277,7 +277,7 @@ VertexBuffer createVertexBuffer(float f = 0.0f) {
 	elements.push_back(desc);
 	elements.push_back(desc);
 
-	return VertexBuffer(buf.buf(), 3, elements, INTERLEAVED);
+	return VertexBuffer(buf.release(), 3, elements, INTERLEAVED);
 }
 
 
@@ -817,7 +817,7 @@ void VulkanRenderer::destroy() {
 	}
 }
 
-void VulkanRenderer::loadModel(const Scene::ObjectID &id, const Model &m) {
+void VulkanRenderer::loadModel(const SceneObjectID &id, const Model &m) {
 
 	auto dev = main_device.handle();
 	auto &vk = main_device.vk();
@@ -851,7 +851,7 @@ void VulkanRenderer::loadModel(const Scene::ObjectID &id, const Model &m) {
 
 	void* mem;
 	vk.vkMapMemory(dev, memory.handle(), 0, memory.size(), 0, &mem);
-	memcpy(mem, m.vertexData().data(), m.vertexCount() * m.vertexSize());
+	memcpy(mem, m.vertexData().data(), m.vertexData().size());
 	vk.vkUnmapMemory(dev, memory.handle());
 
 	VkDeviceSize offset = (m.vertexCount() * m.vertexSize());
@@ -874,21 +874,21 @@ std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
 	}
 	bufmemIndex->purge();
 
-	if (currentScene) currentScene->unregisterUpdateListener(sceneListener);
+	if (currentScene) ::unregisterObserver(*currentScene, *sceneListener);
 	auto oldScene = currentScene;
 	currentScene = scene;
-	currentScene->registerUpdateListener(sceneListener);
+	::registerObserver(*currentScene, *sceneListener);
 
-	auto &objs = currentScene->getAllObjects();
+	auto &objs = currentScene->getAllObjectIDs();
 	GuidGenerator ggen;
 	for (auto &object : objs) {
-		loadModel(object.first, *object.second);
+		loadModel(object, currentScene->getObject(object).model);
 	}
 
 	return oldScene;
 }
 
-void VulkanRenderer::unloadModel(const Scene::ObjectID &id) {
+void VulkanRenderer::unloadModel(const SceneObjectID &id) {
 
 	auto dev = main_device.handle();
 	auto &vk = main_device.vk();
@@ -905,14 +905,14 @@ void VulkanRenderer::unloadModel(const Scene::ObjectID &id) {
 	renderObjects.erase(obj);
 }
 
-void ImplSceneUpdateListener::onNewObject(const Scene::ObjectID &objectID, const Model& object) {
-	renderer.loadModel(objectID, object);
+void ImplSceneUpdateListener::onNewObject(const Scene &scene, const SceneObjectID &objectID, const DrawableObject& object) {
+	renderer.loadModel(objectID, object.model);
 }
 
-void ImplSceneUpdateListener::onObjectRemoved(const Scene::ObjectID &objectID, const Model &object) {
+void ImplSceneUpdateListener::onObjectRemoved(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
 	renderer.unloadModel(objectID);
 }
 
-void ImplSceneUpdateListener::onObjectUpdated(const Scene::ObjectID &objectID, const Model &object) {
+void ImplSceneUpdateListener::onObjectUpdated(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
 
 }
