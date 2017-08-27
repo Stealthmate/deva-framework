@@ -98,10 +98,10 @@ namespace DevaFramework {
 
 
 	template<typename T, size_t OBJSIZE = SerialFixedSize<T>::v>
-	class FixedSizeSerialVector {
+	class FixedSizeSerialVector : public DataHolder<ByteBuffer> {
 	public:
 		FixedSizeSerialVector() : FixedSizeSerialVector(0) {}
-		FixedSizeSerialVector(size_t size) : array(std::make_shared<ByteBuffer>(size * OBJSIZE)), currentSize(0), currentCapacity(size) {}
+		FixedSizeSerialVector(size_t size) : array(size * OBJSIZE), currentSize(0), currentCapacity(size) {}
 
 		void push_back(const T& obj) {
 
@@ -149,9 +149,15 @@ namespace DevaFramework {
 
 		void reserve(size_t capacity) {
 			if (currentCapacity < capacity) {
-				array->resize((size_t)(capacity * OBJSIZE));
+				array.resize((size_t)(capacity * OBJSIZE));
 				currentCapacity = capacity;
 			}
+		}
+
+	protected:
+
+		virtual ByteBuffer onRelease() override {
+			return std::move(array.release());
 		}
 
 	private:
@@ -163,13 +169,13 @@ namespace DevaFramework {
 		}
 
 		T read_element(size_t pos) const {
-			auto istr = ByteBufferInputStream(array);
+			auto istr = ByteBufferInputStream(const_cast<ByteBuffer&>(array));
 			istr.setPosition(pos * OBJSIZE);
 			return BinaryDeserializer<T>()(istr);
 		}
 
 
-		std::shared_ptr<ByteBuffer> array;
+		ByteBuffer array;
 		size_t currentSize;
 		size_t currentCapacity;
 	};
