@@ -44,6 +44,8 @@ namespace DevaFramework
 		INSERTION_FOR_TYPE(signed long long);
 		INSERTION_FOR_TYPE(unsigned long long);
 		INSERTION_FOR_TYPE(bool);
+		INSERTION_FOR_TYPE(float);
+		INSERTION_FOR_TYPE(double);
 #undef INSERTION_FOR_TYPE
 
 

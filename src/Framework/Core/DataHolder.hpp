@@ -14,6 +14,13 @@ namespace DevaFramework {
 			return onRelease();
 		}
 
+		
+		explicit DataHolder(const DataHolder<DataType> &holder) = default;
+		DataHolder<DataType>& operator=(const DataHolder<DataType> &holder) = default;
+
+		DataHolder(DataHolder<DataType> &&holder) = default;
+		DataHolder<DataType>& operator=(DataHolder<DataType> &&holder) = default;
+
 	protected:
 		DataHolder() : mIsDataValid(true) {}
 
