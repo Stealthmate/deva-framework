@@ -22,32 +22,26 @@ int main()
 		LOG_VULKAN.setPrio(DevaLogger::LogLevel::DEBUG);
 		LOG.setPrio(DevaLogger::LogLevel::DEBUG);
 
-		//BasicModelBuilder bmb;
 		TexturedModelBuilder bmb;
-		std::unique_ptr<Model> model = std::make_unique<Model>(bmb
-			//.addVertex({ -0.5f, 0.f, 0.f, 1.f })
-			//.addVertex({ 0.f, 1.f, 0.f, 1.f })
-			//.addVertex({ 0.5f, 0.f, 0.f, 1.f })
+		auto model = std::make_shared<DrawableObject>(std::move(bmb
 			.addVertex({ -0.5f, 0.f, 0.f, 1.f }, { 0.0f, .5f, .8f })
 			.addVertex({ 0.f, 1.f, 0.f, 1.f }, { 0.0f, .3f, .7f })
 			.addVertex({ 0.5f, 0.f, 0.f, 1.f }, { 0.0f, .7f, .3f })
 			.addFace({ 0, 2, 1 })
-			.build());
-
+			.build()));
+		
 		std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-		Uuid id = scene->addObject(std::move(model));
+		Uuid id = scene->addObject(model);
 		Uuid id1;
-		const Model &mobj = scene->getObject(id);
-		//auto msg = strformat("{} {}", mobj.vertexData().size(), mobj.vertexCount());
-		//LOG.i(msg);
+		auto &mobj = scene->getObject(id);
 
 		auto engine = DevaEngineInstance::createInstance(info);
 		LOG.i("SUCCESS!");
 		auto &renderer = engine->getRenderer();
 		renderer.render(scene);
-
+		
 		bmb = TexturedModelBuilder();
-		model = std::make_unique<Model>(bmb
+		model = std::make_shared<DrawableObject>(bmb
 			.addVertex({ -0.5f, 0.f, 0.f, 1.f }, { 1.0f, .5f, .8f })
 			.addVertex({ 0.f, -1.f, 0.f, 1.f }, { 1.0f, .3f, .7f })
 			.addVertex({ 0.5f, 0.f, 0.f, 1.f }, { 1.0f, .7f, .3f })
@@ -57,11 +51,10 @@ int main()
 		size_t c = 0;
 		while (engine->update()) {
 			c++;
-			if (c > 500) {
-				//LOG.i("LEL");
+			if (c > 1000) {
 				c = 0;
-				if (scene->getAllObjects().size() == 1) id1 = scene->addObject(std::move(model));
-				else model = std::move(scene->removeObject(id1));
+				if (scene->getAllObjectIDs().size() == 1) id1 = scene->addObject(std::move(model));
+				else model = scene->removeObject(id1);
 			}
 		}
 		LOG.i("Over");
@@ -69,7 +62,7 @@ int main()
 		engine->destroy();
 
 	}
-	catch (std::exception &ex) {
+	catch (std::exception ex) {
 		std::cout << "WTF\n";
 		std::cout << ex.what() << std::endl;
 	}
