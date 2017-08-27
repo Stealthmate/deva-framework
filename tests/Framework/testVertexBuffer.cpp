@@ -13,7 +13,7 @@ protected:
 	void SetUp() {
 
 		auto bbuf = std::make_shared<ByteBuffer>(60);
-		auto ostr = ByteBufferOutputStream(bbuf);
+		auto ostr = ByteBufferOutputStream(*bbuf);
 		ostr << 1.f << 1.1f << 1.2f << 1.3f << 1.4f << 1.5f;
 		ostr << 2.1f << 2.2f << 2.3f << 2.4f << 2.5f;
 		ostr << 3.1f << 3.2f << 3.3f << 3.4f << 3.5f;
@@ -38,7 +38,7 @@ TEST_F(BufferTester, testByteBuffer)
 	EXPECT_EQ(buffer->layout(), INTERLEAVED);
 
 	auto bbuf = std::make_shared<ByteBuffer>(60);
-	auto ostr = ByteBufferOutputStream(bbuf);
+	auto ostr = ByteBufferOutputStream(*bbuf);
 	ostr << 1.1f << 1.2f << 1.3f;
 	ostr << 2.1f << 2.2f << 2.3f;
 	ostr << 3.1f << 3.2f << 3.3f;
@@ -48,8 +48,8 @@ TEST_F(BufferTester, testByteBuffer)
 	//*bbuf.asWriteOnly().lock().setPosition(0);
 
 	VertexBuffer vbremapped = VertexBuffer::convertToLayout(*buffer, SEPARATE);
-	ByteBuffer remapped = ByteBuffer(vbremapped.release());
-	ByteBuffer init = ByteBuffer(buffer->release());
+	ByteBuffer remapped(std::move(vbremapped.release()));
+	ByteBuffer init(std::move(buffer->release()));
 	for (size_t i = 0;i < 9;i++)
 	{
 		float ref;
