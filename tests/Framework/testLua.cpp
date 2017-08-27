@@ -2,37 +2,41 @@
 #include <DevaFramework\Util\Time.hpp>
 
 #include <iostream>
-
+#include <sstream>
 using namespace DevaFramework;
+using namespace std;
 
-template<uint64_t id>
-class test {
-public:
-	virtual void f() {
-		std::cout << "F " << id << std::endl;
-	}
-};
+#include<atomic>
 
-class TestDerive : public test<1>, public test<2> {
-public:
-	void test1() {
-		test<1>::f();
-	}
-	void test2() {
-		test<2>::f();
-	}
-};
+atomic<bool> over(false);
 
+void threadloop() {
+	stringstream str;
+	while (cin) {
+		string s;
+		cin >> s;
+		str << s;
+	}
+	LOG << "Read:\n" << str.str() << LOG.endl;
+	over.store(true);
+}
+#include <thread>
 int main() {
-	/*LuaContext lua;
+	LuaContext lua;
 	lua.eval("print \"Hello me!\"");
-
-	LOG.wtf("What");
-
-	return 0;*/
-
-	TestDerive td;
-	td.test1();
-	td.test2();
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 	
+	auto i = std::thread(threadloop);
+	size_t t = 0;
+	size_t cap = 10e7;
+	while (!over.load()) {
+		if (t > cap) {
+			cout << cin.rdbuf()->in_avail() << endl;
+			t = 0;
+		}
+		t++;
+	}
+	i.join();
+	return 0;
 }
