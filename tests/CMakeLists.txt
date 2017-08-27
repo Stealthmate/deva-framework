@@ -40,6 +40,7 @@ add_approval_test(Window)
 # add_approval_test(RotatingCube "VertexShader.inl" "FragmentShader.inl")
 add_approval_test(Vulkan)
 add_approval_test(UnitTests)
+add_approval_test(MinecraftClone)
 # add_approval_test("Model")
 # add_approval_test("FT_text")
 

@@ -70,8 +70,8 @@ elseif (${COMPILER} STREQUAL MSVC) # For some reason CMake complains about deref
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${REQUIRED_COMPILER_VERSION_MSVC})
 		message( SEND_ERROR "Compiler version is lower than required (${REQUIRED_COMPILER_VERSION_MSVC})! Build may fail!")
 	endif()
-	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /std:c++latest /EHsc" )
-	set(CMAKE_CXX_FLAGS_DEBUG "/MDd")
+	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /std:c++latest /EHsc /Fo\"${BINDIR}/temp/\"" )
+	set(CMAKE_CXX_FLAGS_DEBUG "/MDd /Zi /Od")
 	#message(${CMAKE_CXX_FLAGS})
 endif()
 
@@ -184,6 +184,7 @@ include(${CURDIR}/CMakeLists.txt)
 
 #Engine Public Headers
 set(HEADER_OUTPUT_DIR ${DEVA_ENGINE_PUBLIC_INCLUDE_DIR}/)
+#add_dependencies(PublicHeaders ${DEVA_ENGINE_PUBLIC_HEADERS})
 foreach(header IN LISTS DEVA_ENGINE_PUBLIC_HEADERS)
 	set(FORMATTED_PATH ${header})
 	string(REPLACE "/" "\\" FORMATTED_PATH ${FORMATTED_PATH})
