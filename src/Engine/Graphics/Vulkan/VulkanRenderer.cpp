@@ -4,6 +4,7 @@
 #include "VulkanRenderer.hpp"
 
 #include "VulkanPipelineBuilder.hpp"
+#include "VulkanBufferMemoryIndex.hpp"
 
 #include <DevaFramework\Graphics\Vulkan\Common.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanCommandPool.hpp>
@@ -16,239 +17,12 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 
+
+static std::unordered_map<Uuid, std::unique_ptr<VulkanBuffer>> buffers;
+static std::unordered_map<Uuid, std::unique_ptr<VulkanMemory>> memories;
+
 namespace DevaEngine {
-
-	class VulkanRenderer::BufferMemoryIndex {
-
-		bool needsPurge = false;
-
-		std::unordered_set<Uuid> bufferIDs;
-		std::unordered_set<Uuid> memoryIDs;
-		std::unordered_map<Uuid, std::unique_ptr<VulkanBuffer>> bufferIDMap;
-		std::unordered_map<Uuid, std::unique_ptr<VulkanMemory>> memoryIDMap;
-		std::unordered_map<Uuid, Uuid> bufferToMemoryMap;
-		std::unordered_map<Uuid, std::unordered_set<Uuid>> memoryToBuffersMap;
-
-		std::unique_ptr<VulkanBuffer> eraseBuffer(const Uuid &id) {
-			bufferIDs.erase(id);
-			std::unique_ptr<VulkanBuffer> buf;
-
-			auto i = bufferIDMap.find(id);
-			if (i != bufferIDMap.end()) {
-				buf = std::move(i->second);
-				bufferIDMap.erase(i);
-			}
-
-			return buf;
-		}
-
-		std::unique_ptr<VulkanMemory> eraseMemory(const Uuid &id) {
-			memoryIDs.erase(id);
-			std::unique_ptr<VulkanMemory> mem;
-
-			auto i = memoryIDMap.find(id);
-			if (i != memoryIDMap.end()) {
-				mem = std::move(i->second);
-				memoryIDMap.erase(i);
-			}
-
-			return mem;
-		}
-
-	public:
-
-#define BUFFER_NOT_FOUND(id) DevaInvalidArgumentException(strformat("Buffer with ID: {} does not exist in index", id.str()));
-#define MEMORY_NOT_FOUND(id) DevaInvalidArgumentException(strformat("Memory with ID: {} does not exist in index", id.str()));
-
-		Uuid addBuffer(std::unique_ptr<VulkanBuffer> buffer, const Uuid &memory) {
-
-			auto iMem = memoryIDs.find(memory);
-			if (iMem == memoryIDs.end()) {
-				throw MEMORY_NOT_FOUND(memory);
-			}
-
-			Uuid id;
-			while (bufferIDs.find(id) != bufferIDs.end()) id = Uuid();
-
-			bufferIDs.insert(id);
-			bufferIDMap.insert({ id, std::move(buffer) });
-			bufferToMemoryMap.insert({id, memory});
-			memoryToBuffersMap.find(memory)->second.insert(id);
-
-			return id;
-		}
-		VulkanBuffer& getBuffer(const Uuid &id) {
-			auto i = bufferIDs.find(id);
-			if (i == bufferIDs.end()) {
-				throw BUFFER_NOT_FOUND(id);
-			}
-
-			return *bufferIDMap.find(id)->second;
-		}
-		const VulkanBuffer& getBuffer(const Uuid &id) const {
-			auto i = bufferIDs.find(id);
-			if (i == bufferIDs.end()) {
-				throw BUFFER_NOT_FOUND(id);
-			}
-
-			return *bufferIDMap.find(id)->second;
-		}
-
-		Uuid getBufferMemory(const Uuid &bufID) {
-			auto i = bufferIDs.find(bufID);
-			if (i == bufferIDs.end()) {
-				throw BUFFER_NOT_FOUND(bufID);
-			}
-
-			return bufferToMemoryMap.find(bufID)->second;
-		}
-
-		void bindBufferMemory(const Uuid &bufID, const Uuid &memID, const VulkanDevice &dev, VkDeviceSize offset = 0) {
-
-			auto iBuf = bufferIDMap.find(bufID);
-			if (iBuf == bufferIDMap.end()) {
-				throw BUFFER_NOT_FOUND(bufID);
-			}
-			auto iMem = memoryIDMap.find(memID);
-			if (iMem == memoryIDMap.end()) {
-				throw MEMORY_NOT_FOUND(memID);
-			}
-
-			auto iMappedMem = bufferToMemoryMap.find(iBuf->first);
-			if (iMappedMem != bufferToMemoryMap.end()) {
-				throw DevaInvalidArgumentException(strformat("Buffer {} has already been mapped to memory {}", bufID.str(), iMappedMem->second.str()));
-			}
-
-			auto device = dev.handle();
-			auto &vk = dev.vk();
-			VkResult result = vk.vkBindBufferMemory(device, iBuf->second->handle(), iMem->second->handle(), offset);
-			if (result != VK_SUCCESS) {
-				throw DevaExternalFailureException("Vulkan", strformat("Could not bind buffer handle {} to memory handle {}", strm(iBuf->second->handle()), strm(iMem->second->handle())));
-			}
-
-			bufferToMemoryMap.insert({ bufID, memID });
-
-			auto iMemBufMap = memoryToBuffersMap.find(memID);
-			iMemBufMap->second.insert(bufID);
-		}
-
-		Uuid addMemory(std::unique_ptr<VulkanMemory> memory) {
-			Uuid id;
-			while (memoryIDs.find(id) != memoryIDs.end()) id = Uuid();
-
-			memoryIDs.insert(id);
-			memoryIDMap.insert({ id, std::move(memory) });
-			memoryToBuffersMap.insert({ id, {} });
-
-			return id;
-		}
-		VulkanMemory& getMemory(const Uuid &id) {
-			auto i = memoryIDs.find(id);
-			if (i == memoryIDs.end()) {
-				throw MEMORY_NOT_FOUND(id);
-			}
-
-			return *memoryIDMap.find(id)->second;
-		}
-		const VulkanMemory& getMemory(const Uuid &id) const {
-			auto i = memoryIDs.find(id);
-			if (i == memoryIDs.end()) {
-				throw MEMORY_NOT_FOUND(id);
-			}
-
-			return *memoryIDMap.find(id)->second;
-		}
-
-		void removeBuffer(Uuid id, bool discardMemory) {
-			auto iBuf = bufferIDs.find(id);
-			if (iBuf == bufferIDs.end()) {
-				throw BUFFER_NOT_FOUND(id);
-			}
-
-			auto iBufMem = bufferToMemoryMap.find(id);
-			Uuid memID = iBufMem->second;
-
-			auto iMemBuf = memoryToBuffersMap.find(memID);
-			iMemBuf->second.erase(id);
-			if (discardMemory && iMemBuf->second.size() == 0) {
-				removeMemory(memID);
-			}
-			bufferToMemoryMap.erase(iBufMem);
-			bufferIDs.erase(iBuf);
-			needsPurge = true;
-		}
-
-		void removeMemory(Uuid id) {
-			auto iMem = memoryIDs.find(id);
-			if (iMem == memoryIDs.end()) {
-				throw MEMORY_NOT_FOUND(id);
-			}
-
-			auto iMemBuf = memoryToBuffersMap.find(id);
-
-			if (iMemBuf != memoryToBuffersMap.end() && iMemBuf->second.size() > 0) {
-				throw DevaInvalidArgumentException(strformat("Memory {} is still bound to {} buffers", id.str(), iMemBuf->second.size()));
-			}
-
-			memoryToBuffersMap.erase(iMemBuf);
-			memoryIDs.erase(id);
-			needsPurge = true;
-		}
-
-		std::pair<std::vector<std::unique_ptr<VulkanBuffer>>, std::vector<std::unique_ptr<VulkanMemory>>> purge() {
-			
-			if (!needsPurge) return{};
-
-			std::pair<std::vector<std::unique_ptr<VulkanBuffer>>, std::vector<std::unique_ptr<VulkanMemory>>> purged;
-
-			auto i = bufferIDMap.begin();
-			while (i != bufferIDMap.end()) {
-				if (bufferIDs.find(i->first) == bufferIDs.end()) {
-					purged.first.push_back(std::move(i->second));
-					i = bufferIDMap.erase(i);
-				}
-				else {
-					i++;
-				}
-			}
-
-			auto j = memoryIDMap.begin();
-			while (j != memoryIDMap.end()) {
-				if (memoryIDs.find(j->first) == memoryIDs.end()) {
-					purged.second.push_back(std::move(j->second));
-					j = memoryIDMap.erase(j);
-				}
-				else {
-					j++;
-				}
-			}
-			needsPurge = false;
-
-			//LOG.d(strformat("Purged {} buffers and {} memory blocks", purged.first.size(), purged.second.size()));
-
-			return purged;
-		}
-
-		std::pair<std::vector<std::unique_ptr<VulkanBuffer>>, std::vector<std::unique_ptr<VulkanMemory>>> clear(bool discardResources) {
-			std::pair<std::vector<std::unique_ptr<VulkanBuffer>>, std::vector<std::unique_ptr<VulkanMemory>>> purged = {};
-
-			bufferIDs.clear();
-			memoryIDs.clear();
-
-			if (!discardResources) {
-				purged = purge();
-			}
-
-			bufferIDMap.clear();
-			bufferToMemoryMap.clear();
-			memoryIDMap.clear();
-			memoryToBuffersMap.clear();
-
-			return purged;
-		}
-	};
-
-	class ImplSceneUpdateListener : public Scene::SceneUpdateObserver {
+	class VulkanRenderer::ImplSceneUpdateListener : public Scene::SceneUpdateObserver {
 	public:
 
 		VulkanRenderer& renderer;
@@ -402,8 +176,8 @@ namespace
 
 VulkanRenderer::VulkanRenderer() :
 	instance(VulkanInstance()),
-	bufmemIndex(std::make_unique<BufferMemoryIndex>(BufferMemoryIndex())),
-	sceneListener(std::make_shared<ImplSceneUpdateListener>(*this)) {}
+	bufmemIndex(std::make_unique<VulkanBufferMemoryIndex>(VulkanBufferMemoryIndex())),
+	sceneListener(std::static_pointer_cast<Observers::SceneObserver>(std::make_shared<ImplSceneUpdateListener>(*this))) {}
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 	VkDebugReportFlagsEXT       flags,
@@ -607,6 +381,8 @@ void VulkanRenderer::createPipeline()
 	vib.addAttribute(vad);
 
 	plb.addVertexInputBinding(vib);
+	plb.setDescriptorSetCount(1);
+	plb.defineUniform(0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
 
 	this->pipeline = plb.build(this->main_device);
 
@@ -665,8 +441,6 @@ struct HashHandle {
 	}
 };
 
-static std::vector<std::unique_ptr<VulkanBuffer>> buffers;
-static std::vector<std::unique_ptr<VulkanMemory>> memories;
 
 void VulkanRenderer::drawFrame()
 {
@@ -699,13 +473,12 @@ void VulkanRenderer::drawFrame()
 	vk.vkCmdBeginRenderPass(commandBuffers[0], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vk.vkCmdBindPipeline(commandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-	auto purged = bufmemIndex->purge();
-	//for (auto &i : purged.first) buffers.push_back(std::move(i));
-	for (auto &i : purged.second) memories.push_back(std::move(i));
+	bufmemIndex->purge();
 
 	for (auto& object : renderObjects) {
 		auto &obj = object.second;
-		VulkanBuffer& buf = bufmemIndex->getBuffer(object.second.buffer());
+		//VulkanBuffer& buf = bufmemIndex->getBuffer(object.second.buffer());
+		VulkanBuffer& buf = *buffers.find(object.second.buffer())->second;
 		VkDeviceSize offsets[] = { 0 };
 		VkBuffer handle = buf.handle();
 		VkDeviceSize offsetIndex = obj.offsetIndex();
@@ -823,45 +596,59 @@ void VulkanRenderer::loadModel(const SceneObjectID &id, const Model &m) {
 	auto &vk = main_device.vk();
 
 	size_t datasize = (m.vertexCount() * m.vertexSize()) + (m.faceIndices().size() * sizeof(uint32_t));
-	std::unique_ptr<VulkanMemory> memptr = nullptr;
-	for (auto mem = memories.begin(); mem != memories.end(); mem++) {
-		if (mem->get()->size() >= datasize) {
-			memptr = std::move(*mem);
-			memories.erase(mem);
-			break;
-		}
-	}
-	std::unique_ptr<VulkanBuffer> bufptr = nullptr;
-	for (auto buf = buffers.begin(); buf != buffers.end(); buf++) {
-		if (buf->get()->size() >= datasize) {
-			bufptr = std::move(*buf);
-			buffers.erase(buf);
+
+	/*VulkanBufferMemoryIndex::BufID bufid(VulkanBufferMemoryIndex::BufID::NULL_ID);
+	for (auto id : bufmemIndex->getUnmappedBuffers()) {
+		auto &buf = bufmemIndex->getBuffer(id);
+		if (buf.size() >= datasize) {
+			bufid = id;
 			break;
 		}
 	}
 
-	if(!bufptr) bufptr = std::make_unique<VulkanBuffer>(VulkanBuffer::create(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
-	if(!memptr) memptr = std::make_unique<VulkanMemory>(VulkanMemory::forBuffer(*bufptr, main_device, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
-	
-	Uuid memID = bufmemIndex->addMemory(std::move(memptr));
-	VulkanMemory &memory = bufmemIndex->getMemory(memID);
-	vk.vkBindBufferMemory(dev, bufptr->handle(), memory.handle(), 0);
-	Uuid bufID = bufmemIndex->addBuffer(std::move(bufptr), memID);
-	VulkanBuffer &buf = bufmemIndex->getBuffer(bufID);
+	if (bufid == Uuid::NULL_ID) {
+		bufid = bufmemIndex->addBuffer(VulkanBuffer::create(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
+	}
 
-	void* mem;
-	vk.vkMapMemory(dev, memory.handle(), 0, memory.size(), 0, &mem);
-	memcpy(mem, m.vertexData().data(), m.vertexData().size());
-	vk.vkUnmapMemory(dev, memory.handle());
+	auto &buf = bufmemIndex->getBuffer(bufid);
+
+	VulkanBufferMemoryIndex::MemID memid = Uuid::NULL_ID;
+
+	auto memories = bufmemIndex->getUnmappedMemoryBlocks();
+	for (auto id : memories) {
+		auto &mem = bufmemIndex->getMemory(id);
+		if (Vulkan::vulkanBufferCompatibleWithMemory(buf, mem)) {
+			memid = id;
+			break;
+		}
+	}
+	if (memid == Uuid::NULL_ID) {
+		memid = bufmemIndex->addMemory(VulkanMemory::forBuffer(buf, main_device, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+	}*/
+
+	/*auto bufid = bufmemIndex->addBuffer(VulkanBuffer::create(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
+	auto &buf = bufmemIndex->getBuffer(bufid);
+	auto memid = bufmemIndex->addMemory(VulkanMemory);
+	auto &mem = bufmemIndex->getMemory(memid);
+	bufmemIndex->bindBufferMemory(bufid, memid, main_device, 0);*/
+	buffers.insert({ id, std::make_unique<VulkanBuffer>(VulkanBuffer::create(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE)) });
+	auto &buf = *buffers.find(id)->second;
+	memories.insert({ id, std::make_unique<VulkanMemory>(VulkanMemory::forBuffer(buf, main_device, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) });
+	auto &mem = *memories.find(id)->second;
+	vk.vkBindBufferMemory(dev, buf.handle(), mem.handle(), 0);
+	void* memory = nullptr;
+	vk.vkMapMemory(dev, mem.handle(), 0, mem.size(), 0, &memory);
+	memcpy(memory, m.vertexData().data(), m.vertexData().size());
+	vk.vkUnmapMemory(dev, mem.handle());
 
 	VkDeviceSize offset = (m.vertexCount() * m.vertexSize());
-	vk.vkMapMemory(dev, memory.handle(), offset, m.faceIndices().size() * sizeof(uint32_t), 0, &mem);
-	memcpy(mem, m.faceIndices().data(), m.faceIndices().size() * sizeof(uint32_t));
-	vk.vkUnmapMemory(dev, memory.handle());
+	vk.vkMapMemory(dev, mem.handle(), offset, m.faceIndices().size() * sizeof(uint32_t), 0, &memory);
+	memcpy(memory, m.faceIndices().data(), m.faceIndices().size() * sizeof(uint32_t));
+	vk.vkUnmapMemory(dev, mem.handle());
 
-	mem = nullptr;
+	memory = nullptr;
 
-	renderObjects.insert({ id, VulkanRenderObject(bufID, offset, static_cast<uint32_t>(m.faceIndices().size())) });
+	renderObjects.insert({ id, VulkanRenderObject(id, offset, static_cast<uint32_t>(m.faceIndices().size())) });
 }
 
 std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
@@ -905,14 +692,14 @@ void VulkanRenderer::unloadModel(const SceneObjectID &id) {
 	renderObjects.erase(obj);
 }
 
-void ImplSceneUpdateListener::onNewObject(const Scene &scene, const SceneObjectID &objectID, const DrawableObject& object) {
+void VulkanRenderer::ImplSceneUpdateListener::onNewObject(const Scene &scene, const SceneObjectID &objectID, const DrawableObject& object) {
 	renderer.loadModel(objectID, object.model);
 }
 
-void ImplSceneUpdateListener::onObjectRemoved(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
+void VulkanRenderer::ImplSceneUpdateListener::onObjectRemoved(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
 	renderer.unloadModel(objectID);
 }
 
-void ImplSceneUpdateListener::onObjectUpdated(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
+void VulkanRenderer::ImplSceneUpdateListener::onObjectUpdated(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
 
 }

@@ -12,7 +12,7 @@ const int HEIGHT = 600;
 
 int main()
 {
-	try {
+	//try {
 
 		DevaEngineInstanceCreateInfo info;
 		info.window_height = 600;
@@ -53,17 +53,17 @@ int main()
 			c++;
 			if (c > 1000) {
 				c = 0;
-				if (scene->getAllObjectIDs().size() == 1) id1 = scene->addObject(std::move(model));
-				else model = scene->removeObject(id1);
+				//if (scene->getAllObjectIDs().size() == 1) id1 = scene->addObject(std::move(model));
+				//else model = scene->removeObject(id1);
 			}
 		}
 		LOG.i("Over");
 
 		engine->destroy();
 
-	}
+	/*}
 	catch (std::exception ex) {
 		std::cout << "WTF\n";
 		std::cout << ex.what() << std::endl;
-	}
+	}*/
 }

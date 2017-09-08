@@ -25,25 +25,31 @@ VulkanMemory VulkanMemory::forBuffer(const VulkanBuffer &buffer, const VulkanDev
 		throw DevaExternalFailureException("Vulkan", "Could not allocated device memory");
 	}
 
-	return VulkanMemory(dev, mem, allocInfo.allocationSize, dev.physicalDeviceTraits().memoryProperties().memoryTypes[index]);
+	return VulkanMemory(dev, mem, allocInfo.allocationSize, dev.physicalDeviceTraits().memoryProperties().memoryTypes[index], index);
 }
 
 VulkanMemory::VulkanMemory() noexcept = default;
 
-VulkanMemory::VulkanMemory(const VulkanDevice &dev, VkDeviceMemory handle, VkDeviceSize size, const VkMemoryType &type)
+VulkanMemory::VulkanMemory(const VulkanDevice &dev, VkDeviceMemory handle, VkDeviceSize size, const VkMemoryType &type, uint32_t typeIndex)
 	: mHandle(dev.handle(), dev.vk().vkFreeMemory, handle),
 	mSize(size),
-	mType(type) {}
+	mType(type),
+	mTypeIndex(typeIndex) {}
 
 VulkanMemory::VulkanMemory(VulkanMemory &&memory) noexcept
 	: mHandle(std::move(memory.mHandle)),
 	mSize(memory.mSize),
-	mType(memory.mType) {}
+	mType(memory.mType),
+	mTypeIndex(memory.mTypeIndex) {}
 
 VulkanMemory& VulkanMemory::operator=(VulkanMemory &&memory) noexcept {
+
+	if (this == &memory) return *this;
+
 	mHandle = std::move(memory.mHandle);
 	mSize = memory.mSize;
 	mType = memory.mType;
+	mTypeIndex = memory.mTypeIndex;
 
 	return *this;
 }

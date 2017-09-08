@@ -9,18 +9,38 @@
 #include <DevaFramework/Graphics/Vulkan/VulkanCommandPool.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanBuffer.hpp>
 #include "VulkanRenderObject.hpp"
-
+#include "VulkanBufferMemoryIndex.hpp"
 #include "VulkanSwapchain.hpp"
 
 namespace DevaEngine
 {
 	class VulkanRenderer : public Renderer
 	{
-		class BufferMemoryIndex;
+	public:
+
+		DEVA_ENGINE_API VulkanRenderer();
+		DEVA_ENGINE_API VulkanRenderer(const DevaFramework::Window &wnd);
+		DEVA_ENGINE_API VulkanRenderer(VulkanRenderer &&renderer);
+		DEVA_ENGINE_API virtual ~VulkanRenderer();
+
+		DEVA_ENGINE_API void attachToWindow(const DevaFramework::Window &wnd);
+
+		DEVA_ENGINE_API virtual void createPipeline();
+
+		DEVA_ENGINE_API virtual void renderExample() override;
+
+		DEVA_ENGINE_API virtual std::shared_ptr<Scene> render(std::shared_ptr<Scene> scene) override;
+
+		DEVA_ENGINE_API void destroy();
+
+
+	private:
+
+		class ImplSceneUpdateListener;
 		friend class ImplSceneUpdateListener;
 
 		std::shared_ptr<Scene::SceneUpdateObserver> sceneListener;
-		std::unique_ptr<BufferMemoryIndex> bufmemIndex;
+		std::unique_ptr<VulkanBufferMemoryIndex> bufmemIndex;
 
 		std::shared_ptr<Scene> currentScene;
 
@@ -47,23 +67,6 @@ namespace DevaEngine
 
 		void freeBuffer(const DevaFramework::Vulkan::VulkanBufferID &buffer);
 
-
-	public:
-
-		DEVA_ENGINE_API VulkanRenderer();
-		DEVA_ENGINE_API VulkanRenderer(const DevaFramework::Window &wnd);
-		DEVA_ENGINE_API VulkanRenderer(VulkanRenderer &&renderer);
-
-		DEVA_ENGINE_API 
-			void attachToWindow(const DevaFramework::Window &wnd);
-		DEVA_ENGINE_API virtual void createPipeline();
-
-		DEVA_ENGINE_API virtual void renderExample() override;
-
-		DEVA_ENGINE_API virtual std::shared_ptr<Scene> render(std::shared_ptr<Scene> scene) override;
-
-		DEVA_ENGINE_API void destroy();
-		DEVA_ENGINE_API virtual ~VulkanRenderer() override;
 	};
 }
 

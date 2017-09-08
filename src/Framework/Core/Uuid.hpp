@@ -8,6 +8,7 @@
 namespace DevaFramework {
 	class Uuid {
 	public:
+		DEVA_FRAMEWORK_API static const Uuid NULL_ID;
 
 		DEVA_FRAMEWORK_API Uuid();
 
@@ -17,6 +18,8 @@ namespace DevaFramework {
 
 	private:
 		Guid uuid;
+
+		Uuid(Guid guid);
 	};
 
 	inline bool operator==(const Uuid &lhs, const Uuid &rhs) { return (std::string) lhs == (std::string)rhs; }

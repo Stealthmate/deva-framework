@@ -20,6 +20,7 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API VkDeviceMemory handle() const noexcept { return mHandle; }
 		DEVA_FRAMEWORK_API VkDeviceSize size() const noexcept { return mSize; }
 		DEVA_FRAMEWORK_API VkMemoryType type() const noexcept { return mType; }
+		DEVA_FRAMEWORK_API uint32_t typeIndex() const noexcept { return mTypeIndex; }
 
 		DEVA_FRAMEWORK_API void free();
 
@@ -28,8 +29,9 @@ namespace DevaFramework {
 		VulkanHandle<VkDeviceMemory> mHandle;
 		VkDeviceSize mSize;
 		VkMemoryType mType;
+		uint32_t mTypeIndex;
 
-		VulkanMemory(const VulkanDevice& dev, VkDeviceMemory memory, VkDeviceSize size, const VkMemoryType &type);
+		VulkanMemory(const VulkanDevice& dev, VkDeviceMemory memory, VkDeviceSize size, const VkMemoryType &type, uint32_t typeIndex);
 		VulkanMemory(const VulkanMemory &memory) = delete;
 		VulkanMemory& operator=(const VulkanMemory &memory) = delete;
 	};

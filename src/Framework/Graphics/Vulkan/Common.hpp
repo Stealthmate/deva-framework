@@ -6,6 +6,8 @@
 #include "VulkanHandle.hpp"
 #include "VulkanInstance.hpp"
 #include "VulkanPhysicalDevice.hpp"
+#include "VulkanBuffer.hpp"
+#include "VulkanMemory.hpp"
 
 #include "..\VertexBuffer.hpp"
 
@@ -27,6 +29,8 @@ namespace DevaFramework {
 
 		template <class T>
 		DEVA_FRAMEWORK_API T vulkanCopyHandle(const T &o1, const T &o2);
+
+		DEVA_FRAMEWORK_API bool vulkanBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanMemory &mem);
 	}
 
 }

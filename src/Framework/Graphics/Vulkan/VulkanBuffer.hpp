@@ -3,6 +3,7 @@
 
 #include "Config.hpp"
 #include "VulkanHandle.hpp"
+#include "../../Core/DataHolder.hpp"
 
 namespace DevaFramework {
 
