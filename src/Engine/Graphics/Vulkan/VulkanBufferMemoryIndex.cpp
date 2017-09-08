@@ -160,11 +160,11 @@ std::unordered_set<BufID> VulkanBufferMemoryIndex::getUnmappedBuffers() const {
 
 	typedef struct {
 		bool operator()(const BufID &id, const std::pair<BufID, MemID> &idpair) {
-			return id == idpair.first;
+			return id < idpair.first;
 		}
 
 		bool operator()(const std::pair<BufID, MemID> &idpair, const BufID &id) {
-			return !(*this)(id, idpair);
+			return (*this)(id, idpair);
 		}
 
 		bool operator()(const BufID &id1, const BufID &id2) {

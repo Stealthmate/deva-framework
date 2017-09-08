@@ -17,10 +17,6 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 
-
-static std::unordered_map<Uuid, std::unique_ptr<VulkanBuffer>> buffers;
-static std::unordered_map<Uuid, std::unique_ptr<VulkanMemory>> memories;
-
 namespace DevaEngine {
 	class VulkanRenderer::ImplSceneUpdateListener : public Scene::SceneUpdateObserver {
 	public:
@@ -477,8 +473,7 @@ void VulkanRenderer::drawFrame()
 
 	for (auto& object : renderObjects) {
 		auto &obj = object.second;
-		//VulkanBuffer& buf = bufmemIndex->getBuffer(object.second.buffer());
-		VulkanBuffer& buf = *buffers.find(object.second.buffer())->second;
+		VulkanBuffer& buf = bufmemIndex->getBuffer(object.second.buffer());
 		VkDeviceSize offsets[] = { 0 };
 		VkBuffer handle = buf.handle();
 		VkDeviceSize offsetIndex = obj.offsetIndex();
@@ -597,7 +592,7 @@ void VulkanRenderer::loadModel(const SceneObjectID &id, const Model &m) {
 
 	size_t datasize = (m.vertexCount() * m.vertexSize()) + (m.faceIndices().size() * sizeof(uint32_t));
 
-	/*VulkanBufferMemoryIndex::BufID bufid(VulkanBufferMemoryIndex::BufID::NULL_ID);
+	VulkanBufferMemoryIndex::BufID bufid(VulkanBufferMemoryIndex::BufID::NULL_ID);
 	for (auto id : bufmemIndex->getUnmappedBuffers()) {
 		auto &buf = bufmemIndex->getBuffer(id);
 		if (buf.size() >= datasize) {
@@ -624,18 +619,11 @@ void VulkanRenderer::loadModel(const SceneObjectID &id, const Model &m) {
 	}
 	if (memid == Uuid::NULL_ID) {
 		memid = bufmemIndex->addMemory(VulkanMemory::forBuffer(buf, main_device, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
-	}*/
-
-	/*auto bufid = bufmemIndex->addBuffer(VulkanBuffer::create(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
-	auto &buf = bufmemIndex->getBuffer(bufid);
-	auto memid = bufmemIndex->addMemory(VulkanMemory);
+	}
+	
 	auto &mem = bufmemIndex->getMemory(memid);
-	bufmemIndex->bindBufferMemory(bufid, memid, main_device, 0);*/
-	buffers.insert({ id, std::make_unique<VulkanBuffer>(VulkanBuffer::create(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE)) });
-	auto &buf = *buffers.find(id)->second;
-	memories.insert({ id, std::make_unique<VulkanMemory>(VulkanMemory::forBuffer(buf, main_device, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) });
-	auto &mem = *memories.find(id)->second;
-	vk.vkBindBufferMemory(dev, buf.handle(), mem.handle(), 0);
+	bufmemIndex->bindBufferMemory(bufid, memid, main_device, 0);
+
 	void* memory = nullptr;
 	vk.vkMapMemory(dev, mem.handle(), 0, mem.size(), 0, &memory);
 	memcpy(memory, m.vertexData().data(), m.vertexData().size());
@@ -648,7 +636,7 @@ void VulkanRenderer::loadModel(const SceneObjectID &id, const Model &m) {
 
 	memory = nullptr;
 
-	renderObjects.insert({ id, VulkanRenderObject(id, offset, static_cast<uint32_t>(m.faceIndices().size())) });
+	renderObjects.insert({ id, VulkanRenderObject(bufid, offset, static_cast<uint32_t>(m.faceIndices().size())) });
 }
 
 std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
@@ -688,7 +676,7 @@ void VulkanRenderer::unloadModel(const SceneObjectID &id) {
 
 	VulkanRenderObject &vro = obj->second;
 
-	bufmemIndex->removeBuffer(vro.buffer(), true);
+	bufmemIndex->removeBuffer(vro.buffer(), false);
 	renderObjects.erase(obj);
 }
 
