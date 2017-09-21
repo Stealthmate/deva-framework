@@ -23,7 +23,6 @@ namespace DevaEngine {
 		DEVA_ENGINE_API DevaFramework::Vulkan::VulkanBufferID buffer() const;
 		DEVA_ENGINE_API VkDeviceSize offsetIndex() const;
 		DEVA_ENGINE_API uint32_t indexCount() const;
-		DEVA_ENGINE_API DevaFramework::Vulkan::VulkanBufferID bufferMVP() const;
 		DEVA_ENGINE_API VkDeviceSize offsetMVP() const;
 		DEVA_ENGINE_API VkDescriptorSet getDescriptorSet() const;
 
@@ -39,11 +38,8 @@ namespace DevaEngine {
 		DevaFramework::Vulkan::VulkanBufferID mBufferVertexIndex;
 		uint32_t mIndexCount;
 		VkDeviceSize mOffsetIndex;
-
-		DevaFramework::Vulkan::VulkanBufferID mBufferMVP;
 		VkDeviceSize mOffsetMVP;
-
-		VkDescriptorSet dset;
+		VkDescriptorSet mDescriptorSet;
 	};
 
 }

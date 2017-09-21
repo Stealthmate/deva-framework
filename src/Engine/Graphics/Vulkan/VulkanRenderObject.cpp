@@ -9,11 +9,6 @@ VkDeviceSize DevaEngine::VulkanRenderObject::offsetIndex() const { return mOffse
 
 uint32_t DevaEngine::VulkanRenderObject::indexCount() const { return mIndexCount; }
 
-DevaFramework::Vulkan::VulkanBufferID DevaEngine::VulkanRenderObject::bufferMVP() const
-{
-	return mBufferMVP;
-}
-
 VkDeviceSize DevaEngine::VulkanRenderObject::offsetMVP() const
 {
 	return mOffsetMVP;
@@ -27,8 +22,8 @@ DevaEngine::VulkanRenderObject::VulkanRenderObject(
 	VkDescriptorSet dset)
 	: mBufferVertexIndex(buffer),
 	mOffsetIndex(offsetIndex),
-	mIndexCount(indexCount), mBufferMVP(buffer), mOffsetMVP(offsetMVP), dset(dset) {}
+	mIndexCount(indexCount), mOffsetMVP(offsetMVP), mDescriptorSet(dset) {}
 
 	VkDescriptorSet VulkanRenderObject::getDescriptorSet() const {
-	return dset;
+	return mDescriptorSet;
 }
