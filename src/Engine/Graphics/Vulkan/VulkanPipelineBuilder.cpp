@@ -144,27 +144,15 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::setRenderPass(VkRe
 	return *this;
 }
 
-VulkanHandle<VkPipeline> VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
+VulkanGraphicsPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
 {
 	auto device = dev.handle();
 	auto & vk = dev.vk();
 
-	std::vector<VkDescriptorSetLayout> descsetlayouts;
-	for (auto i : descriptorSets) {
-		descsetlayouts.push_back({});
-		VkDescriptorSetLayoutCreateInfo cinfo;
-		cinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		cinfo.pNext = nullptr;
-		cinfo.flags = 0;
-		cinfo.bindingCount = static_cast<uint32_t>(i.size());
-		cinfo.pBindings = i.data();
-		VkResult result = vk.vkCreateDescriptorSetLayout(device, &cinfo, nullptr, &*(descsetlayouts.end() - 1));
-	}
-
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descsetlayouts.size());// Optional
-	pipelineLayoutInfo.pSetLayouts = descsetlayouts.data(); // Optional
+	pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());// Optional
+	pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data(); // Optional
 	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 	pipelineLayoutInfo.pPushConstantRanges = 0; // Optional
 
@@ -207,9 +195,9 @@ VulkanHandle<VkPipeline> VulkanGraphicsPipelineBuilder::build(const VulkanDevice
 		throw DevaException("Failed to create graphics pipeline!");
 	}
 
-	vk.vkDestroyPipelineLayout(device, createInfo.layout, nullptr);
+	//vk.vkDestroyPipelineLayout(device, createInfo.layout, nullptr);
 
-	return pl;
+	return VulkanGraphicsPipeline(std::move(pl), createInfo);
 }
 
 VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding)
@@ -218,45 +206,8 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addVertexInputBind
 	return *this;
 }
 
-VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::setDescriptorSetCount(uint32_t count) {
-	descriptorSets.resize(count, std::vector<VkDescriptorSetLayoutBinding>());
-
-	return *this;
-}
-
-VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::defineUniform(
-	uint32_t set,
-	uint32_t binding,
-	VkDescriptorType type,
-	uint32_t count,
-	VkShaderStageFlags stage,
-	std::vector<VkSampler> pImmutableSamplers) {
-
-	if (set >= descriptorSets.size()) {
-		throw DevaException("Attempt to define uniform for set number " + strm(set) + " which is larger than current set count " + strm(set));
-	}
-
-	auto& bindings = descriptorSets[set];
-	VkDescriptorSetLayoutBinding *newbind = nullptr;
-	for (auto &b : bindings) {
-		if (b.binding == binding) {
-			ENGINE_LOG.w(strformat("Overwriting binding {} in set {}", binding, set));
-			newbind = &b;
-			break;
-		}
-	}
-	if (!newbind) {
-		bindings.push_back({});
-		newbind = &*(bindings.end() - 1);
-	}
-
-	newbind->binding = binding;
-	newbind->descriptorCount = count;
-	newbind->descriptorType = type;
-	newbind->pImmutableSamplers = pImmutableSamplers.data();
-	newbind->stageFlags = stage;
-
-	ENGINE_LOG.v(strformat("Add pipeline binding {} to set {}", binding, set));
-
+VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addDescriptorSetLayout(VkDescriptorSetLayout layout, uint32_t *setn) {
+	descriptorSetLayouts.push_back(layout);
+	if (setn) *setn = descriptorSetLayouts.size() - 1;
 	return *this;
 }

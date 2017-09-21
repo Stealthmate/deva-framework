@@ -5,13 +5,32 @@
 #include <DevaFramework\Util\CStructDeleter.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanHandle.hpp>
 #include "VulkanSwapchain.hpp"
+#include "VulkanPipeline.hpp"
 
 #include <DevaFramework\Graphics\Vulkan\VertexInputBinding.hpp>
 
 namespace DevaEngine {
 
 	class VulkanGraphicsPipelineBuilder {
+	public:
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder();
 
+
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& outputExtent(const VkExtent2D &extent);
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setTopology(VkPrimitiveTopology t);
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setRenderPass(VkRenderPass rp, int subpass);
+
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& attachShader(VkShaderModule shader, VkShaderStageFlagBits type, const char* entry);
+
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding);
+
+		VkDescriptorSetLayoutBinding st;
+
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& addDescriptorSetLayout(VkDescriptorSetLayout layout, uint32_t *setn = nullptr);
+
+		DEVA_ENGINE_API VulkanGraphicsPipeline build(const DevaFramework::VulkanDevice &dev);
+
+	private:
 		VkGraphicsPipelineCreateInfo createInfo;
 
 		std::vector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;
@@ -38,36 +57,10 @@ namespace DevaEngine {
 		std::vector<VkDynamicState> dynamicStates;
 		VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo;
 
-		std::vector<std::vector<VkDescriptorSetLayoutBinding>> descriptorSets;
+
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
 
 		void prepare();
-
-	public:
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder();
-
-
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& outputExtent(const VkExtent2D &extent);
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setTopology(VkPrimitiveTopology t);
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setRenderPass(VkRenderPass rp, int subpass);
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setLayout(VkPipelineLayout layout);
-
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& attachShader(VkShaderModule shader, VkShaderStageFlagBits type, const char* entry);
-
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding);
-
-		VkDescriptorSetLayoutBinding st;
-
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& setDescriptorSetCount(uint32_t count);
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& defineUniform(
-			uint32_t set,
-			uint32_t binding,
-			VkDescriptorType type,
-			uint32_t count = 1,
-			VkShaderStageFlags stage = VK_SHADER_STAGE_ALL_GRAPHICS,
-			std::vector<VkSampler> pImmutableSamplers = std::vector<VkSampler>());
-
-		DEVA_ENGINE_API DevaFramework::VulkanHandle<VkPipeline> build(const DevaFramework::VulkanDevice &dev);
-
 	};
 }
 
