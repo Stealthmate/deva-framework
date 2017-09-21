@@ -22,14 +22,14 @@ namespace DevaEngine
 		};
 
 		DEVA_ENGINE_API VulkanGraphicsPipeline() noexcept;
-		DEVA_ENGINE_API VulkanGraphicsPipeline(DevaFramework::VulkanHandle<VkPipeline> handle, const VkGraphicsPipelineCreateInfo &cinfo);
+		DEVA_ENGINE_API VulkanGraphicsPipeline(VkPipeline handle, const VkGraphicsPipelineCreateInfo &cinfo);
 
 		DEVA_ENGINE_API VkPipeline getHandle() const;
 		DEVA_ENGINE_API VkPipelineLayout getPipelineLayout() const;
 
 	private:
-		DevaFramework::VulkanHandle<VkPipeline> mHandle;
-		DevaFramework::VulkanHandle<VkPipelineLayout> mPipelineLayout;
+		VkPipeline mHandle;
+		VkPipelineLayout mPipelineLayout;
 		std::vector<DescriptorSetLayoutInfo> mLayoutInfos;
 	};
 }

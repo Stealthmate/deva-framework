@@ -189,15 +189,13 @@ VulkanGraphicsPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &
 	inputState.pVertexAttributeDescriptions = attrDescriptions.data();
 	createInfo.pVertexInputState = &inputState;
 
-	VulkanHandle<VkPipeline> pl(device, vk.vkDestroyPipeline);
-	auto result = vk.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &createInfo, nullptr, pl.replace());
+	VkPipeline pl;
+	auto result = vk.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &createInfo, nullptr, &pl);
 	if (result != VK_SUCCESS) {
 		throw DevaException("Failed to create graphics pipeline!");
 	}
 
-	//vk.vkDestroyPipelineLayout(device, createInfo.layout, nullptr);
-
-	return VulkanGraphicsPipeline(std::move(pl), createInfo);
+	return VulkanGraphicsPipeline(pl, createInfo);
 }
 
 VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding)
