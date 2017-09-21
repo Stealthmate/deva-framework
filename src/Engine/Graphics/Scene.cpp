@@ -69,6 +69,7 @@ SceneObjectID Scene::addObject(Scene::ObjectPtr object) {
 	SceneObjectID id;
 	::registerObserver(*object, *objectObserver);
 	objects.insert({ id, std::move(object) });
+	objectTransforms.insert({ id, mat4() });
 	notifyObservers(SceneEvent(SceneEventType::NEW_OBJECT, *this, id, *objects.find(id)->second));
 	return id;
 }
@@ -113,4 +114,17 @@ Scene::ObjectPtr Scene::removeObject(const SceneObjectID &id) {
 	objects.erase(id);
 	notifyObservers(SceneEvent(SceneEventType::OBJECT_REMOVED, *this, id, *obj));
 	return obj;
+}
+
+const mat4& Scene::getObjectTransform(const SceneObjectID &id) const {
+	auto &result = objectTransforms.find(id);
+	if (result == objectTransforms.end())
+		throw DevaInvalidArgumentException("Scene does not contain object with id " + strm(id.str()));
+	
+	return result->second;
+}
+
+void Scene::setObjectTransform(const SceneObjectID &id, const mat4 &transform) {
+	objectTransforms.insert_or_assign(id, transform);
+	notifyObservers(SceneEvent(SceneEventType::OBJECT_UPDATED, *this, id, *objects.find(id)->second));
 }
