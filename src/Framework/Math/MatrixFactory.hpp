@@ -7,9 +7,8 @@
 #include "Vector.hpp"
 //#include "Quaternion.hpp"
 
-namespace DevaFramework
+namespace DevaFramework::Math
 {
-
 	/**
 		@param angle - angle of rotation
 		@param axis - axis of rotation

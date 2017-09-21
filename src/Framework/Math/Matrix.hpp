@@ -18,7 +18,6 @@ namespace DevaFramework
 	typedef BaseMatrix<float, 4, 3> mat4x3;
 	typedef BaseMatrix<float, 4, 4> mat4x4;
 
-	/* Not ready for deployment
 	typedef BaseMatrix<double, 2, 2> dmat2x2;
 	typedef BaseMatrix<double, 2, 3> dmat2x3;
 	typedef BaseMatrix<double, 2, 4> dmat2x4;
@@ -30,7 +29,6 @@ namespace DevaFramework
 	typedef BaseMatrix<double, 4, 2> dmat4x2;
 	typedef BaseMatrix<double, 4, 3> dmat4x3;
 	typedef BaseMatrix<double, 4, 4> dmat4x4;
-	*/
 
 	typedef mat2x2 mat2;
 	typedef mat3x3 mat3;

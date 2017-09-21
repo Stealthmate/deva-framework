@@ -34,20 +34,22 @@ namespace DevaFramework
 	template<typename T, unsigned int n_vectors, unsigned int vector_length>
 	class BaseMatrix
 	{
+		static_assert(std::is_arithmetic_v<T>, "Cannot create matrix with non-arithmetic type");
 	protected:
 		T data[n_vectors*vector_length];
 
 	public:
 
 
-		///Default constructs every element in the matrix
-		BaseMatrix()
+		///Creates an identity matrix
+		constexpr BaseMatrix()
 		{
 			for (int i = 0;i <= n_vectors - 1;i++)
 			{
 				for (int j = 0;j <= vector_length - 1;j++)
 				{
-					data[i*vector_length + j] = T();
+					data[i*vector_length + j] = 0;
+					if (i == j) data[i*vector_length + j] = 1;
 				}
 			}
 		}
