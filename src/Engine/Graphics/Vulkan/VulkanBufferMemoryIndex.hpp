@@ -33,7 +33,7 @@ namespace DevaEngine {
 		DEVA_ENGINE_API void removeMemory(const MemID &id);
 
 		DEVA_ENGINE_API std::pair<std::vector<DevaFramework::VulkanBuffer>, std::vector<DevaFramework::VulkanMemory>> purge();
-		DEVA_ENGINE_API std::pair<std::vector<DevaFramework::VulkanBuffer>, std::vector<DevaFramework::VulkanMemory>> clear(bool discardResources);
+		DEVA_ENGINE_API std::pair<std::vector<DevaFramework::VulkanBuffer>, std::vector<DevaFramework::VulkanMemory>> clear();
 
 	private:
 

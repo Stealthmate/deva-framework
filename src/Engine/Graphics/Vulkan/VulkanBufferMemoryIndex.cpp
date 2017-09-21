@@ -281,15 +281,14 @@ std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemory>> VulkanBufferMemo
 	return purged;
 }
 
-std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemory>> VulkanBufferMemoryIndex::clear(bool discardResources) {
+std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemory>> VulkanBufferMemoryIndex::clear() {
 	std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemory>> purged = {};
 
 	bufferIDs.clear();
 	memoryIDs.clear();
+	needsPurge = true;
 
-	if (!discardResources) {
-		purged = purge();
-	}
+	purged = purge();
 
 	bufferIDMap.clear();
 	bufferToMemoryMap.clear();
