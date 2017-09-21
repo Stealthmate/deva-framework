@@ -31,7 +31,7 @@ namespace DevaEngine {
 		virtual void onObjectRemoved(const Scene &scene, const SceneObjectID &id, const DrawableObject &object);
 	};
 
-	DescriptorPoolManager::DescriptorPoolManager(
+	VulkanDescriptorPool::VulkanDescriptorPool(
 		const DevaFramework::VulkanDevice &dev,
 		const std::vector<VulkanDescriptorSetLayout::LayoutModel> &layouts,
 		uint32_t maxSets)
@@ -66,11 +66,15 @@ namespace DevaEngine {
 		cinfo.pPoolSizes = sizes.data();
 		cinfo.maxSets = maxSets;
 
-		if (vk.vkCreateDescriptorPool(device, &cinfo, nullptr, poolHandle.replace()) != VK_SUCCESS)
+		if (vk.vkCreateDescriptorPool(device, &cinfo, nullptr, &poolHandle) != VK_SUCCESS)
 			throw DevaException("Could not create descriptor pool");
 	}
 
-	std::vector<VkDescriptorSet> DescriptorPoolManager::allocateDescriptorSets(const std::vector<VkDescriptorSetLayout> &layouts, size_t count) {
+	VkDescriptorPool VulkanDescriptorPool::getHandle() const {
+		return poolHandle;
+	}
+
+	std::vector<VkDescriptorSet> VulkanDescriptorPool::allocateDescriptorSets(const std::vector<VkDescriptorSetLayout> &layouts, size_t count) {
 		VkDescriptorSetAllocateInfo info;
 		info.descriptorPool = poolHandle;
 		info.descriptorSetCount = count;
@@ -85,7 +89,7 @@ namespace DevaEngine {
 		return sets;
 	}
 
-	void DescriptorPoolManager::relinquishDescriptorSet(VkDescriptorSet dset)
+	void VulkanDescriptorPool::relinquishDescriptorSet(VkDescriptorSet dset)
 	{
 	}
 
@@ -480,7 +484,7 @@ void VulkanRenderer::createPipeline()
 	plb.addDescriptorSetLayout(dslayout.first, &setn);
 	dsLayoutPipelineMap.insert({ id, setn });
 
-	dpoolManager = std::make_unique<DescriptorPoolManager>(DescriptorPoolManager(main_device, { dslayout.second }, { 2 }));
+	dpoolManager = std::make_unique<VulkanDescriptorPool>(VulkanDescriptorPool(main_device, { dslayout.second }, { 2 }));
 
 	this->pipeline = plb.build(this->main_device);
 
@@ -561,7 +565,7 @@ void VulkanRenderer::drawFrame()
 	for (auto &i : renderObjects) {
 		auto &mvp = currentScene->getObjectTransform(i.first);
 		void *memory = nullptr;
-		auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(i.second.bufferMVP()));
+		auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(i.second.buffer()));
 
 		vk.vkMapMemory(device, mem.handle(), i.second.offsetMVP(), 16 * sizeof(float), 0, &memory);
 		memcpy(memory, mvp.asBytes().data(), 16 * sizeof(float));
@@ -690,14 +694,12 @@ void VulkanRenderer::destroy() {
 
 	if (inst != VK_NULL_HANDLE) {
 		vkd.vkDeviceWaitIdle(dev);
-		bufmemIndex->clear(true);
 		vkd.vkDestroyRenderPass(dev, renderPass, nullptr);
 		imageAvailableSemaphore.replace();
 		renderFinishedSemaphore.replace();
 		vkd.vkDestroyFence(dev, fence, nullptr);
 		vkd.vkDestroySwapchainKHR(dev, this->swapchain.handle, nullptr);
 		this->surface.replace();
-		vki.vkDestroyDebugReportCallbackEXT(inst, callback, nullptr);
 		for (auto i : swapchain.framebuffers) {
 			vkd.vkDestroyFramebuffer(dev, i, nullptr);
 		}
@@ -707,9 +709,29 @@ void VulkanRenderer::destroy() {
 		for (auto i : swapchain.imageViews) {
 			vkd.vkDestroyImageView(dev, i, nullptr);
 		}
-		vkd.vkDestroyPipeline(dev, pipeline.getHandle(), nullptr);
-		this->commandPool.replace();
 
+		for (auto &i : dsLayouts) {
+			vkd.vkDestroyDescriptorSetLayout(dev, i.second.first, nullptr);
+		}
+
+		vkd.vkDestroyDescriptorPool(dev, dpoolManager->getHandle(), nullptr);
+
+		auto leftover = bufmemIndex->clear();
+		for (auto &i : leftover.first) {
+			vkd.vkDestroyBuffer(dev, i.handle(), nullptr);
+		}
+		leftover.first.clear();
+		for (auto &i : leftover.second) {
+			vkd.vkFreeMemory(dev, i.handle(), nullptr);
+		}
+		leftover.second.clear();
+		this->commandPool.replace();
+		//this->dpoolManager->clear();
+		vkd.vkDestroyPipelineLayout(dev, pipeline.getPipelineLayout(), nullptr);
+		vkd.vkDestroyPipeline(dev, pipeline.getHandle(), nullptr);
+
+
+		vki.vkDestroyDebugReportCallbackEXT(inst, callback, nullptr);
 	}
 }
 
@@ -723,7 +745,8 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	size_t mvpsize = 16 * sizeof(float);
 	size_t datasize = (m.vertexCount() * m.vertexSize()) + (m.faceIndices().size() * sizeof(uint32_t)) + mvpsize;
 	VkDeviceSize offsetMultiplier = main_device.physicalDeviceTraits().properties().limits.minUniformBufferOffsetAlignment;
-	datasize = datasize % offsetMultiplier == mvpsize ? datasize : datasize + (datasize % offsetMultiplier) + mvpsize;
+	VkDeviceSize aligndiff = offsetMultiplier - ((datasize - mvpsize) % offsetMultiplier);
+	datasize = datasize + aligndiff;
 
 	VulkanBufferMemoryIndex::BufID bufid(VulkanBufferMemoryIndex::BufID::NULL_ID);
 	for (auto id : bufmemIndex->getUnmappedBuffers()) {
@@ -767,8 +790,7 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	memcpy(memory, m.faceIndices().data(), m.faceIndices().size() * sizeof(uint32_t));
 	vk.vkUnmapMemory(dev, mem.handle());
 
-	VkDeviceSize offsetMVP = offset + (m.faceIndices().size() * sizeof(uint32_t));
-	offsetMVP = offsetMVP % offsetMultiplier == 0 ? offsetMVP : ((offsetMVP / offsetMultiplier) + 1) * offsetMultiplier;
+	VkDeviceSize offsetMVP = datasize - mvpsize;
 	memory = nullptr;
 
 	VkDescriptorSet dset = dpoolManager->allocateDescriptorSets({ dsLayouts.begin()->second.first }, 1)[0];
@@ -842,7 +864,7 @@ void VulkanRenderer::updateModelMVP(const SceneObjectID &id, const mat4 &mvp) {
 	}
 	auto &obj = obji->second;
 
-	auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(obj.bufferMVP()));
+	auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(obj.buffer()));
 
 	void* memory = nullptr;
 

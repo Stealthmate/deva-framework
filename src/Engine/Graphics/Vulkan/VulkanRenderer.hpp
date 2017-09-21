@@ -44,22 +44,23 @@ namespace DevaEngine
 		std::vector<VkDescriptorSetLayoutBinding> mBindings;
 	};
 
-	class DescriptorPoolManager {
+	class VulkanDescriptorPool {
 	public:
 
-		DescriptorPoolManager(const DevaFramework::VulkanDevice &dev, const std::vector<VulkanDescriptorSetLayout::LayoutModel> &layouts, uint32_t maxSets);
+		VulkanDescriptorPool(const DevaFramework::VulkanDevice &dev, const std::vector<VulkanDescriptorSetLayout::LayoutModel> &layouts, uint32_t maxSets);
 
 		bool supportsLayout(const VulkanDescriptorSetLayout::LayoutModel &layout);
 
 		std::vector<VkDescriptorSet> allocateDescriptorSets(const std::vector<VkDescriptorSetLayout> &layout, size_t count);
 		void relinquishDescriptorSet(VkDescriptorSet dset);
 
+		DEVA_ENGINE_API VkDescriptorPool getHandle() const;
 
 	private:
 
 		const DevaFramework::VulkanDevice& device;
 		std::vector<VulkanDescriptorSetLayout::LayoutModel> supportedLayouts;
-		DevaFramework::VulkanHandle<VkDescriptorPool> poolHandle;
+		VkDescriptorPool poolHandle;
 
 	};
 
@@ -93,7 +94,7 @@ namespace DevaEngine
 
 		std::shared_ptr<Scene> currentScene;
 
-		std::unique_ptr<DescriptorPoolManager> dpoolManager;
+		std::unique_ptr<VulkanDescriptorPool> dpoolManager;
 
 		DevaFramework::VulkanInstance instance;
 		DevaFramework::VulkanDevice main_device;
@@ -119,8 +120,6 @@ namespace DevaEngine
 		void loadDrawableObject(const SceneObjectID&id, const DrawableObject & object);
 		void unloadModel(const SceneObjectID &id);
 		void updateModelMVP(const SceneObjectID &id, const DevaFramework::mat4 &mvp);
-
-		void allocateDescriptorSets(const DevaFramework::Uuid &layout);
 	};
 }
 
