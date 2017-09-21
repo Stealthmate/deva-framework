@@ -18,6 +18,7 @@ using namespace DevaFramework;
 using namespace DevaEngine;
 
 namespace DevaEngine {
+
 	class VulkanRenderer::ImplSceneUpdateListener : public Scene::SceneUpdateObserver {
 	public:
 
@@ -29,25 +30,77 @@ namespace DevaEngine {
 		virtual void onObjectUpdated(const Scene &scene, const SceneObjectID &id, const DrawableObject &object);
 		virtual void onObjectRemoved(const Scene &scene, const SceneObjectID &id, const DrawableObject &object);
 	};
-}
 
-VertexBuffer createVertexBuffer(float f = 0.0f) {
-	//LOG.i(strm(f));
-	auto buf = ByteBuffer(72);
-	auto ostr = ByteBufferOutputStream(buf);
-	ostr << +0.0f + f << -0.5f << +0.0f << +1.0f << +0.0f + f << +1.0f;
-	ostr << +0.5f << +0.5f << +0.0f << +0.0f << +1.0f << +1.0f;
-	ostr << -0.5f << +0.5f << +0.0f << +0.0f << +0.0f + f << +1.0f;
+	DescriptorPoolManager::DescriptorPoolManager(
+		const DevaFramework::VulkanDevice &dev,
+		const std::vector<VulkanDescriptorSetLayout::LayoutModel> &layouts,
+		uint32_t maxSets)
+		: device(dev), supportedLayouts(layouts)
+	{
+		auto device = dev.handle();
+		auto &vk = dev.vk();
 
-	std::vector<VertexDataElementDescription> elements;
-	VertexDataElementDescription desc;
-	desc.componentBitsizes = { 32, 32, 32 };
-	desc.size = 12;
-	desc.type = VertexComponentType::FLOAT;
-	elements.push_back(desc);
-	elements.push_back(desc);
 
-	return VertexBuffer(buf.release(), 3, elements, INTERLEAVED);
+		std::unordered_map<VkDescriptorType, uint32_t> poolSizes;
+		for (auto i = 0;i < layouts.size();i++) {
+			for (auto j : layouts[i].bindings) {
+				auto &result = poolSizes.find(j.second.descriptorType);
+				if (result == poolSizes.end()) poolSizes.insert({ j.second.descriptorType, j.second.descriptorCount });
+				else if (result->second < j.second.descriptorCount) result->second = j.second.descriptorCount;
+			}
+		}
+
+		std::vector<VkDescriptorPoolSize> sizes;
+		for (auto i : poolSizes) {
+			VkDescriptorPoolSize psize;
+			psize.type = i.first;
+			psize.descriptorCount = i.second;
+			sizes.push_back(psize);
+		}
+
+		VkDescriptorPoolCreateInfo cinfo;
+		cinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		cinfo.pNext = nullptr;
+		cinfo.flags = 0;
+		cinfo.poolSizeCount = sizes.size();
+		cinfo.pPoolSizes = sizes.data();
+		cinfo.maxSets = maxSets;
+
+		if (vk.vkCreateDescriptorPool(device, &cinfo, nullptr, poolHandle.replace()) != VK_SUCCESS)
+			throw DevaException("Could not create descriptor pool");
+	}
+
+	std::vector<VkDescriptorSet> DescriptorPoolManager::allocateDescriptorSets(const std::vector<VkDescriptorSetLayout> &layouts, size_t count) {
+		VkDescriptorSetAllocateInfo info;
+		info.descriptorPool = poolHandle;
+		info.descriptorSetCount = count;
+		info.pNext = nullptr;
+		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		info.pSetLayouts = layouts.data();
+
+		std::vector<VkDescriptorSet> sets(count);
+		if (device.vk().vkAllocateDescriptorSets(device.handle(), &info, sets.data()) != VK_SUCCESS)
+			throw DevaException("Could not allocated descriptor sets");
+
+		return sets;
+	}
+
+	void DescriptorPoolManager::relinquishDescriptorSet(VkDescriptorSet dset)
+	{
+	}
+
+	/*bool isVulkanDescriptorSetLayoutInfoEqual(const DescriptorSetLayoutModel &l1, const DescriptorSetLayoutModel &l2) {
+		if (l1.bindings.size() != l2.bindings.size()) return false;
+
+		for (auto i : l1.bindings) {
+			auto &result = l2.bindings.find(i.first);
+			if (result == l2.bindings.end()) return false;
+			if (result->second.size != i.second.size || result->second.type != i.second.type) return false;
+		}
+
+		return true;
+	}*/
+
 }
 
 
@@ -166,6 +219,38 @@ namespace
 		if (pdev.features().fillModeNonSolid) dev_cinfo.pEnabledFeatures = &features;
 
 		return VulkanDevice(instance, pdev, dev_cinfo);
+	}
+
+	std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel> createLayout(
+		const VulkanDevice &device,
+		const std::vector<VkDescriptorSetLayoutBinding> &bindings,
+		VkDescriptorSetLayoutCreateFlags flags = 0) {
+
+		auto dev = device.handle();
+		auto &vk = device.vk();
+
+		VkDescriptorSetLayoutCreateInfo cinfo;
+		cinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		cinfo.pNext = nullptr;
+		cinfo.flags = flags;
+		cinfo.bindingCount = bindings.size();
+		cinfo.pBindings = bindings.data();
+
+		VkDescriptorSetLayout layout;
+
+		if (vk.vkCreateDescriptorSetLayout(dev, &cinfo, nullptr, &layout) != VK_SUCCESS) {
+			throw DevaException("Could not create descriptor set layout");
+		}
+
+		VulkanDescriptorSetLayout::LayoutModel layoutinfo;
+		for (auto i : bindings) {
+			VulkanDescriptorSetLayout::LayoutModel::Binding binfo;
+			binfo.descriptorType = i.descriptorType;
+			binfo.descriptorCount = i.descriptorCount;
+			layoutinfo.bindings.insert({ i.binding, binfo });
+		}
+
+		return { layout, layoutinfo };
 	}
 }
 
@@ -316,6 +401,10 @@ VulkanHandle<VkSemaphore> renderFinishedSemaphore;
 std::vector<VkCommandBuffer> commandBuffers;
 VkRenderPass renderPass;
 void *devmem;
+VulkanHandle<VkDescriptorPool> dpool;
+VulkanHandle<VkDescriptorSetLayout> descsetlayout;
+VkDescriptorSet descSet;
+
 void VulkanRenderer::createPipeline()
 {
 	auto vert = Vulkan::loadShaderFromFile(this->main_device, "../shaders/vshader.spv");
@@ -377,8 +466,21 @@ void VulkanRenderer::createPipeline()
 	vib.addAttribute(vad);
 
 	plb.addVertexInputBinding(vib);
-	plb.setDescriptorSetCount(1);
-	plb.defineUniform(0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+	VkDescriptorSetLayoutBinding binding;
+	binding.binding = 0;
+	binding.descriptorCount = 1;
+	binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	binding.pImmutableSamplers = nullptr;
+
+	auto dslayout = createLayout(main_device, { binding });
+	auto id = Uuid();
+	dsLayouts.insert({ id, dslayout });
+	uint32_t setn;
+	plb.addDescriptorSetLayout(dslayout.first, &setn);
+	dsLayoutPipelineMap.insert({ id, setn });
+
+	dpoolManager = std::make_unique<DescriptorPoolManager>(DescriptorPoolManager(main_device, { dslayout.second }, { 2 }));
 
 	this->pipeline = plb.build(this->main_device);
 
@@ -423,6 +525,17 @@ void VulkanRenderer::createPipeline()
 
 	imageAvailableSemaphore = Vulkan::createSemaphore(main_device);
 	renderFinishedSemaphore = Vulkan::createSemaphore(main_device);
+
+	VkDescriptorPoolSize dpoolsize;
+	dpoolsize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	dpoolsize.descriptorCount = 1;
+	VkDescriptorPoolCreateInfo dpoolcinfo;
+	dpoolcinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	dpoolcinfo.pNext = nullptr;
+	dpoolcinfo.flags = 0;
+	dpoolcinfo.poolSizeCount = 1;
+	dpoolcinfo.pPoolSizes = &dpoolsize;
+	dpoolcinfo.maxSets = 1;
 }
 
 float f = 0.0f;
@@ -438,11 +551,23 @@ struct HashHandle {
 };
 
 
+
 void VulkanRenderer::drawFrame()
 {
 	//if (drawn) return;
 	auto &vk = main_device.vk();
 	auto device = main_device.handle();
+	
+	for (auto &i : renderObjects) {
+		auto &mvp = currentScene->getObjectTransform(i.first);
+		void *memory = nullptr;
+		auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(i.second.bufferMVP()));
+
+		vk.vkMapMemory(device, mem.handle(), i.second.offsetMVP(), 16 * sizeof(float), 0, &memory);
+		memcpy(memory, mvp.asBytes().data(), 16 * sizeof(float));
+		vk.vkUnmapMemory(device, mem.handle());
+	}
+	
 
 	VkResult res = vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 100);
 
@@ -467,7 +592,7 @@ void VulkanRenderer::drawFrame()
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
 	vk.vkCmdBeginRenderPass(commandBuffers[0], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	vk.vkCmdBindPipeline(commandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+	vk.vkCmdBindPipeline(commandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getHandle());
 
 	bufmemIndex->purge();
 
@@ -477,8 +602,11 @@ void VulkanRenderer::drawFrame()
 		VkDeviceSize offsets[] = { 0 };
 		VkBuffer handle = buf.handle();
 		VkDeviceSize offsetIndex = obj.offsetIndex();
+		VkDescriptorSet dset = obj.getDescriptorSet();
+		
 		vk.vkCmdBindVertexBuffers(commandBuffers[0], 0, 1, &handle, offsets);
 		vk.vkCmdBindIndexBuffer(commandBuffers[0], handle, obj.offsetIndex(), VK_INDEX_TYPE_UINT32);
+		vk.vkCmdBindDescriptorSets(commandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &dset, 0, nullptr);
 		vk.vkCmdDrawIndexed(commandBuffers[0], obj.indexCount(), 1, 0, 0, 0);
 	}
 
@@ -579,18 +707,23 @@ void VulkanRenderer::destroy() {
 		for (auto i : swapchain.imageViews) {
 			vkd.vkDestroyImageView(dev, i, nullptr);
 		}
-		this->pipeline.replace();
+		vkd.vkDestroyPipeline(dev, pipeline.getHandle(), nullptr);
 		this->commandPool.replace();
 
 	}
 }
 
-void VulkanRenderer::loadModel(const SceneObjectID &id, const Model &m) {
+void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableObject & object) {
 
 	auto dev = main_device.handle();
 	auto &vk = main_device.vk();
 
-	size_t datasize = (m.vertexCount() * m.vertexSize()) + (m.faceIndices().size() * sizeof(uint32_t));
+	auto &m = object.model;
+
+	size_t mvpsize = 16 * sizeof(float);
+	size_t datasize = (m.vertexCount() * m.vertexSize()) + (m.faceIndices().size() * sizeof(uint32_t)) + mvpsize;
+	VkDeviceSize offsetMultiplier = main_device.physicalDeviceTraits().properties().limits.minUniformBufferOffsetAlignment;
+	datasize = datasize % offsetMultiplier == mvpsize ? datasize : datasize + (datasize % offsetMultiplier) + mvpsize;
 
 	VulkanBufferMemoryIndex::BufID bufid(VulkanBufferMemoryIndex::BufID::NULL_ID);
 	for (auto id : bufmemIndex->getUnmappedBuffers()) {
@@ -602,7 +735,7 @@ void VulkanRenderer::loadModel(const SceneObjectID &id, const Model &m) {
 	}
 
 	if (bufid == Uuid::NULL_ID) {
-		bufid = bufmemIndex->addBuffer(VulkanBuffer::create(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
+		bufid = bufmemIndex->addBuffer(VulkanBuffer::create(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
 	}
 
 	auto &buf = bufmemIndex->getBuffer(bufid);
@@ -620,7 +753,7 @@ void VulkanRenderer::loadModel(const SceneObjectID &id, const Model &m) {
 	if (memid == Uuid::NULL_ID) {
 		memid = bufmemIndex->addMemory(VulkanMemory::forBuffer(buf, main_device, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 	}
-	
+
 	auto &mem = bufmemIndex->getMemory(memid);
 	bufmemIndex->bindBufferMemory(bufid, memid, main_device, 0);
 
@@ -634,9 +767,28 @@ void VulkanRenderer::loadModel(const SceneObjectID &id, const Model &m) {
 	memcpy(memory, m.faceIndices().data(), m.faceIndices().size() * sizeof(uint32_t));
 	vk.vkUnmapMemory(dev, mem.handle());
 
+	VkDeviceSize offsetMVP = offset + (m.faceIndices().size() * sizeof(uint32_t));
+	offsetMVP = offsetMVP % offsetMultiplier == 0 ? offsetMVP : ((offsetMVP / offsetMultiplier) + 1) * offsetMultiplier;
 	memory = nullptr;
 
-	renderObjects.insert({ id, VulkanRenderObject(bufid, offset, static_cast<uint32_t>(m.faceIndices().size())) });
+	VkDescriptorSet dset = dpoolManager->allocateDescriptorSets({ dsLayouts.begin()->second.first }, 1)[0];
+	VkDescriptorBufferInfo dbufinfo;
+	dbufinfo.buffer = buf.handle();
+	dbufinfo.offset = offsetMVP;
+	dbufinfo.range = sizeof(float) * 16;
+	VkWriteDescriptorSet descriptorWrite = {};
+	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrite.dstSet = dset;
+	descriptorWrite.dstBinding = 0;
+	descriptorWrite.dstArrayElement = 0;
+	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorWrite.descriptorCount = 1;
+	descriptorWrite.pBufferInfo = &dbufinfo;
+	descriptorWrite.pImageInfo = nullptr; // Optional
+	descriptorWrite.pTexelBufferView = nullptr; // Optional
+	vk.vkUpdateDescriptorSets(dev, 1, &descriptorWrite, 0, nullptr);
+
+	renderObjects.insert({ id, VulkanRenderObject(bufid, offset, static_cast<uint32_t>(m.faceIndices().size()), offsetMVP, dset)});
 }
 
 std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
@@ -657,7 +809,7 @@ std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
 	auto &objs = currentScene->getAllObjectIDs();
 	GuidGenerator ggen;
 	for (auto &object : objs) {
-		loadModel(object, currentScene->getObject(object).model);
+		loadDrawableObject(object, currentScene->getObject(object));
 	}
 
 	return oldScene;
@@ -680,8 +832,28 @@ void VulkanRenderer::unloadModel(const SceneObjectID &id) {
 	renderObjects.erase(obj);
 }
 
+void VulkanRenderer::updateModelMVP(const SceneObjectID &id, const mat4 &mvp) {
+	auto dev = main_device.handle();
+	auto &vk = main_device.vk();
+
+	auto obji = renderObjects.find(id);
+	if (obji == renderObjects.end()) {
+		throw DevaInvalidArgumentException(strformat("Object ID {} does not exist in renderer", (std::string)id));
+	}
+	auto &obj = obji->second;
+
+	auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(obj.bufferMVP()));
+
+	void* memory = nullptr;
+
+	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100);
+	vk.vkMapMemory(dev, mem.handle(), obj.offsetMVP(), sizeof(float) * 16, 0, &memory);
+	memcpy(memory, mvp.asBytes().data(), sizeof(float) * 16);
+	vk.vkUnmapMemory(dev, mem.handle());
+}
+
 void VulkanRenderer::ImplSceneUpdateListener::onNewObject(const Scene &scene, const SceneObjectID &objectID, const DrawableObject& object) {
-	renderer.loadModel(objectID, object.model);
+	renderer.loadDrawableObject(objectID, object);
 }
 
 void VulkanRenderer::ImplSceneUpdateListener::onObjectRemoved(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
@@ -689,5 +861,5 @@ void VulkanRenderer::ImplSceneUpdateListener::onObjectRemoved(const Scene &scene
 }
 
 void VulkanRenderer::ImplSceneUpdateListener::onObjectUpdated(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
-
+	renderer.updateModelMVP(objectID, scene.getObjectTransform(objectID));
 }

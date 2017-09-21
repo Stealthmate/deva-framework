@@ -3,6 +3,7 @@
 #include <DevaFramework\Graphics\Vulkan\VulkanHandle.hpp>
 #include <DevaFramework\Math\Vector.hpp>
 #include <DevaFramework\Graphics\ModelBuilder.hpp>
+#include <DevaFramework\Math\MatrixFactory.hpp>
 
 using namespace DevaEngine;
 using namespace DevaFramework;
@@ -12,7 +13,7 @@ const int HEIGHT = 600;
 
 int main()
 {
-	//try {
+	try {
 
 		DevaEngineInstanceCreateInfo info;
 		info.window_height = 600;
@@ -28,6 +29,7 @@ int main()
 			.addVertex({ 0.f, 1.f, 0.f, 1.f }, { 0.0f, .3f, .7f })
 			.addVertex({ 0.5f, 0.f, 0.f, 1.f }, { 0.0f, .7f, .3f })
 			.addFace({ 0, 2, 1 })
+			.addFace({0, 1, 2})
 			.build()));
 		
 		std::shared_ptr<Scene> scene = std::make_shared<Scene>();
@@ -48,22 +50,24 @@ int main()
 			.addFace({ 0, 1, 2 })
 			.build());
 
-		size_t c = 0;
+		float c = 0;
+		float dc = 0.01f;
 		while (engine->update()) {
-			c++;
-			if (c > 1000) {
+			c+=dc;
+			if (c > 2 * M_PI) {
 				c = 0;
 				//if (scene->getAllObjectIDs().size() == 1) id1 = scene->addObject(std::move(model));
 				//else model = scene->removeObject(id1);
 			}
+			scene->setObjectTransform(id, Math::rotateY(c));
 		}
 		LOG.i("Over");
 
 		engine->destroy();
 
-	/*}
+	}
 	catch (std::exception ex) {
 		std::cout << "WTF\n";
 		std::cout << ex.what() << std::endl;
-	}*/
+	}
 }

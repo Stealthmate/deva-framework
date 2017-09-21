@@ -13,6 +13,8 @@ set(
 	${CURDIR}/Graphics/SceneBuilder.hpp
 	${CURDIR}/Graphics/GUI/Component.hpp
 	${CURDIR}/Graphics/Vulkan/Config.hpp
+	${CURDIR}/Graphics/Vulkan/DescriptorPoolManager.cpp
+	${CURDIR}/Graphics/Vulkan/DescriptorPoolManager.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipeline.hpp

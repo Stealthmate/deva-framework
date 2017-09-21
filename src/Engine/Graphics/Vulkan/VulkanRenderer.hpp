@@ -11,9 +11,58 @@
 #include "VulkanRenderObject.hpp"
 #include "VulkanBufferMemoryIndex.hpp"
 #include "VulkanSwapchain.hpp"
+#include "VulkanPipeline.hpp"
 
 namespace DevaEngine
 {
+
+	class VulkanDescriptorSetLayout {
+	public:
+		struct LayoutModel {
+			struct Binding {
+				VkDescriptorType descriptorType;
+				uint32_t descriptorCount;
+			};
+			std::unordered_map<uint32_t, Binding> bindings;
+		};
+
+		DEVA_ENGINE_API static VulkanDescriptorSetLayout create(
+			const DevaFramework::VulkanDevice &device,
+			const std::vector<VkDescriptorSetLayoutBinding> &bindings,
+			VkDescriptorSetLayoutCreateFlags flags = 0);
+
+		DEVA_ENGINE_API VkDescriptorSetLayout getHandle() const;
+		DEVA_ENGINE_API const std::vector<VkDescriptorSetLayoutBinding>& getBindings() const;
+
+		DEVA_ENGINE_API LayoutModel getLayoutModel() const;
+
+	private:
+
+		VulkanDescriptorSetLayout(VkDescriptorSetLayout handle);
+
+		DevaFramework::VulkanHandle<VkDescriptorSetLayout> mHandle;
+		std::vector<VkDescriptorSetLayoutBinding> mBindings;
+	};
+
+	class DescriptorPoolManager {
+	public:
+
+		DescriptorPoolManager(const DevaFramework::VulkanDevice &dev, const std::vector<VulkanDescriptorSetLayout::LayoutModel> &layouts, uint32_t maxSets);
+
+		bool supportsLayout(const VulkanDescriptorSetLayout::LayoutModel &layout);
+
+		std::vector<VkDescriptorSet> allocateDescriptorSets(const std::vector<VkDescriptorSetLayout> &layout, size_t count);
+		void relinquishDescriptorSet(VkDescriptorSet dset);
+
+
+	private:
+
+		const DevaFramework::VulkanDevice& device;
+		std::vector<VulkanDescriptorSetLayout::LayoutModel> supportedLayouts;
+		DevaFramework::VulkanHandle<VkDescriptorPool> poolHandle;
+
+	};
+
 	class VulkanRenderer : public Renderer
 	{
 	public:
@@ -44,6 +93,8 @@ namespace DevaEngine
 
 		std::shared_ptr<Scene> currentScene;
 
+		std::unique_ptr<DescriptorPoolManager> dpoolManager;
+
 		DevaFramework::VulkanInstance instance;
 		DevaFramework::VulkanDevice main_device;
 		VkFence fence;
@@ -54,19 +105,22 @@ namespace DevaEngine
 
 		DevaFramework::VulkanHandle<VkSurfaceKHR> surface;
 		VulkanSwapchain swapchain;
-		DevaFramework::VulkanHandle<VkPipeline> pipeline;
+		VulkanGraphicsPipeline pipeline;
 
 		DevaFramework::VulkanCommandPool commandPool;
 
 		std::unordered_map<DevaFramework::Uuid, VulkanRenderObject> renderObjects;
 
+		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel>> dsLayouts;
+		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;
+
 		void drawFrame();
 
-		void loadModel(const SceneObjectID&id, const DevaFramework::Model &model);
+		void loadDrawableObject(const SceneObjectID&id, const DrawableObject & object);
 		void unloadModel(const SceneObjectID &id);
+		void updateModelMVP(const SceneObjectID &id, const DevaFramework::mat4 &mvp);
 
-		void freeBuffer(const DevaFramework::Vulkan::VulkanBufferID &buffer);
-
+		void allocateDescriptorSets(const DevaFramework::Uuid &layout);
 	};
 }
 
