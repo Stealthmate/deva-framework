@@ -29,8 +29,8 @@ VulkanBuffer VulkanBuffer::create(
 		throw DevaExternalFailureException("Vulkan", "Could not create buffer");
 	}
 
-	VulkanBuffer buffer(device);
-	buffer.mHandle.replace(buf);
+	VulkanBuffer buffer;
+	buffer.mHandle = buf;
 
 	buffer.mUsage = usage;
 	buffer.mSharingMode = sharingMode;
@@ -42,8 +42,6 @@ VulkanBuffer VulkanBuffer::create(
 }
 
 VulkanBuffer::VulkanBuffer() = default;
-
-VulkanBuffer::VulkanBuffer(const VulkanDevice &dev) : mHandle(dev.handle(), dev.vk().vkDestroyBuffer) {}
 
 VulkanBuffer::VulkanBuffer(VulkanBuffer &&buf)
 	: mHandle(std::move(buf.mHandle)),
@@ -63,7 +61,3 @@ VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer &&buf) {
 }
 
 VulkanBuffer::~VulkanBuffer() = default;
-
-void VulkanBuffer::destroy() {
-	mHandle.replace();
-}

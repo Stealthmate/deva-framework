@@ -31,7 +31,7 @@ VulkanMemory VulkanMemory::forBuffer(const VulkanBuffer &buffer, const VulkanDev
 VulkanMemory::VulkanMemory() noexcept = default;
 
 VulkanMemory::VulkanMemory(const VulkanDevice &dev, VkDeviceMemory handle, VkDeviceSize size, const VkMemoryType &type, uint32_t typeIndex)
-	: mHandle(dev.handle(), dev.vk().vkFreeMemory, handle),
+	: mHandle(handle),
 	mSize(size),
 	mType(type),
 	mTypeIndex(typeIndex) {}
@@ -54,6 +54,10 @@ VulkanMemory& VulkanMemory::operator=(VulkanMemory &&memory) noexcept {
 	return *this;
 }
 
-void VulkanMemory::free() {
-	mHandle.replace();
-}
+VkDeviceMemory VulkanMemory::handle() const noexcept { return mHandle; }
+
+VkDeviceSize VulkanMemory::size() const noexcept { return mSize; }
+
+VkMemoryType VulkanMemory::type() const noexcept { return mType; }
+
+uint32_t VulkanMemory::typeIndex() const noexcept { return mTypeIndex; }

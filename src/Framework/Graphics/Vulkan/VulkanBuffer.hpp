@@ -21,7 +21,6 @@ namespace DevaFramework {
 			const std::vector<uint32_t> &queues = std::vector<uint32_t>());
 
 		DEVA_FRAMEWORK_API VulkanBuffer();
-		DEVA_FRAMEWORK_API VulkanBuffer(const VulkanDevice &dev);
 		DEVA_FRAMEWORK_API VulkanBuffer(VulkanBuffer &&buffer);
 		DEVA_FRAMEWORK_API VulkanBuffer& operator=(VulkanBuffer &&buffer);
 		DEVA_FRAMEWORK_API ~VulkanBuffer();
@@ -32,11 +31,9 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API VkSharingMode sharingMode() const noexcept { return mSharingMode; }
 		DEVA_FRAMEWORK_API VkMemoryRequirements memoryRequirements() const noexcept { return mMemoryRequirements; }
 
-		DEVA_FRAMEWORK_API void destroy();
-
 	private:
 
-		VulkanHandle<VkBuffer> mHandle;
+		VkBuffer mHandle;
 		VkDeviceSize mSize;
 		VkBufferUsageFlags mUsage;
 		VkSharingMode mSharingMode;
