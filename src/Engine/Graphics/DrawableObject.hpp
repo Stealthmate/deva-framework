@@ -33,6 +33,7 @@ namespace DevaEngine {
 
 	//private:
 		DevaFramework::Model model;
+		DevaFramework::vec4 frontVector;
 
 	};
 }
