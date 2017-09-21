@@ -34,11 +34,8 @@ namespace DevaFramework
 		*/
 		constexpr BaseVector(const std::initializer_list<T> &values)
 		{
-			if (values.size() != vector_length)
-			{
-				throw DevaInvalidInputException(
-					"Tried to create vector with " + strm(vector_length) + " values, but passed " + strm(values.size()));
-			}
+			assert(values.size() == vector_length);
+			
 			auto val_i = values.begin();
 			for (int i = 0;i < vector_length;i++)
 			{
@@ -77,7 +74,7 @@ namespace DevaFramework
 		BaseVector& operator+(const Vector &vec) const
 		{
 			Vector result;
-			for (int i = 0;i <= vector_length - 1;i++)
+			for (int i = 0;i < vector_length;i++)
 			{
 				result[i] = this->getValue(0, i) + vec.getValue(0, i);
 			}
@@ -92,7 +89,7 @@ namespace DevaFramework
 		BaseVector& operator-(const Vector &vec) const
 		{
 			Vector result;
-			for (int i = 0;i <= vector_length - 1;i++)
+			for (int i = 0;i < vector_length;i++)
 			{
 				result[i] = this->getValue(0, i) - vec.getValue(0, i);
 			}
@@ -107,7 +104,7 @@ namespace DevaFramework
 		BaseVector& operator*(const Vector &vec) const
 		{
 			Vector result;
-			for (int i = 0;i <= vector_length - 1;i++)
+			for (int i = 0;i < vector_length;i++)
 			{
 				result[i] = this->getValue(0, i) * vec.getValue(0, i);
 			}
@@ -122,7 +119,7 @@ namespace DevaFramework
 		BaseVector& operator/(const Vector &vec) const
 		{
 			Vector result;
-			for (int i = 0;i <= vector_length - 1;i++)
+			for (int i = 0;i < vector_length;i++)
 			{
 				result[i] = this->getValue(0, i) / vec.getValue(0, i);
 			}
@@ -133,7 +130,7 @@ namespace DevaFramework
 		float magnitude() const
 		{
 			float sum = 0;
-			for (int i = 0;i <= vector_length - 1; i++)
+			for (int i = 0;i < vector_length; i++)
 			{
 				sum += this->operator()(0, i) * this->operator()(0, i);
 			}
@@ -145,7 +142,7 @@ namespace DevaFramework
 		{
 			Vector result;
 			float mag = this->magnitude();
-			for (int i = 0;i <= vector_length - 1;i++)
+			for (int i = 0;i < vector_length;i++)
 			{
 				result[i] = this->operator()(0, i) / mag;
 			}
@@ -155,7 +152,7 @@ namespace DevaFramework
 		std::string to_str() const
 		{
 			std::string str = "vec" + strm(vector_length) + " [";
-			for (int i = 0;i <= vector_length - 1;i++)
+			for (int i = 0;i < vector_length;i++)
 			{
 				str += strm(this->operator()(0, i));
 				if(i<vector_length - 1) str += ";";

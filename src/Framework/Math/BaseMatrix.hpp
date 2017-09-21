@@ -44,9 +44,9 @@ namespace DevaFramework
 		///Creates an identity matrix
 		constexpr BaseMatrix()
 		{
-			for (int i = 0;i <= n_vectors - 1;i++)
+			for (int i = 0;i < n_vectors;i++)
 			{
-				for (int j = 0;j <= vector_length - 1;j++)
+				for (int j = 0;j < vector_length;j++)
 				{
 					data[i*vector_length + j] = 0;
 					if (i == j) data[i*vector_length + j] = 1;
@@ -65,15 +65,12 @@ namespace DevaFramework
 		*/
 		BaseMatrix(const std::initializer_list<BaseMatrix<T, vector_length, 1>> &values)
 		{
-			if (values.size() != n_vectors)
-			{
-				throw DevaInvalidInputException(
-					"Tried to create matrix with " + strm(n_vectors) + " columns, but passed " + strm(values.size()));
-			}
+			assert(values.size() == n_vectors);
+
 			auto val_i = values.begin();
-			for (int i = 0;i <= n_vectors;i++)
+			for (int i = 0;i < n_vectors;i++)
 			{
-				for (int j = 0;j <= vector_length - 1;j++)
+				for (int j = 0;j < vector_length;j++)
 				{
 					data[i * vector_length + j] = (*val_i)(0, j);
 				}
@@ -153,11 +150,11 @@ namespace DevaFramework
 		BaseMatrix<T, n_vectors, vec_len> operator*(const BaseMatrix<T, vector_length, vec_len> &mat) const
 		{
 			BaseMatrix<T, n_vectors, vec_len> result;
-			for (int k = 0;k <= vector_length - 1;k++)
+			for (int k = 0;k < vector_length;k++)
 			{
-				for (int i = 0;i <= vec_len - 1;i++)
+				for (int i = 0;i < vec_len;i++)
 				{
-					for (int j = 0;j <= n_vectors - 1;j++)
+					for (int j = 0;j < n_vectors;j++)
 					{
 						result(i, k) += (*this)(k, j) * mat(i, j);
 					}
@@ -177,9 +174,9 @@ namespace DevaFramework
 		std::string to_str() const
 		{
 			std::string res = "\nMat" + strm(n_vectors) + "x" + strm(vector_length) + ":\n";
-			for (int i = 0;i <= n_vectors - 1;i++)
+			for (int i = 0;i < n_vectors;i++)
 			{
-				for (int j = 0;j <= vector_length - 1;j++)
+				for (int j = 0;j < vector_length;j++)
 				{
 					res += strm(data[i*vector_length + j]) + " ";
 				}
