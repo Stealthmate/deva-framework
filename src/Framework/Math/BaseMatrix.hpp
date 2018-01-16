@@ -123,18 +123,7 @@ namespace DevaFramework
 			return data[vec_n * vector_length + vec_pos];
 		}
 
-
-		/**
-			@return A const T* const pointer to the first element of the memory block of the matrix.
-			The data inside is read-only and
-			cannot be modified. Can be to set uniform matrices in OpenGL functions.
-		*/
-		operator const T* () const
-		{
-			return &data[0];
-		}
-
-		std::pair<const T*, size_t> rawData() const
+		constexpr std::pair<const T*, size_t> rawData() const
 		{
 			return { &data[0], n_vectors * vector_length };
 		}

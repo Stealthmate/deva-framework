@@ -61,7 +61,6 @@ int main()
 	for (int i = 0;i < n;i++) {
 		int a, b, c;
 		ostr >> a >> b >> c;
-		//LOG << a << " " << b << " " << c << LOG.endl;
 		bmb.addFace({ a, b, c });
 	}
 
@@ -95,7 +94,6 @@ int main()
 		LOG.i("SUCCESS!");
 		auto &renderer = engine->getRenderer();
 		renderer.render(scene);
-		LOG << mvp << LOG.endl;
 
 		int deg = 0;
 		int dm = 3;

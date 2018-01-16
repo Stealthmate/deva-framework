@@ -8,10 +8,8 @@ VulkanGraphicsPipeline::VulkanGraphicsPipeline() noexcept {
 }
 
 VulkanGraphicsPipeline::VulkanGraphicsPipeline(VkPipeline handle, const VkGraphicsPipelineCreateInfo &cinfo)
-	: mHandle(handle) {
-	VulkanHandle<VkPipelineLayout> layoutHandle;
-	layoutHandle.replace(cinfo.layout);
-	mPipelineLayout = std::move(layoutHandle);
+	: mHandle(handle),
+	mPipelineLayout(cinfo.layout) {
 }
 
 VkPipeline VulkanGraphicsPipeline::getHandle() const {

@@ -531,40 +531,21 @@ void VulkanRenderer::createPipeline()
 	dpoolcinfo.maxSets = 1;
 }
 
-float f = 0.0f;
-float df = 0.01f;
 bool drawn = false;
 int i = 0;
-
-template<class T>
-struct HashHandle {
-	size_t operator()(const T &obj) const {
-		return (uintptr_t)obj.handle();
-	}
-};
-
-
 
 void VulkanRenderer::drawFrame()
 {
 	//if (drawn) return;
 	auto &vk = main_device.vk();
 	auto device = main_device.handle();
-	
-	/*for (auto &i : renderObjects) {
-		auto &mvp = currentScene->getObjectTransform(i.first);
-		void *memory = nullptr;
-		auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(i.second.buffer()));
+	VkResult res = VK_SUCCESS;
 
-		vk.vkMapMemory(device, mem.handle(), 0, 64, 0, &memory);
-		memcpy(memory, mvp.rawData().data(), 64);
-		vk.vkUnmapMemory(device, mem.handle());
-	}*/
-	
-
-	VkResult res = vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 100);
-
-	if (drawn) while (res == VK_TIMEOUT) res = vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 100);
+	if (drawn) {
+		do {
+			res = vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 100);
+		} while (res == VK_TIMEOUT);
+	}
 	if (res != VK_SUCCESS) LOG.w("FENCE NOT COMPLETE " + strm(res));
 
 	if (i == swapchain.framebuffers.size()) i = 0;
