@@ -35,7 +35,7 @@ namespace DevaFramework
 		Please do not blame me for using defines. I'm trying as hard as I can to follow the DRY principle.
 		Thank you.
 		*/
-#define INSERTION_FOR_TYPE(TYPE) inline virtual const Logger& operator<<(TYPE msg) const { return enabled ? this->print(strm(msg)) : *this; }
+#define INSERTION_FOR_TYPE(TYPE) inline virtual const Logger& operator<<(TYPE msg) const { return enabled ? this->print(strf(msg)) : *this; }
 		INSERTION_FOR_TYPE(byte_t);
 		INSERTION_FOR_TYPE(signed short);
 		INSERTION_FOR_TYPE(unsigned short);

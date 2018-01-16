@@ -49,7 +49,7 @@ void* OSHandles::xlib_window() const
 std::shared_ptr<Window> Window::openWindow(uint32_t width, uint32_t height, const std::string &name)
 {
 	window_list.push_back(std::shared_ptr<Window>(new Window(width, height, name)));
-	LOG.i(strm(window_list[window_list.size() - 1]->impl->surface_width) + " \n");
+	LOG.i(strf(window_list[window_list.size() - 1]->impl->surface_width) + " \n");
 	return window_list[window_list.size() - 1];
 }
 

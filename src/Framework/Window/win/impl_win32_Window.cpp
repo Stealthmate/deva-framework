@@ -90,10 +90,10 @@ void ImplWindow::impl_init()
 
 	if (surface_width <= 0 || surface_height <= 0)
 		throw DevaInvalidArgumentException(
-			"Invalid window dimensions. (width: " + strm(surface_width) + " ; height: " + strm(surface_height) + ")");
+			"Invalid window dimensions. (width: " + strf(surface_width) + " ; height: " + strf(surface_height) + ")");
 
 	impl_win32_hinstance = GetModuleHandle(nullptr);
-	impl_win32_class_name = this->name + "_" + strm(impl_win32_class_id_counter);
+	impl_win32_class_name = this->name + "_" + strf(impl_win32_class_id_counter);
 	impl_win32_class_id_counter++;
 
 	// Initialize the window class structure:

@@ -37,7 +37,7 @@ std::string timestamp()
 	auto ms = (t.count()/1000)%1000;
 	if(ms<10) time_ms+="0";
 	if(ms<100) time_ms += "0";
-	time_ms+=strm(ms);
+	time_ms+=str(ms);
 	if(!ErrorHandler::showMS) time_ms = "";
 	return std::string("[") + time.substr(11, 8) + time_ms + "] ";
 	return "";
