@@ -190,14 +190,14 @@ void VulkanBufferMemoryIndex::unbindBufferMemory(const BufID & bufID, const MemI
 {
 	auto i = bufferToMemoryMap.find(bufID);
 	if (i == bufferToMemoryMap.end()) {
-		throw DevaInvalidArgumentException(strformat("Buffer {} is not bound to {} memory", bufID.str(), memID));
+		throw DevaInvalidArgumentException(strformat("Buffer {} is not bound to {} memory", bufID.str(), memID.str()));
 	}
 
 	bufferToMemoryMap.erase(i);
 
 	auto j = memoryToBuffersMap.find(memID);
 	if (j == memoryToBuffersMap.end()) {
-		throw DevaInvalidArgumentException(strformat("Memory {} is not bound to {} buffer", memID.str(), bufID));
+		throw DevaInvalidArgumentException(strformat("Memory {} is not bound to {} buffer", memID.str(), bufID.str()));
 	}
 
 	memoryToBuffersMap.erase(j);

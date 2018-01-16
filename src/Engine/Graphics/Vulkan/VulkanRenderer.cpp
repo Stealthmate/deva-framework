@@ -393,16 +393,13 @@ VulkanHandle<VkSemaphore> imageAvailableSemaphore;
 VulkanHandle<VkSemaphore> renderFinishedSemaphore;
 std::vector<VkCommandBuffer> commandBuffers;
 VkRenderPass renderPass;
-void *devmem;
 VulkanHandle<VkDescriptorPool> dpool;
-VulkanHandle<VkDescriptorSetLayout> descsetlayout;
-VkDescriptorSet descSet;
 
 void VulkanRenderer::createPipeline()
 {
 	auto vert = Vulkan::loadShaderFromFile(this->main_device, "../shaders/vshader.spv");
 	auto frag = Vulkan::loadShaderFromFile(this->main_device, "../shaders/fshader.spv");
-
+	
 	VulkanGraphicsPipelineBuilder plb;
 	plb.attachShader(vert, VK_SHADER_STAGE_VERTEX_BIT, "main")
 		.attachShader(frag, VK_SHADER_STAGE_FRAGMENT_BIT, "main")
