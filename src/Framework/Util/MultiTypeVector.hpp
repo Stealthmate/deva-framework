@@ -123,7 +123,7 @@ namespace DevaFramework {
 		**/
 		T operator[](size_t i) const {
 			if (i > currentSize) {
-				throw DevaInvalidArgumentException("Index out of bounds " + strm(i));
+				throw DevaInvalidArgumentException("Index out of bounds " + strf(i));
 			}
 
 			return read_element(i);
@@ -131,7 +131,7 @@ namespace DevaFramework {
 
 		void replace(size_t i, const T& obj) {
 			if (i > currentSize) {
-				throw DevaInvalidArgumentException("Index out of bounds " + strm(i));
+				throw DevaInvalidArgumentException("Index out of bounds " + str(i));
 			}
 
 

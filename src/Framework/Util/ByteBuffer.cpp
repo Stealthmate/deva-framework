@@ -80,7 +80,7 @@ void ByteBuffer::write(const byte_t* data, size_t count, size_t pos, size_t offs
 
 	if (count + pos > buffer.size())
 		throw DevaException
-		("Attempted to write beyond buffer size. (" + strm(count + pos) + " > " + strm(buffer.size()) + ")");
+		("Attempted to write beyond buffer size. (" + strf(count + pos) + " > " + strf(buffer.size()) + ")");
 
 	for (int i = 0;i <= count - 1;i++)
 	{
@@ -95,7 +95,7 @@ size_t ByteBuffer::read(byte_t* dest, size_t count, size_t pos, size_t offset) c
 	}
 
 	if (pos >= buffer.size())
-		throw DevaInvalidArgumentException("Position " + strm(pos) + " larger than buffer size " + strm(buffer.size()));
+		throw DevaInvalidArgumentException("Position " + strf(pos) + " larger than buffer size " + strf(buffer.size()));
 
 	size_t i = 0;
 	for (i = pos; i < std::min(pos + count, buffer.size()); i++)

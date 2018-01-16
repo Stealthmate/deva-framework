@@ -10,11 +10,11 @@ using namespace gl;
 std::string VertexBufferObject::VertexArrayObject::str() const
 {
     std::string output = "";
-    output+= "  Position: " + strm(id) + "\n";
-    output+= "  nValuesPerVertex: " + strm(nValuesPerVertex) + "\n";
-    output+= "  dataType: " + strm((int)dataType) + "\n";
-    output+= "  stride:  " + strm(stride) + "\n";
-    output+= "  offset: " + strm((uintptr_t)offset) + "\n";
+    output+= "  Position: " + str(id) + "\n";
+    output+= "  nValuesPerVertex: " + str(nValuesPerVertex) + "\n";
+    output+= "  dataType: " + str((int)dataType) + "\n";
+    output+= "  stride:  " + str(stride) + "\n";
+    output+= "  offset: " + str((uintptr_t)offset) + "\n";
     return output;
 }
 
@@ -42,17 +42,17 @@ std::string VertexBufferObject::str() const
 {
     std::string output;
     output+= "\nDataptr:       ";
-    output+= strm((uintptr_t) &data[0]);
+    output+= str((uintptr_t) &data[0]);
     output+= "\nnVertices:     ";
-    output+= strm(nVertices);
+    output+= str(nVertices);
     output+= "\ndata_nValues:  ";
-    output+= strm(data_nValues);
+    output+= str(data_nValues);
     output+= "\ndata_byteSize: ";
-    output+= strm(data_byteSize);
+    output+= str(data_byteSize);
     output+= "\nvaosptr:       ";
-    output+= strm((uintptr_t) &vaos[0]);
+    output+= str((uintptr_t) &vaos[0]);
     output+= "\nvaos_size:     ";
-    output+= strm((unsigned int) vaos_size);
+    output+= str((unsigned int) vaos_size);
     for(unsigned int i=0;i<=this->vaos_size-1;i++) output+= "\n" +  vaos[i].str();
     output+= "\n";
     return output;
