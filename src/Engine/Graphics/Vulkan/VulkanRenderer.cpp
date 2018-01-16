@@ -551,7 +551,7 @@ void VulkanRenderer::drawFrame()
 	auto &vk = main_device.vk();
 	auto device = main_device.handle();
 	
-	for (auto &i : renderObjects) {
+	/*for (auto &i : renderObjects) {
 		auto &mvp = currentScene->getObjectTransform(i.first);
 		void *memory = nullptr;
 		auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(i.second.buffer()));
@@ -559,7 +559,7 @@ void VulkanRenderer::drawFrame()
 		vk.vkMapMemory(device, mem.handle(), 0, 64, 0, &memory);
 		memcpy(memory, mvp.asBytes().data(), 64);
 		vk.vkUnmapMemory(device, mem.handle());
-	}
+	}*/
 	
 
 	VkResult res = vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 100);

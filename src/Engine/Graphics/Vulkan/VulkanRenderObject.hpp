@@ -6,15 +6,6 @@
 
 namespace DevaEngine {
 
-	class VulkanDescriptorSet {
-	public:
-
-	private:
-
-		VkDescriptorSet handle;
-		VkDescriptorSetLayout layoutHandle;
-	};
-
 	class VulkanRenderObject {
 	public:
 
