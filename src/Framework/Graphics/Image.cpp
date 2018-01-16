@@ -21,7 +21,7 @@ Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
 
 	if (raw.error)
 	{
-		LOG.e("Could not load image. Error code: " + strm(raw.error));
+		LOG.e("Could not load image. Error code: " + strf(raw.error));
 		return Image();
 	}
 

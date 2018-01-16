@@ -206,6 +206,6 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addVertexInputBind
 
 VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addDescriptorSetLayout(VkDescriptorSetLayout layout, uint32_t *setn) {
 	descriptorSetLayouts.push_back(layout);
-	if (setn) *setn = descriptorSetLayouts.size() - 1;
+	if (setn) *setn = static_cast<uint32_t>(descriptorSetLayouts.size()) - 1;
 	return *this;
 }

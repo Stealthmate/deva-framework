@@ -17,11 +17,13 @@ set(
 	${CURDIR}/Graphics/Vulkan/DescriptorPoolManager.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanGraphicsPipeline.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipeline.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipelineBuilder.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipelineBuilder.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderer.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderer.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanRenderObject.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderObject.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanSwapchain.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanSwapchain.hpp

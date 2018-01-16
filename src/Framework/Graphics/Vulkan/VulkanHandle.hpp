@@ -15,7 +15,7 @@ namespace DevaFramework {
 	public:
 		VulkanHandle() noexcept : mHandle(VK_NULL_HANDLE) {
 			deleter = [](HandleType handle) {
-				LOG.w(strformat("No deleter specified for handle {} = {}", typeid(HandleType).name(), strm(handle)));
+				LOG.w(strformat("No deleter specified for handle {} = {}", typeid(HandleType).name(), strf(handle)));
 			};
 		}
 		VulkanHandle(

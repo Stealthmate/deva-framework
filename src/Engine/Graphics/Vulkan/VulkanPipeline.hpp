@@ -2,8 +2,7 @@
 #define DEVA_ENGINE_VULKAN_PIPELINE_HPP
 
 #include "Config.hpp"
-#include <DevaFramework\Graphics\Vulkan\VulkanAPI.hpp>
-#include <DevaFramework/Graphics/Vulkan/VulkanHandle.hpp>
+#include <DevaFramework\Graphics\Vulkan\Config.hpp>
 
 namespace DevaEngine
 {

@@ -18,27 +18,30 @@ namespace DevaEngine {
 	class VulkanRenderObject {
 	public:
 
+		struct Offsets {
+			VkDeviceSize mvp;
+			VkDeviceSize vertex;
+			VkDeviceSize index;
+		};
+
 		friend class VulkanRenderer;
 
 		DEVA_ENGINE_API DevaFramework::Vulkan::VulkanBufferID buffer() const;
-		DEVA_ENGINE_API VkDeviceSize offsetIndex() const;
 		DEVA_ENGINE_API uint32_t indexCount() const;
-		DEVA_ENGINE_API VkDeviceSize offsetMVP() const;
+		DEVA_ENGINE_API Offsets offsets() const;
 		DEVA_ENGINE_API VkDescriptorSet getDescriptorSet() const;
 
 	private:
 
 		VulkanRenderObject(
 			const DevaFramework::Vulkan::VulkanBufferID &buffer, 
-			VkDeviceSize offsetIndex, 
 			uint32_t indexCount, 
-			VkDeviceSize offsetMVP,
+			Offsets offsets,
 			VkDescriptorSet dset);
 
 		DevaFramework::Vulkan::VulkanBufferID mBufferVertexIndex;
 		uint32_t mIndexCount;
-		VkDeviceSize mOffsetIndex;
-		VkDeviceSize mOffsetMVP;
+		Offsets mOffsets;
 		VkDescriptorSet mDescriptorSet;
 	};
 

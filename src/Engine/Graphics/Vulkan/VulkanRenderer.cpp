@@ -13,6 +13,8 @@
 #include <DevaFramework\Util\Time.hpp>
 #include <limits>
 #include <unordered_set>
+//#include <memory>
+
 
 using namespace DevaFramework;
 using namespace DevaEngine;
@@ -62,7 +64,7 @@ namespace DevaEngine {
 		cinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		cinfo.pNext = nullptr;
 		cinfo.flags = 0;
-		cinfo.poolSizeCount = sizes.size();
+		cinfo.poolSizeCount = static_cast<uint32_t>(sizes.size());
 		cinfo.pPoolSizes = sizes.data();
 		cinfo.maxSets = maxSets;
 
@@ -77,7 +79,7 @@ namespace DevaEngine {
 	std::vector<VkDescriptorSet> VulkanDescriptorPool::allocateDescriptorSets(const std::vector<VkDescriptorSetLayout> &layouts, size_t count) {
 		VkDescriptorSetAllocateInfo info;
 		info.descriptorPool = poolHandle;
-		info.descriptorSetCount = count;
+		info.descriptorSetCount = static_cast<uint32_t>(count);
 		info.pNext = nullptr;
 		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		info.pSetLayouts = layouts.data();
@@ -92,19 +94,6 @@ namespace DevaEngine {
 	void VulkanDescriptorPool::relinquishDescriptorSet(VkDescriptorSet dset)
 	{
 	}
-
-	/*bool isVulkanDescriptorSetLayoutInfoEqual(const DescriptorSetLayoutModel &l1, const DescriptorSetLayoutModel &l2) {
-		if (l1.bindings.size() != l2.bindings.size()) return false;
-
-		for (auto i : l1.bindings) {
-			auto &result = l2.bindings.find(i.first);
-			if (result == l2.bindings.end()) return false;
-			if (result->second.size != i.second.size || result->second.type != i.second.type) return false;
-		}
-
-		return true;
-	}*/
-
 }
 
 
@@ -237,7 +226,7 @@ namespace
 		cinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		cinfo.pNext = nullptr;
 		cinfo.flags = flags;
-		cinfo.bindingCount = bindings.size();
+		cinfo.bindingCount = static_cast<uint32_t>(bindings.size());
 		cinfo.pBindings = bindings.data();
 
 		VkDescriptorSetLayout layout;
@@ -258,11 +247,10 @@ namespace
 	}
 }
 
-
 VulkanRenderer::VulkanRenderer() :
 	instance(VulkanInstance()),
-	bufmemIndex(std::make_unique<VulkanBufferMemoryIndex>(VulkanBufferMemoryIndex())),
-	sceneListener(std::static_pointer_cast<Observers::SceneObserver>(std::make_shared<ImplSceneUpdateListener>(*this))) {}
+	bufmemIndex(new VulkanBufferMemoryIndex()),
+	sceneListener(new VulkanRenderer::ImplSceneUpdateListener(*this)) {}
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 	VkDebugReportFlagsEXT       flags,
@@ -294,7 +282,8 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 }
 
 VkDebugReportCallbackEXT callback;
-VulkanRenderer::VulkanRenderer(const Window &wnd) : VulkanRenderer()
+
+VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRenderer()
 {
 	if (!VULKAN_LOADED) LoadVulkan();
 
@@ -567,8 +556,8 @@ void VulkanRenderer::drawFrame()
 		void *memory = nullptr;
 		auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(i.second.buffer()));
 
-		vk.vkMapMemory(device, mem.handle(), i.second.offsetMVP(), 16 * sizeof(float), 0, &memory);
-		memcpy(memory, mvp.asBytes().data(), 16 * sizeof(float));
+		vk.vkMapMemory(device, mem.handle(), 0, 64, 0, &memory);
+		memcpy(memory, mvp.asBytes().data(), 64);
 		vk.vkUnmapMemory(device, mem.handle());
 	}
 	
@@ -603,13 +592,13 @@ void VulkanRenderer::drawFrame()
 	for (auto& object : renderObjects) {
 		auto &obj = object.second;
 		VulkanBuffer& buf = bufmemIndex->getBuffer(object.second.buffer());
-		VkDeviceSize offsets[] = { 0 };
+		VkDeviceSize offsets[] = { obj.offsets().vertex };
 		VkBuffer handle = buf.handle();
-		VkDeviceSize offsetIndex = obj.offsetIndex();
+		VkDeviceSize offsetIndex = obj.offsets().index;
 		VkDescriptorSet dset = obj.getDescriptorSet();
 		
 		vk.vkCmdBindVertexBuffers(commandBuffers[0], 0, 1, &handle, offsets);
-		vk.vkCmdBindIndexBuffer(commandBuffers[0], handle, obj.offsetIndex(), VK_INDEX_TYPE_UINT32);
+		vk.vkCmdBindIndexBuffer(commandBuffers[0], handle, obj.offsets().index, VK_INDEX_TYPE_UINT32);
 		vk.vkCmdBindDescriptorSets(commandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &dset, 0, nullptr);
 		vk.vkCmdDrawIndexed(commandBuffers[0], obj.indexCount(), 1, 0, 0, 0);
 	}
@@ -743,10 +732,9 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	auto &m = object.model;
 
 	size_t mvpsize = 16 * sizeof(float);
-	size_t datasize = (m.vertexCount() * m.vertexSize()) + (m.faceIndices().size() * sizeof(uint32_t)) + mvpsize;
-	VkDeviceSize offsetMultiplier = main_device.physicalDeviceTraits().properties().limits.minUniformBufferOffsetAlignment;
-	VkDeviceSize aligndiff = offsetMultiplier - ((datasize - mvpsize) % offsetMultiplier);
-	datasize = datasize + aligndiff;
+	size_t vsize = m.vertexCount() * m.vertexSize();
+	size_t isize = m.faceIndices().size() * sizeof(uint32_t);
+	size_t datasize = vsize + isize + mvpsize;
 
 	VulkanBufferMemoryIndex::BufID bufid(VulkanBufferMemoryIndex::BufID::NULL_ID);
 	for (auto id : bufmemIndex->getUnmappedBuffers()) {
@@ -781,23 +769,21 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	bufmemIndex->bindBufferMemory(bufid, memid, main_device, 0);
 
 	void* memory = nullptr;
-	vk.vkMapMemory(dev, mem.handle(), 0, mem.size(), 0, &memory);
-	memcpy(memory, m.vertexData().data(), m.vertexData().size());
+	VkDeviceSize offset = mvpsize;
+	vk.vkMapMemory(dev, mem.handle(), offset, vsize, 0, &memory);
+	memcpy(memory, m.vertexData().data(), vsize);
 	vk.vkUnmapMemory(dev, mem.handle());
 
-	VkDeviceSize offset = (m.vertexCount() * m.vertexSize());
-	vk.vkMapMemory(dev, mem.handle(), offset, m.faceIndices().size() * sizeof(uint32_t), 0, &memory);
-	memcpy(memory, m.faceIndices().data(), m.faceIndices().size() * sizeof(uint32_t));
+	offset = offset + vsize;
+	vk.vkMapMemory(dev, mem.handle(), offset, isize, 0, &memory);
+	memcpy(memory, m.faceIndices().data(), isize);
 	vk.vkUnmapMemory(dev, mem.handle());
-
-	VkDeviceSize offsetMVP = datasize - mvpsize;
-	memory = nullptr;
 
 	VkDescriptorSet dset = dpoolManager->allocateDescriptorSets({ dsLayouts.begin()->second.first }, 1)[0];
 	VkDescriptorBufferInfo dbufinfo;
 	dbufinfo.buffer = buf.handle();
-	dbufinfo.offset = offsetMVP;
-	dbufinfo.range = sizeof(float) * 16;
+	dbufinfo.offset = 0;
+	dbufinfo.range = mvpsize;
 	VkWriteDescriptorSet descriptorWrite = {};
 	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	descriptorWrite.dstSet = dset;
@@ -810,7 +796,12 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	descriptorWrite.pTexelBufferView = nullptr; // Optional
 	vk.vkUpdateDescriptorSets(dev, 1, &descriptorWrite, 0, nullptr);
 
-	renderObjects.insert({ id, VulkanRenderObject(bufid, offset, static_cast<uint32_t>(m.faceIndices().size()), offsetMVP, dset)});
+	VulkanRenderObject::Offsets offsets;
+	offsets.mvp = 0;
+	offsets.vertex = mvpsize;
+	offsets.index = vsize + mvpsize;
+
+	renderObjects.insert({ id, VulkanRenderObject(bufid, static_cast<uint32_t>(m.faceIndices().size()), offsets, dset)});
 }
 
 std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
@@ -869,7 +860,7 @@ void VulkanRenderer::updateModelMVP(const SceneObjectID &id, const mat4 &mvp) {
 	void* memory = nullptr;
 
 	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100);
-	vk.vkMapMemory(dev, mem.handle(), obj.offsetMVP(), sizeof(float) * 16, 0, &memory);
+	vk.vkMapMemory(dev, mem.handle(), obj.offsets().mvp, sizeof(float) * 16, 0, &memory);
 	memcpy(memory, mvp.asBytes().data(), sizeof(float) * 16);
 	vk.vkUnmapMemory(dev, mem.handle());
 }

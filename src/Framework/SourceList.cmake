@@ -105,6 +105,8 @@ set(
 	${CURDIR}/Include/Window.hpp
 	${CURDIR}/Math/BaseMatrix.hpp
 	${CURDIR}/Math/BaseVector.hpp
+	${CURDIR}/Math/Common.cpp
+	${CURDIR}/Math/Common.hpp
 	${CURDIR}/Math/Config.hpp
 	${CURDIR}/Math/EulerAngles.hpp
 	${CURDIR}/Math/Init.cpp
@@ -114,6 +116,7 @@ set(
 	${CURDIR}/Math/Matrix.hpp
 	${CURDIR}/Math/MatrixFactory.cpp
 	${CURDIR}/Math/MatrixFactory.hpp
+	${CURDIR}/Math/MatrixVectorArithmetic.hpp
 	${CURDIR}/Math/Quaternion.cpp
 	${CURDIR}/Math/Quaternion.hpp
 	${CURDIR}/Math/Vector.hpp

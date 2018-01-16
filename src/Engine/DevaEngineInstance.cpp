@@ -115,7 +115,7 @@ InputListener& DevaEngineInstance::getInputListener()
 }
 
 void DevaEngineInstance::destroy() {
-	auto i = instances.find(mID);
+	auto &i = instances.find(mID);
 	if (i != instances.end()) {
 		instances.erase(i);
 	}

@@ -5,24 +5,20 @@ using namespace DevaFramework;
 
 DevaFramework::Vulkan::VulkanBufferID DevaEngine::VulkanRenderObject::buffer() const { return mBufferVertexIndex; }
 
-VkDeviceSize DevaEngine::VulkanRenderObject::offsetIndex() const { return mOffsetIndex; }
-
 uint32_t DevaEngine::VulkanRenderObject::indexCount() const { return mIndexCount; }
 
-VkDeviceSize DevaEngine::VulkanRenderObject::offsetMVP() const
+VulkanRenderObject::Offsets DevaEngine::VulkanRenderObject::offsets() const
 {
-	return mOffsetMVP;
+	return mOffsets;
 }
 
 DevaEngine::VulkanRenderObject::VulkanRenderObject(
 	const DevaFramework::Vulkan::VulkanBufferID & buffer,
-	VkDeviceSize offsetIndex,
 	uint32_t indexCount,
-	VkDeviceSize offsetMVP,
+	Offsets offsets,
 	VkDescriptorSet dset)
 	: mBufferVertexIndex(buffer),
-	mOffsetIndex(offsetIndex),
-	mIndexCount(indexCount), mOffsetMVP(offsetMVP), mDescriptorSet(dset) {}
+	mIndexCount(indexCount), mOffsets(offsets), mDescriptorSet(dset) {}
 
 	VkDescriptorSet VulkanRenderObject::getDescriptorSet() const {
 	return mDescriptorSet;

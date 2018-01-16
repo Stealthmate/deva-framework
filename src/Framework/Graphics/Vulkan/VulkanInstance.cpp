@@ -72,7 +72,7 @@ void VulkanInstance::populatePDeviceList()
 		throw DevaException(std::string("No physical devices available."));
 	}
 
-	LOG_VULKAN.v("System has " + strm(device_count) + " devices.");
+	LOG_VULKAN.v("System has " + strf(device_count) + " devices.");
 
 	LOG_VULKAN.v("Enumerating physical devices (mHandles)...");
 	std::vector<VkPhysicalDevice> deviceHandles(device_count);

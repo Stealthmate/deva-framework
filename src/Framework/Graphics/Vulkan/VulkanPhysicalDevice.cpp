@@ -25,9 +25,9 @@ namespace
 	std::string parseVKVersion(uint32_t version)
 	{
 		return ""
-			+ strm(VK_VERSION_MAJOR(version)) + "."
-			+ strm(VK_VERSION_MINOR(version)) + "."
-			+ strm(VK_VERSION_PATCH(version));
+			+ strf(VK_VERSION_MAJOR(version)) + "."
+			+ strf(VK_VERSION_MINOR(version)) + "."
+			+ strf(VK_VERSION_PATCH(version));
 	}
 	std::string parseDeviceType(VkPhysicalDeviceType type)
 	{
@@ -40,7 +40,7 @@ namespace
 		case VK_PHYSICAL_DEVICE_TYPE_OTHER: return "Other";
 		}
 
-		return "Error parsing device type " + strm(type);
+		return "Error parsing device type " + strf(type);
 	}
 
 	std::string parseQueueFamilyProperties(const VkQueueFamilyProperties &queueprop)
@@ -53,7 +53,7 @@ namespace
 		if (queueprop.queueFlags & VK_QUEUE_TRANSFER_BIT)  str += " Transfer";
 		if (queueprop.queueFlags & VK_QUEUE_SPARSE_BINDING_BIT)  str += " SparseBinding";
 
-		str += "\n\t\tNumber of queues:           " + strm(queueprop.queueCount);
+		str += "\n\t\tNumber of queues:           " + strf(queueprop.queueCount);
 
 		//TODO: Implement additional property info
 
@@ -142,7 +142,7 @@ str += "\n";
 			int major = VK_VERSION_MAJOR(ex.specVersion);
 			int minor = VK_VERSION_MINOR(ex.specVersion);
 			int patch = VK_VERSION_PATCH(ex.specVersion);
-			str += "\t" + std::string(ex.extensionName) + " - " + strm(major) + "." + strm(minor) + "." + strm(patch) + "\n";
+			str += "\t" + std::string(ex.extensionName) + " - " + strf(major) + "." + strf(minor) + "." + strf(patch) + "\n";
 		}
 		return str;
 	}
@@ -165,8 +165,8 @@ str += "\n";
 
 			std::string desc = l.description;
 
-			str += "\t" + name + "\n\t\tSpec Version: " + strm(specMajor) + "." + strm(specMinor) + "." + strm(specPatch) + "\n";
-			str += "\t\tImpl Version: " + strm(implMajor) + "." + strm(implMinor) + "." + strm(implPatch) + "\n";
+			str += "\t" + name + "\n\t\tSpec Version: " + strf(specMajor) + "." + strf(specMinor) + "." + strf(specPatch) + "\n";
+			str += "\t\tImpl Version: " + strf(implMajor) + "." + strf(implMinor) + "." + strf(implPatch) + "\n";
 			str += "\t\t" + desc + "\n";
 		}
 
