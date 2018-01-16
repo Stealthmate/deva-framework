@@ -32,9 +32,11 @@ Model BasicModelBuilder::build() const
 {
 	std::vector<byte_t> vertexData;
 	for (auto &v : vertices) {
-		auto bytes = v.asBytes();
-		for (auto b : bytes)
-			vertexData.push_back(b);
+		auto raw = v.rawData();
+		size_t bytesize = raw.second * sizeof(float);
+		size_t start = vertexData.size();
+		vertexData.resize(vertexData.size() + bytesize, 0);
+		memcpy(&vertexData[start], raw.first, bytesize);
 	}
 
 	VertexDataElementDescription eld;

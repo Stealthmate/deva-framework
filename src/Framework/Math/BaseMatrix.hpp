@@ -40,7 +40,6 @@ namespace DevaFramework
 
 	public:
 
-
 		///Creates an identity matrix
 		constexpr BaseMatrix()
 		{
@@ -135,11 +134,9 @@ namespace DevaFramework
 			return &data[0];
 		}
 
-		std::array<byte_t, n_vectors * vector_length * sizeof(T)> asBytes() const
+		std::pair<const T*, size_t> rawData() const
 		{
-			std::array<byte_t, n_vectors * vector_length * sizeof(T)> arr;
-			memcpy(arr.data(), data, arr.max_size());
-			return arr;
+			return { &data[0], n_vectors * vector_length };
 		}
 	};
 

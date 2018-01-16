@@ -557,7 +557,7 @@ void VulkanRenderer::drawFrame()
 		auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(i.second.buffer()));
 
 		vk.vkMapMemory(device, mem.handle(), 0, 64, 0, &memory);
-		memcpy(memory, mvp.asBytes().data(), 64);
+		memcpy(memory, mvp.rawData().data(), 64);
 		vk.vkUnmapMemory(device, mem.handle());
 	}*/
 	
@@ -861,7 +861,8 @@ void VulkanRenderer::updateModelMVP(const SceneObjectID &id, const mat4 &mvp) {
 
 	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100);
 	vk.vkMapMemory(dev, mem.handle(), obj.offsets().mvp, sizeof(float) * 16, 0, &memory);
-	memcpy(memory, mvp.asBytes().data(), sizeof(float) * 16);
+	auto rawmvp = mvp.rawData();
+	memcpy(memory, (const unsigned char*) rawmvp.first, rawmvp.second* sizeof(float));
 	vk.vkUnmapMemory(dev, mem.handle());
 }
 
