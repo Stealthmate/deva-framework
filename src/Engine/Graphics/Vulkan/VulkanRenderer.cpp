@@ -24,7 +24,7 @@ namespace DevaEngine {
 	class VulkanRenderer::ImplSceneUpdateListener : public Scene::SceneUpdateObserver {
 	public:
 
-		VulkanRenderer& renderer;
+		VulkanRenderer & renderer;
 
 		ImplSceneUpdateListener(VulkanRenderer& renderer) : renderer(renderer) {}
 
@@ -399,7 +399,7 @@ void VulkanRenderer::createPipeline()
 {
 	auto vert = Vulkan::loadShaderFromFile(this->main_device, "../shaders/vshader.spv");
 	auto frag = Vulkan::loadShaderFromFile(this->main_device, "../shaders/fshader.spv");
-	
+
 	VulkanGraphicsPipelineBuilder plb;
 	plb.attachShader(vert, VK_SHADER_STAGE_VERTEX_BIT, "main")
 		.attachShader(frag, VK_SHADER_STAGE_FRAGMENT_BIT, "main")
@@ -574,7 +574,7 @@ void VulkanRenderer::drawFrame()
 		VkBuffer handle = buf.handle();
 		VkDeviceSize offsetIndex = obj.offsets().index;
 		VkDescriptorSet dset = obj.getDescriptorSet();
-		
+
 		vk.vkCmdBindVertexBuffers(commandBuffers[0], 0, 1, &handle, offsets);
 		vk.vkCmdBindIndexBuffer(commandBuffers[0], handle, obj.offsets().index, VK_INDEX_TYPE_UINT32);
 		vk.vkCmdBindDescriptorSets(commandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &dset, 0, nullptr);
@@ -779,7 +779,7 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	offsets.vertex = mvpsize;
 	offsets.index = vsize + mvpsize;
 
-	renderObjects.insert({ id, VulkanRenderObject(bufid, static_cast<uint32_t>(m.faceIndices().size()), offsets, dset)});
+	renderObjects.insert({ id, VulkanRenderObject(bufid, static_cast<uint32_t>(m.faceIndices().size()), offsets, dset) });
 }
 
 std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
@@ -810,7 +810,6 @@ void VulkanRenderer::unloadModel(const SceneObjectID &id) {
 
 	auto dev = main_device.handle();
 	auto &vk = main_device.vk();
-	//vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100);
 
 	auto obj = renderObjects.find(id);
 	if (obj == renderObjects.end()) {
@@ -840,7 +839,7 @@ void VulkanRenderer::updateModelMVP(const SceneObjectID &id, const mat4 &mvp) {
 	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100);
 	vk.vkMapMemory(dev, mem.handle(), obj.offsets().mvp, sizeof(float) * 16, 0, &memory);
 	auto rawmvp = mvp.rawData();
-	memcpy(memory, (const unsigned char*) rawmvp.first, rawmvp.second* sizeof(float));
+	memcpy(memory, (const unsigned char*)rawmvp.first, rawmvp.second * sizeof(float));
 	vk.vkUnmapMemory(dev, mem.handle());
 }
 
