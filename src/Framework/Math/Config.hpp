@@ -6,18 +6,18 @@
 namespace DevaFramework
 {
 	const float EPS = 1.0E-10f;
-	const double M_PI = 3.1415;
+	const double M_PI = std::acos(-1);
 	const double TWOPI = 2 * M_PI;
 
 	///Converts degrees to radians
-	inline float rad(float deg)
+	inline double rad(double deg)
 	{
-		return static_cast<float>(M_PI*deg / 180.f);
+		return M_PI*deg / 180.f;
 	}
 	///Converts radians to degrees
-	inline float deg(float rad)
+	inline double deg(double rad)
 	{
-		return static_cast<float>(rad*180.f / M_PI);
+		return rad*180.f / M_PI;
 	}
 
 }

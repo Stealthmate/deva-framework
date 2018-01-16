@@ -14,14 +14,14 @@ namespace DevaFramework::Math
 		@param axis - axis of rotation
 		@return A 4x4 float matrix, representing the rotation
 	*/
-	DEVA_FRAMEWORK_API mat4 rotate(float angle, const vec3 axis);
+	DEVA_FRAMEWORK_API mat4 rotate(double angle, const vec3 axis);
 
 	///Shorthand for rotate(angle, vec3{1, 0, 0});
-	inline mat4 rotateX(float angle) { return rotate(angle, vec3{ 1, 0, 0 }); }
+	inline mat4 rotateX(double angle) { return rotate(angle, vec3{ 1, 0, 0 }); }
 	///Shorthand for rotate(angle, vec{0, 1, 0,});
-	inline mat4 rotateY(float angle) { return rotate(angle, vec3{ 0, 1, 0 }); }
+	inline mat4 rotateY(double angle) { return rotate(angle, vec3{ 0, 1, 0 }); }
 	///Shorthand for rotate(angle, vec{0, 0, 1,});
-	inline mat4 rotateZ(float angle) { return rotate(angle, vec3{ 0, 0, 1 }); }
+	inline mat4 rotateZ(double angle) { return rotate(angle, vec3{ 0, 0, 1 }); }
 
 	///Alias for rotateX
 	constexpr auto pitch = rotateX;
@@ -45,7 +45,7 @@ namespace DevaFramework::Math
 	*/
 	DEVA_FRAMEWORK_API mat4 scale(vec3 scale_vec);
 
-	//DEVA_FRAMEWORK_API mat4 project(vec3 camera_pos, float fl);
+	DEVA_FRAMEWORK_API mat4 projection(float fov, float aspectratio, float zn, float zf);
 
 }
 

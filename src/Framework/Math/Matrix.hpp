@@ -2,7 +2,8 @@
 #define DEVA_FRAMEWORK_MATH_MATRIX_H
 
 #include "BaseMatrix.hpp"
-#include "Vector.hpp"
+#include "BaseVector.hpp"
+#include "MatrixVectorArithmetic.hpp"
 
 namespace DevaFramework
 {

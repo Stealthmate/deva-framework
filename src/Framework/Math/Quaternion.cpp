@@ -1,4 +1,5 @@
 #include "Quaternion.hpp"
+#include "Common.hpp"
 
 using namespace DevaFramework;
 
@@ -11,5 +12,5 @@ Quaternion::Quaternion()
 Quaternion::Quaternion(float angle, const vec3 &axis)
 {
 	this->angle = angle;
-	this->unit_axis = axis.normal();
+	this->unit_axis = Math::normal(axis);
 }
