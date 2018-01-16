@@ -115,7 +115,7 @@ const VulkanMemory & VulkanBufferMemoryIndex::getMemory(const MemID & id) const 
 	return memoryIDMap.find(id)->second;
 }
 
-Uuid VulkanBufferMemoryIndex::getBufferMemory(const Uuid & bufID) {
+MemID VulkanBufferMemoryIndex::getBufferMemory(const BufID & bufID) {
 	auto i = bufferIDs.find(bufID);
 	if (i == bufferIDs.end()) {
 		throw BUFFER_NOT_FOUND(bufID);
@@ -184,6 +184,23 @@ std::unordered_set<BufID> VulkanBufferMemoryIndex::getUnmappedBuffers() const {
 		std::inserter(bufs, bufs.end()),
 		cmp());
 	return bufs;
+}
+
+void VulkanBufferMemoryIndex::unbindBufferMemory(const BufID & bufID, const MemID & memID)
+{
+	auto i = bufferToMemoryMap.find(bufID);
+	if (i == bufferToMemoryMap.end()) {
+		throw DevaInvalidArgumentException(strformat("Buffer {} is not bound to {} memory", bufID.str(), memID));
+	}
+
+	bufferToMemoryMap.erase(i);
+
+	auto j = memoryToBuffersMap.find(memID);
+	if (j == memoryToBuffersMap.end()) {
+		throw DevaInvalidArgumentException(strformat("Memory {} is not bound to {} buffer", memID.str(), bufID));
+	}
+
+	memoryToBuffersMap.erase(j);
 }
 
 void VulkanBufferMemoryIndex::removeBuffer(const BufID &id, bool discardMemory) {
