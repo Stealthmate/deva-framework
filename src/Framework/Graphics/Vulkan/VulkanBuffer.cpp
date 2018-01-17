@@ -2,7 +2,7 @@
 
 using namespace DevaFramework;
 
-VulkanBuffer VulkanBuffer::create(
+VulkanBuffer Vulkan::createBuffer(
 	const VulkanDevice &device,
 	VkBufferCreateFlags flags,
 	VkDeviceSize size,
@@ -29,18 +29,17 @@ VulkanBuffer VulkanBuffer::create(
 		throw DevaExternalFailureException("Vulkan", "Could not create buffer");
 	}
 
-	VulkanBuffer buffer;
-	buffer.mHandle = buf;
+	VulkanBufferInfo info;
 
-	buffer.mUsage = usage;
-	buffer.mSharingMode = sharingMode;
-	buffer.mSize = size;
+	info.usage = usage;
+	info.sharingMode = sharingMode;
+	info.size = size;
 
-	vk.vkGetBufferMemoryRequirements(dev, buf, &buffer.mMemoryRequirements);
+	vk.vkGetBufferMemoryRequirements(dev, buf, &info.memoryRequirements);
 
-	return buffer;
+	return VulkanBuffer(buf, info);
 }
-
+/*
 VulkanBuffer::VulkanBuffer() = default;
 
 VulkanBuffer::VulkanBuffer(VulkanBuffer &&buf)
@@ -60,4 +59,4 @@ VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer &&buf) {
 	return *this;
 }
 
-VulkanBuffer::~VulkanBuffer() = default;
+VulkanBuffer::~VulkanBuffer() = default;*/

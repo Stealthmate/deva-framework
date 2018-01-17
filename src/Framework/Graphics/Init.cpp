@@ -48,7 +48,7 @@ namespace
 		instanceInfo.pNext = NULL;
 		// flags is mandatory
 		instanceInfo.flags = 0;
-		// The application info structure is then passed through the instance
+		// The application mInfo structure is then passed through the instance
 		instanceInfo.pApplicationInfo = &DEFAULT_APPLICATION_SETTINGS;
 		// Don't enable and layer
 		instanceInfo.enabledLayerCount = 0;

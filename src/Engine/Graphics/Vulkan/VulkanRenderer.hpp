@@ -83,6 +83,7 @@ namespace DevaEngine
 
 		DEVA_ENGINE_API void destroy();
 
+		DEVA_ENGINE_API virtual DevaFramework::Uuid loadImage(const DevaFramework::Image &img);
 
 	private:
 
@@ -114,6 +115,8 @@ namespace DevaEngine
 
 		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel>> dsLayouts;
 		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;
+
+		std::unordered_map<DevaFramework::Uuid, VkImage> mImages;
 
 		void drawFrame();
 

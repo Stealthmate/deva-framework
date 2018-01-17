@@ -5,6 +5,8 @@
 
 #include "Scene.hpp"
 
+#include<DevaFramework\Graphics\Image.hpp>
+
 namespace DevaEngine
 {
 	class Renderer
@@ -13,6 +15,8 @@ namespace DevaEngine
 		Renderer();
 
 		virtual void renderExample() = 0;
+
+		virtual DevaFramework::Uuid loadImage(const DevaFramework::Image& img) = 0;
 
 		virtual std::shared_ptr<Scene> render(std::shared_ptr<Scene> scene) = 0;
 

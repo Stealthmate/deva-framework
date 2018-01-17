@@ -39,7 +39,7 @@ namespace DevaFramework
 
 		void populatePDeviceList();
 
-		VulkanInstance(VkInstance handle); //Wraps the handle
+		VulkanInstance(VkInstance handle); //Wraps the mHandle
 		VulkanInstance(const VkInstanceCreateInfo &info);
 		VulkanInstance(const VulkanInstance &vkinstance) = delete;
 		VulkanInstance& operator=(const VulkanInstance &vkinstance) = delete;

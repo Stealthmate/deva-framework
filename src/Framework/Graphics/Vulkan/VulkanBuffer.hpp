@@ -3,12 +3,32 @@
 
 #include "Config.hpp"
 #include "VulkanHandle.hpp"
-#include "../../Core/DataHolder.hpp"
+#include "VulkanObject.hpp"
 
 namespace DevaFramework {
 
-	//Immutable
 
+	struct VulkanBufferInfo {
+		VkDeviceSize           size;
+		VkBufferUsageFlags     usage;
+		VkSharingMode          sharingMode;
+		VkMemoryRequirements memoryRequirements;
+	};
+
+	typedef VulkanObject<VkBuffer, VulkanBufferInfo> VulkanBuffer;
+
+	namespace Vulkan {
+		DEVA_FRAMEWORK_API VulkanBuffer createBuffer(
+			const VulkanDevice &dev,
+			VkBufferCreateFlags flags,
+			VkDeviceSize size,
+			VkBufferUsageFlags usage,
+			VkSharingMode sharingMode,
+			const std::vector<uint32_t> &queues = std::vector<uint32_t>());
+	}
+
+	//Immutable
+	/*
 	class VulkanBuffer {
 	public:
 
@@ -41,7 +61,7 @@ namespace DevaFramework {
 
 		VulkanBuffer(const VulkanBuffer& buffer) = delete;
 		VulkanBuffer& operator=(const VulkanBuffer &buffer) = delete;
-	};
+	};*/
 
 }
 

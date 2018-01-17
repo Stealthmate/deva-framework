@@ -141,8 +141,8 @@ void ImplWindow::impl_init()
 		CW_USEDEFAULT, CW_USEDEFAULT,	// x/y coords
 		wr.right - wr.left,				// width
 		wr.bottom - wr.top,				// height
-		NULL,							// handle to parent
-		NULL,							// handle to menu
+		NULL,							// mHandle to parent
+		NULL,							// mHandle to menu
 		this->impl_win32_hinstance,				// hInstance
 		NULL);							// no extra parameters
 

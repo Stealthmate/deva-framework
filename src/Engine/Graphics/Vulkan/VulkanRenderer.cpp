@@ -528,6 +528,62 @@ void VulkanRenderer::createPipeline()
 	dpoolcinfo.maxSets = 1;
 }
 
+Uuid VulkanRenderer::loadImage(const Image &img) {
+
+	auto dev = this->main_device.handle();
+	auto vk = this->main_device.vk();
+
+	size_t imageSize = img.width * img.height;
+	Uuid bufid = bufmemIndex->addBuffer(Vulkan::createBuffer(
+		this->main_device,
+		0,
+		imageSize,
+		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+		VK_SHARING_MODE_EXCLUSIVE));
+	Uuid memid = bufmemIndex->addMemory(VulkanMemory::forBuffer(
+		bufmemIndex->getBuffer(bufid),
+		this->main_device,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+
+	void* mem = nullptr;
+	vk.vkMapMemory(dev, bufmemIndex->getMemory(memid).handle(), 0, imageSize, 0, &mem);
+	memcpy(mem, img.getData().data(), imageSize);
+	vk.vkUnmapMemory(dev, bufmemIndex->getMemory(memid).handle());
+	
+	VkImage image;
+	VkDeviceMemory texImgMem;
+
+	VkImageCreateInfo imageInfo = {};
+	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageInfo.imageType = VK_IMAGE_TYPE_2D;
+	imageInfo.extent.width = static_cast<uint32_t>(img.width);
+	imageInfo.extent.height = static_cast<uint32_t>(img.height);
+	imageInfo.extent.depth = 1;
+	imageInfo.mipLevels = 1;
+	imageInfo.arrayLayers = 1;
+	imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageInfo.flags = 0; // Optional
+
+	VkResult res;
+	res = vk.vkCreateImage(dev, &imageInfo, nullptr, &image);
+	if (res != VK_SUCCESS) {
+		throw DevaException("Could not create image");
+	}
+		
+	Uuid id = Uuid();
+	mImages.insert({ id, image });
+
+	//VulkanMemory imgmem = VulkanMemory::forImage(image);
+
+	//vkBindImageMemory(device, textureImage, textureImageMemory, 0);
+
+}
+
 bool drawn = false;
 int i = 0;
 
@@ -717,14 +773,14 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	VulkanBufferMemoryIndex::BufID bufid(VulkanBufferMemoryIndex::BufID::NULL_ID);
 	for (auto id : bufmemIndex->getUnmappedBuffers()) {
 		auto &buf = bufmemIndex->getBuffer(id);
-		if (buf.size() >= datasize) {
+		if (buf.info().size >= datasize) {
 			bufid = id;
 			break;
 		}
 	}
 
 	if (bufid == Uuid::NULL_ID) {
-		bufid = bufmemIndex->addBuffer(VulkanBuffer::create(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
+		bufid = bufmemIndex->addBuffer(Vulkan::createBuffer(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
 	}
 
 	auto &buf = bufmemIndex->getBuffer(bufid);

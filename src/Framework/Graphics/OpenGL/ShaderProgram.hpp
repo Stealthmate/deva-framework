@@ -42,7 +42,7 @@ namespace DevaFramework
 		///NOT YET IMPLEMENTED!!!
 		DEVA_FRAMEWORK_API ShaderProgram& operator=(ShaderProgram &&shaderprog);
 
-		///@return A GLuint representing the handle to the OpenGL ProgramObject
+		///@return A GLuint representing the mHandle to the OpenGL ProgramObject
 		DEVA_FRAMEWORK_API inline GLuint handle() const
 		{
 			return mHandle;

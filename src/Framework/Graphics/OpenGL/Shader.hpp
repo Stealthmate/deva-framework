@@ -51,7 +51,7 @@ namespace DevaFramework
 		*/
 		DEVA_FRAMEWORK_API Shader& operator=(Shader &&shader);
 
-		///@return A GLuint representing the handle to the OpenGL shader object
+		///@return A GLuint representing the mHandle to the OpenGL shader object
 		DEVA_FRAMEWORK_API inline GLuint handle() const
 		{
 			return mHandle;

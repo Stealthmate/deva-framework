@@ -6,9 +6,9 @@ VulkanMemory VulkanMemory::forBuffer(const VulkanBuffer &buffer, const VulkanDev
 	VkMemoryAllocateInfo allocInfo;
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.pNext = nullptr;
-	allocInfo.allocationSize = buffer.memoryRequirements().size;
+	allocInfo.allocationSize = buffer.info().size;
 
-	uint32_t typeFilter = buffer.memoryRequirements().memoryTypeBits;
+	uint32_t typeFilter = buffer.info().memoryRequirements.memoryTypeBits;
 	auto memProperties = dev.physicalDeviceTraits().memoryProperties();
 	uint32_t index;
 	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {

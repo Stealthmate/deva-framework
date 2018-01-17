@@ -55,7 +55,7 @@ namespace
 
 		str += "\n\t\tNumber of queues:           " + strf(queueprop.queueCount);
 
-		//TODO: Implement additional property info
+		//TODO: Implement additional property mInfo
 
 		return str;
 	}

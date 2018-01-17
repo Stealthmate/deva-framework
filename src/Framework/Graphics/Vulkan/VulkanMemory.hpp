@@ -12,6 +12,7 @@ namespace DevaFramework {
 
 		DEVA_FRAMEWORK_API static VulkanMemory allocate(VkDeviceSize size, uint32_t allocInfo);
 		DEVA_FRAMEWORK_API static VulkanMemory forBuffer(const VulkanBuffer &buffer, const VulkanDevice &dev, VkMemoryPropertyFlags properties);
+		//DEVA_FRAMEWORK_API static VulkanMemory forImage(const VulkanImage &image, const VulkanDevice &dev, VkMemoryPropertyFlags properties);
 
 		DEVA_FRAMEWORK_API VulkanMemory() noexcept;
 		DEVA_FRAMEWORK_API VulkanMemory(VulkanMemory &&memory) noexcept;
