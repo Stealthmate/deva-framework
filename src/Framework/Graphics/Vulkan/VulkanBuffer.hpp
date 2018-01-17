@@ -4,6 +4,7 @@
 #include "Config.hpp"
 #include "VulkanHandle.hpp"
 #include "VulkanObject.hpp"
+#include "VulkanDevice.hpp"
 
 namespace DevaFramework {
 
@@ -25,6 +26,11 @@ namespace DevaFramework {
 			VkBufferUsageFlags usage,
 			VkSharingMode sharingMode,
 			const std::vector<uint32_t> &queues = std::vector<uint32_t>());
+		
+		template<> inline void destroyObject<VulkanBuffer>(const VulkanDevice& dev, VulkanBuffer &obj) {
+			dev.vk().vkDestroyBuffer(dev.handle(), obj.handle(), nullptr);
+			obj.reset();
+		}
 	}
 
 	//Immutable

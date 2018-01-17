@@ -2,7 +2,7 @@
 #define DEVA_FRAMEWORK_GRAPHICS_VULKAN_VULKAN_OBJECT_HPP
 
 #include "Config.hpp"
-
+#include <functional>
 namespace DevaFramework {
 
 	template<typename ObjectType, typename ObjectInfo>
@@ -35,6 +35,11 @@ namespace DevaFramework {
 		
 		ObjectType handle() const noexcept {
 			return mHandle;
+		}
+
+		void reset() {
+			mHandle = VK_NULL_HANDLE;
+			mInfo = ObjectInfo();
 		}
 
 	protected:

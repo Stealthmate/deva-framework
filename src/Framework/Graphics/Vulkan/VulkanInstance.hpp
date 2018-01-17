@@ -2,12 +2,34 @@
 #define DEVA_FRAMEWORK_GRAPHICS_VULKAN_VULKAN_INSTANCE
 
 #include "Config.hpp"
-
+#include "VulkanObject.hpp"
 #include "VulkanPhysicalDevice.hpp"
 #include "InstanceFunctionSet.hpp"
 
 namespace DevaFramework
 {
+	/*struct VulkanInstanceInfo {
+		std::vector<VulkanPhysicalDeviceTraits> physicalDevices;
+	};
+
+	class VulkanInstance : public VulkanObject<VkInstance, VulkanInstanceInfo> {
+	public:
+		DEVA_FRAMEWORK_API static VulkanInstance createDefault();
+		DEVA_FRAMEWORK_API static VulkanInstance create(const VkInstanceCreateInfo &info);
+
+		DEVA_FRAMEWORK_API VulkanInstance() noexcept;
+		DEVA_FRAMEWORK_API VulkanInstance(VulkanInstance &&vkinstance) noexcept;
+		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance) noexcept;
+		DEVA_FRAMEWORK_API ~VulkanInstance();
+
+		DEVA_FRAMEWORK_API VkInstance handle() const noexcept { return mHandle; }
+		DEVA_FRAMEWORK_API const VulkanInstanceFunctionSet& vk() const noexcept { return mVk; }
+
+		DEVA_FRAMEWORK_API void destroy();
+
+	private:
+		VulkanInstanceFunctionSet mVk;
+	};*/
 
 	//Immutable
 

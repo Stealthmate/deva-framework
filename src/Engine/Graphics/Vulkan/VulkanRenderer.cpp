@@ -741,7 +741,8 @@ void VulkanRenderer::destroy() {
 
 		auto leftover = bufmemIndex->clear();
 		for (auto &i : leftover.first) {
-			vkd.vkDestroyBuffer(dev, i.handle(), nullptr);
+			//vkd.vkDestroyBuffer(dev, i.handle(), nullptr);
+			Vulkan::destroyObject(main_device, i);
 		}
 		leftover.first.clear();
 		for (auto &i : leftover.second) {
