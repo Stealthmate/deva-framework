@@ -9,7 +9,7 @@ VulkanMemory Vulkan::allocateMemoryForBuffer(const VulkanBuffer &buffer, const V
 	allocInfo.allocationSize = buffer.info().size;
 
 	uint32_t typeFilter = buffer.info().memoryRequirements.memoryTypeBits;
-	auto memProperties = dev.physicalDeviceTraits().memoryProperties();
+	auto memProperties = dev.info().physicalDeviceTraits.memoryProperties();
 	uint32_t index;
 	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
 		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
@@ -28,7 +28,7 @@ VulkanMemory Vulkan::allocateMemoryForBuffer(const VulkanBuffer &buffer, const V
 	VulkanMemoryInfo info;
 	info.size = allocInfo.allocationSize;
 	info.typeIndex = allocInfo.memoryTypeIndex;
-	info.type = dev.physicalDeviceTraits().memoryProperties().memoryTypes[index];
+	info.type = dev.info().physicalDeviceTraits.memoryProperties().memoryTypes[index];
 
 	return VulkanMemory(mem, info);
 }

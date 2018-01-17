@@ -2,7 +2,11 @@
 
 using namespace DevaFramework;
 
-VulkanDevice::VulkanDevice() noexcept : mHandle(VK_NULL_HANDLE) {}
+VulkanDevice::VulkanDevice() noexcept {}
+
+const VulkanDeviceFunctionSet& VulkanDevice::vk() const noexcept {
+	return mVk;
+}
 
 VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysicalDeviceTraits &pdev, const VkDeviceCreateInfo &createInfo)
 {
@@ -13,7 +17,8 @@ VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysica
 	}
 
 	mVk = VulkanDeviceFunctionSet::load(mHandle, vkInstance);
-	mPhysicalDeviceTraits = pdev;
+
+	mInfo.physicalDeviceTraits = pdev;
 
 	uint32_t nqci = createInfo.queueCreateInfoCount;
 	for (uint32_t i = 0;i < nqci;i++)
@@ -32,35 +37,28 @@ VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysica
 			queue.mIndex = j;
 			queue.mType = pdev.queueFamilyProperties()[i].queueFlags;
 			queue.mPriority = prio;
-			mQueues.push_back(queue);
+			mInfo.queues.push_back(queue);
 		}
 	}
+
 }
 
 VulkanDevice::VulkanDevice(VulkanDevice &&dev) noexcept
-	:mHandle(dev.mHandle),
-	mVk(dev.mVk),
-	mQueues(dev.mQueues),
-	mPhysicalDeviceTraits(std::move(dev.mPhysicalDeviceTraits))
+	: VulkanObject(std::move(dev)),
+	mVk(dev.mVk)
 {
-	dev.mHandle = VK_NULL_HANDLE;
+	dev.mVk = VulkanDeviceFunctionSet();
 }
 
 VulkanDevice& VulkanDevice::operator=(VulkanDevice &&dev) noexcept {
-	mHandle = dev.mHandle;
-	mVk = dev.mVk;
-	mQueues = dev.mQueues;
-	mPhysicalDeviceTraits = std::move(dev.mPhysicalDeviceTraits);
-
-	dev.mHandle = VK_NULL_HANDLE;
-	
+	swap(dev);
 	return *this;
 }
 
 std::vector<VulkanDeviceQueue> VulkanDevice::getQueuesOfFamily(VkQueueFlagBits type) const
 {
 	std::vector<VulkanDeviceQueue> queues;
-	for (auto & q : this->mQueues)
+	for (auto & q : this->mInfo.queues)
 	{
 		if (q.type() & type) queues.push_back(q);
 	}
@@ -72,4 +70,14 @@ VulkanDevice::~VulkanDevice()
 	if (mHandle != VK_NULL_HANDLE) {
 		mVk.vkDestroyDevice(mHandle, nullptr);
 	}
+}
+
+void VulkanDevice::swap(VulkanDevice &rhs) {
+	using std::swap;
+	VulkanObject::swap(rhs);
+	swap(mVk, rhs.mVk);
+}
+
+void DevaFramework::swap(VulkanDevice &lhs, VulkanDevice &rhs) {
+	lhs.swap(rhs);
 }
