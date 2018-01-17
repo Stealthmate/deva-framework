@@ -18,10 +18,16 @@ namespace DevaFramework {
 		}
 		VulkanObject& operator=(VulkanObject &&obj) noexcept {
 			VulkanObject temp(std::move(obj));
-			std::swap(temp, *this);
+			swap(temp);
 			return *this;
 		}
 		~VulkanObject() = default;
+
+		void swap(VulkanObject& rhs) {
+			using std::swap;
+			swap(mHandle, rhs.mHandle);
+			swap(mInfo, rhs.mInfo);
+		}
 
 		const ObjectInfo& info() const noexcept {
 			return mInfo;
@@ -31,10 +37,15 @@ namespace DevaFramework {
 			return mHandle;
 		}
 
-	private:
+	protected:
 		ObjectType mHandle;
 		ObjectInfo mInfo;
 	};
+
+	template<typename OT, typename OI>
+	void swap(VulkanObject<OT, OI> &lhs, VulkanObject<OT, OI> &rhs) {
+		lhs.swap(rhs);
+	}
 }
 
 #endif //DEVA_FRAMEWORK_GRAPHICS_VULKAN_VULKAN_OBJECT_HPP
