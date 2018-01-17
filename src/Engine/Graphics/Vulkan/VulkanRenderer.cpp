@@ -391,7 +391,7 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 }
 VulkanHandle<VkSemaphore> imageAvailableSemaphore;
 VulkanHandle<VkSemaphore> renderFinishedSemaphore;
-std::vector<VkCommandBuffer> commandBuffers;
+//std::vector<VkCommandBuffer> commandBuffers;
 VkRenderPass renderPass;
 VulkanHandle<VkDescriptorPool> dpool;
 
@@ -492,9 +492,10 @@ void VulkanRenderer::createPipeline()
 			throw DevaException("failed to create framebuffer!");
 		}
 	}
-
+	
 	commandPool = Vulkan::createCommandPool(main_device, renderQueue, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
-	commandBuffers.resize(1);
+	commandBuffers.push_back(std::move(Vulkan::allocateCommandBuffers(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1)[0]));
+	/*commandBuffers.resize(1);
 	for (auto &cb : commandBuffers) cb = VK_NULL_HANDLE;
 
 	VkCommandBufferAllocateInfo allocInfo = {};
@@ -505,7 +506,7 @@ void VulkanRenderer::createPipeline()
 
 	if (vk.vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
 		throw DevaExternalFailureException("Vulkan", "Failed to allocate command buffers!");
-	}
+	}*/
 
 	VkFenceCreateInfo fence_cinfo;
 	fence_cinfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -609,7 +610,7 @@ void VulkanRenderer::drawFrame()
 	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 	beginInfo.pInheritanceInfo = nullptr; // Optional
 
-	vk.vkBeginCommandBuffer(commandBuffers[0], &beginInfo);
+	vk.vkBeginCommandBuffer(commandBuffers[0].handle(), &beginInfo);
 	VkRenderPassBeginInfo renderPassInfo = {};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassInfo.renderPass = renderPass;
@@ -619,8 +620,8 @@ void VulkanRenderer::drawFrame()
 	VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
-	vk.vkCmdBeginRenderPass(commandBuffers[0], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	vk.vkCmdBindPipeline(commandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getHandle());
+	vk.vkCmdBeginRenderPass(commandBuffers[0].handle(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vk.vkCmdBindPipeline(commandBuffers[0].handle(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getHandle());
 
 	bufmemIndex->purge();
 
@@ -632,14 +633,14 @@ void VulkanRenderer::drawFrame()
 		VkDeviceSize offsetIndex = obj.offsets().index;
 		VkDescriptorSet dset = obj.getDescriptorSet();
 
-		vk.vkCmdBindVertexBuffers(commandBuffers[0], 0, 1, &handle, offsets);
-		vk.vkCmdBindIndexBuffer(commandBuffers[0], handle, obj.offsets().index, VK_INDEX_TYPE_UINT32);
-		vk.vkCmdBindDescriptorSets(commandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &dset, 0, nullptr);
-		vk.vkCmdDrawIndexed(commandBuffers[0], obj.indexCount(), 1, 0, 0, 0);
+		vk.vkCmdBindVertexBuffers(commandBuffers[0].handle(), 0, 1, &handle, offsets);
+		vk.vkCmdBindIndexBuffer(commandBuffers[0].handle(), handle, obj.offsets().index, VK_INDEX_TYPE_UINT32);
+		vk.vkCmdBindDescriptorSets(commandBuffers[0].handle(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &dset, 0, nullptr);
+		vk.vkCmdDrawIndexed(commandBuffers[0].handle(), obj.indexCount(), 1, 0, 0, 0);
 	}
 
-	vk.vkCmdEndRenderPass(commandBuffers[0]);
-	if (vk.vkEndCommandBuffer(commandBuffers[0]) != VK_SUCCESS) {
+	vk.vkCmdEndRenderPass(commandBuffers[0].handle());
+	if (vk.vkEndCommandBuffer(commandBuffers[0].handle()) != VK_SUCCESS) {
 		throw DevaException("failed to record command buffer!");
 	}
 
@@ -650,13 +651,15 @@ void VulkanRenderer::drawFrame()
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
+	VkCommandBuffer combuf = commandBuffers[0].handle();
+
 	VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffers[0];
+	submitInfo.pCommandBuffers = &combuf;
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;

@@ -110,6 +110,7 @@ namespace DevaEngine
 		VulkanGraphicsPipeline pipeline;
 
 		DevaFramework::VulkanCommandPool commandPool;
+		std::vector<DevaFramework::VulkanCommandBuffer> commandBuffers;
 
 		std::unordered_map<DevaFramework::Uuid, VulkanRenderObject> renderObjects;
 
