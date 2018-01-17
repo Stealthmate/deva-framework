@@ -18,6 +18,11 @@ namespace DevaFramework {
 	namespace Vulkan {
 		DEVA_FRAMEWORK_API VulkanMemory allocateMemory(VkDeviceSize size, uint32_t allocInfo);
 		DEVA_FRAMEWORK_API VulkanMemory allocateMemoryForBuffer(const VulkanBuffer &buffer, const VulkanDevice &dev, VkMemoryPropertyFlags properties);
+
+		template<> inline void destroyObject<VulkanMemory>(const VulkanDevice& dev, VulkanMemory &obj) {
+			dev.vk().vkFreeMemory(dev.handle(), obj.handle(), nullptr);
+			obj.reset();
+		}
 	}
 }
 

@@ -746,7 +746,8 @@ void VulkanRenderer::destroy() {
 		}
 		leftover.first.clear();
 		for (auto &i : leftover.second) {
-			vkd.vkFreeMemory(dev, i.handle(), nullptr);
+			//vkd.vkFreeMemory(dev, i.handle(), nullptr);
+			Vulkan::destroyObject(main_device, i);
 		}
 		leftover.second.clear();
 		this->commandPool.replace();
