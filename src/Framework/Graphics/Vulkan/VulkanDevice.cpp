@@ -81,3 +81,8 @@ void VulkanDevice::swap(VulkanDevice &rhs) {
 void DevaFramework::swap(VulkanDevice &lhs, VulkanDevice &rhs) {
 	lhs.swap(rhs);
 }
+
+void Vulkan::destroyObject(VulkanDevice &dev) {
+	dev.vk().vkDestroyDevice(dev.handle(), nullptr);
+	dev.reset();
+}

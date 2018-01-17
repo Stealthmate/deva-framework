@@ -33,6 +33,16 @@ namespace DevaFramework
 
 	DEVA_FRAMEWORK_API void swap(VulkanDevice &lhs, VulkanDevice &rhs);
 
+	namespace Vulkan {
+
+		DEVA_FRAMEWORK_API void destroyObject(VulkanDevice &dev);
+
+		template<typename T>
+		void destroyObject(const VulkanDevice &dev, T& obj) {
+			static_assert("No overload found for type");
+		}
+	}
+
 	//Immutable
 	/*
 	class VulkanDevice
