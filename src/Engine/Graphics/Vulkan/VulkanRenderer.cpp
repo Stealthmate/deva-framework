@@ -152,7 +152,7 @@ namespace
 	bool pickGPU(const VulkanInstance &instance, VkSurfaceKHR surface, VulkanPhysicalDeviceTraits * gpu, uint32_t * queueIndex)
 	{
 		auto vk = instance.vk();
-		auto pdevs = instance.getPhysicalDevices();
+		auto pdevs = instance.info().physicalDevices;
 		for (auto &pdev : pdevs) {
 			if (pdev.properties().deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) continue;
 			auto& supportedQueues = Vulkan::deviceQueueFamiliesSupportSurface(instance, pdev.handle(), surface);
@@ -317,7 +317,7 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 
 void VulkanRenderer::attachToWindow(const Window &wnd)
 {
-	auto dev = instance.getPhysicalDevices()[0];
+	auto dev = instance.info().physicalDevices[0];
 	auto vk = instance.vk();
 
 	unsigned int queue = UINT_MAX;
@@ -757,6 +757,9 @@ void VulkanRenderer::destroy() {
 
 
 		vki.vkDestroyDebugReportCallbackEXT(inst, callback, nullptr);
+
+		Vulkan::destroyObject(main_device);
+		Vulkan::destroyObject(instance);
 	}
 }
 

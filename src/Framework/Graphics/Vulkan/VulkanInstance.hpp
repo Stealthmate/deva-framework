@@ -8,7 +8,7 @@
 
 namespace DevaFramework
 {
-	/*struct VulkanInstanceInfo {
+	struct VulkanInstanceInfo {
 		std::vector<VulkanPhysicalDeviceTraits> physicalDevices;
 	};
 
@@ -20,52 +20,28 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API VulkanInstance() noexcept;
 		DEVA_FRAMEWORK_API VulkanInstance(VulkanInstance &&vkinstance) noexcept;
 		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance) noexcept;
-		DEVA_FRAMEWORK_API ~VulkanInstance();
+		DEVA_FRAMEWORK_API void swap(VulkanInstance &rhs);
 
-		DEVA_FRAMEWORK_API VkInstance handle() const noexcept { return mHandle; }
 		DEVA_FRAMEWORK_API const VulkanInstanceFunctionSet& vk() const noexcept { return mVk; }
-
-		DEVA_FRAMEWORK_API void destroy();
 
 	private:
 		VulkanInstanceFunctionSet mVk;
-	};*/
-
-	//Immutable
-
-	class VulkanInstance
-	{
-	public:
-
-		DEVA_FRAMEWORK_API static VulkanInstance createDefault();
-		DEVA_FRAMEWORK_API static VulkanInstance create(const VkInstanceCreateInfo &info);
-
-		DEVA_FRAMEWORK_API VulkanInstance() noexcept;
-		DEVA_FRAMEWORK_API VulkanInstance(VulkanInstance &&vkinstance) noexcept;
-		DEVA_FRAMEWORK_API VulkanInstance& operator=(VulkanInstance &&vkinstance) noexcept;
-		DEVA_FRAMEWORK_API ~VulkanInstance();
-
-		DEVA_FRAMEWORK_API std::vector<VulkanPhysicalDeviceTraits> getPhysicalDevices() const;
-
-		DEVA_FRAMEWORK_API VkInstance handle() const noexcept { return mHandle; }
-		DEVA_FRAMEWORK_API const VulkanInstanceFunctionSet& vk() const noexcept { return mVk; }
-
-		DEVA_FRAMEWORK_API void destroy();
-
-	private:
-
-		VkInstance mHandle;
-		VulkanInstanceFunctionSet mVk;
-
-		std::vector<VulkanPhysicalDeviceTraits> physical_devices;
-
-		void populatePDeviceList();
 
 		VulkanInstance(VkInstance handle); //Wraps the mHandle
 		VulkanInstance(const VkInstanceCreateInfo &info);
-		VulkanInstance(const VulkanInstance &vkinstance) = delete;
-		VulkanInstance& operator=(const VulkanInstance &vkinstance) = delete;
 	};
+
+	DEVA_FRAMEWORK_API void swap(VulkanInstance &lhs, VulkanInstance &rhs);
+
+	namespace Vulkan {
+
+		DEVA_FRAMEWORK_API void destroyObject(VulkanInstance &instance);
+
+		template<typename T>
+		void destroyObject(const VulkanInstance &instance, T& obj) {
+			static_assert("No overload found for type");
+		}
+	}
 }
 
 
