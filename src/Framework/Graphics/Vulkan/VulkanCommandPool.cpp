@@ -2,7 +2,40 @@
 
 using namespace DevaFramework;
 
-VulkanCommandPool::VulkanCommandPool(const VulkanDevice &dev, uint32_t queueFamily, VkCommandPoolCreateFlags flags) : VulkanCommandPool(dev) {
+std::vector<VulkanCommandBuffer> Vulkan::allocateCommandBuffers(
+	const VulkanDevice &device,
+	const VulkanCommandPool &cpool,
+	VkCommandBufferLevel level,
+	uint32_t count) {
+
+	auto dev = device.handle();
+	auto vk = device.vk();
+
+	std::vector<VulkanCommandBuffer> cbufs;
+
+	VkCommandBufferAllocateInfo info;
+	info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	info.pNext = nullptr;
+	info.level = level;
+	info.commandPool = cpool.handle();
+	info.commandBufferCount = count;
+
+	VkResult res;
+	std::vector<VkCommandBuffer> cbufhandles;
+	cbufhandles.resize(count);
+	res = vk.vkAllocateCommandBuffers(dev, &info, cbufhandles.data());
+	if (res != VK_SUCCESS) {
+		throw DevaException("Could not allocate command buffers");
+	}
+
+	for (auto b : cbufhandles) {
+		cbufs.push_back({ b, info });
+	}
+
+	return cbufs;
+}
+
+VulkanCommandPool Vulkan::createCommandPool(const VulkanDevice &dev, uint32_t queueFamily, VkCommandPoolCreateFlags flags) {
 	VkCommandPoolCreateInfo cinfo = {};
 	cinfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	cinfo.queueFamilyIndex = queueFamily;
@@ -15,5 +48,5 @@ VulkanCommandPool::VulkanCommandPool(const VulkanDevice &dev, uint32_t queueFami
 		throw DevaException("Could not create CommandPool!");
 	}
 
-	this->replace(handle);
+	return VulkanCommandPool(handle, cinfo);
 }

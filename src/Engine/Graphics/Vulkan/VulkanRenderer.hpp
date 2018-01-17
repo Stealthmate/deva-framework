@@ -8,11 +8,11 @@
 #include <DevaFramework/Graphics/Vulkan/VulkanDevice.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanCommandPool.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanBuffer.hpp>
+#include <DevaFramework/Graphics/Vulkan/VulkanImage.hpp>
 #include "VulkanRenderObject.hpp"
 #include "VulkanBufferMemoryIndex.hpp"
 #include "VulkanSwapchain.hpp"
 #include "VulkanPipeline.hpp"
-
 namespace DevaEngine
 {
 
@@ -116,7 +116,7 @@ namespace DevaEngine
 		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel>> dsLayouts;
 		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;
 
-		std::unordered_map<DevaFramework::Uuid, VkImage> mImages;
+		std::unordered_map<DevaFramework::Uuid, DevaFramework::VulkanImage> mImages;
 
 		void drawFrame();
 

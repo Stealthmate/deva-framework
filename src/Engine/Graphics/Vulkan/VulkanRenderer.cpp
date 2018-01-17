@@ -493,7 +493,7 @@ void VulkanRenderer::createPipeline()
 		}
 	}
 
-	commandPool = VulkanCommandPool(main_device, renderQueue, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+	commandPool = Vulkan::createCommandPool(main_device, renderQueue, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	commandBuffers.resize(1);
 	for (auto &cb : commandBuffers) cb = VK_NULL_HANDLE;
 
@@ -574,13 +574,14 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	if (res != VK_SUCCESS) {
 		throw DevaException("Could not create image");
 	}
+	VulkanImage vimage(image, imageInfo);
 		
 	Uuid id = Uuid();
-	mImages.insert({ id, image });
+	mImages.insert({ id, VulkanImage(image, imageInfo) });
 
-	//VulkanMemory imgmem = VulkanMemory::forImage(image);
+	VulkanMemory imgmem = Vulkan::allocateMemoryForImage(main_device, vimage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	//vkBindImageMemory(device, textureImage, textureImageMemory, 0);
+	vk.vkBindImageMemory(dev, image, imgmem.handle(), 0);
 
 }
 
@@ -750,7 +751,7 @@ void VulkanRenderer::destroy() {
 			Vulkan::destroyObject(main_device, i);
 		}
 		leftover.second.clear();
-		this->commandPool.replace();
+		Vulkan::destroyObject(main_device, commandPool);
 		//this->dpoolManager->clear();
 		vkd.vkDestroyPipelineLayout(dev, pipeline.getPipelineLayout(), nullptr);
 		vkd.vkDestroyPipeline(dev, pipeline.getHandle(), nullptr);
