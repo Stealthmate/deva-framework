@@ -541,8 +541,8 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 		VK_SHARING_MODE_EXCLUSIVE));
 	Uuid memid = bufmemIndex->addMemory(Vulkan::allocateMemoryForBuffer(
-		bufmemIndex->getBuffer(bufid),
 		this->main_device,
+		bufmemIndex->getBuffer(bufid),
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
 	void* mem = nullptr;
@@ -801,7 +801,7 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 		}
 	}
 	if (memid == Uuid::NULL_ID) {
-		memid = bufmemIndex->addMemory(Vulkan::allocateMemoryForBuffer(buf, main_device, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+		memid = bufmemIndex->addMemory(Vulkan::allocateMemoryForBuffer(main_device, buf, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 	}
 
 	auto &mem = bufmemIndex->getMemory(memid);

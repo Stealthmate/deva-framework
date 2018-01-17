@@ -7,23 +7,20 @@
 
 namespace DevaFramework {
 
-	struct VulkanBufferInfo {
+	struct VulkanImageInfo {
 		VkDeviceSize           size;
 		VkBufferUsageFlags     usage;
 		VkSharingMode          sharingMode;
 		VkMemoryRequirements mMemoryRequirements;
 	};
 
-	typedef VulkanObject<VkBuffer, VulkanBufferInfo> VulkanBuffer;
+	typedef VulkanObject<VkImage, VkImageCreateInfo> VulkanImage;
 
 	namespace Vulkan {
-		DEVA_FRAMEWORK_API VulkanBuffer createBuffer(
-			const VulkanDevice &dev,
-			VkBufferCreateFlags flags,
-			VkDeviceSize size,
-			VkBufferUsageFlags usage,
-			VkSharingMode sharingMode,
-			const std::vector<uint32_t> &queues = std::vector<uint32_t>());
+		template<> inline void destroyObject<VulkanImage>(const VulkanDevice &dev, VulkanImage &obj) {
+			dev.vk().vkDestroyImage(dev.handle(), obj.handle(), nullptr);
+			obj.reset();
+		}
 	}
 }
 
