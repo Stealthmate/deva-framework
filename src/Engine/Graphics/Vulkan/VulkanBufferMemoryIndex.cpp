@@ -12,7 +12,7 @@ typedef VulkanBufferMemoryIndex::BufID BufID;
 typedef VulkanBufferMemoryIndex::MemID MemID;
 
 bool VulkanBufferMemoryIndex::MemoryComparator::operator()(const VulkanMemory* lhs, const VulkanMemory* rhs) const {
-	return lhs->size() < rhs->size();
+	return lhs->info().size < rhs->info().size;
 }
 
 BufID VulkanBufferMemoryIndex::addBuffer(VulkanBuffer &&buffer, const Uuid & memory) {

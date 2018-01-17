@@ -2,7 +2,7 @@
 
 using namespace DevaFramework;
 
-VulkanMemory VulkanMemory::forBuffer(const VulkanBuffer &buffer, const VulkanDevice &dev, VkMemoryPropertyFlags properties) {
+VulkanMemory Vulkan::allocateMemoryForBuffer(const VulkanBuffer &buffer, const VulkanDevice &dev, VkMemoryPropertyFlags properties) {
 	VkMemoryAllocateInfo allocInfo;
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.pNext = nullptr;
@@ -25,39 +25,10 @@ VulkanMemory VulkanMemory::forBuffer(const VulkanBuffer &buffer, const VulkanDev
 		throw DevaExternalFailureException("Vulkan", "Could not allocated device memory");
 	}
 
-	return VulkanMemory(dev, mem, allocInfo.allocationSize, dev.physicalDeviceTraits().memoryProperties().memoryTypes[index], index);
+	VulkanMemoryInfo info;
+	info.size = allocInfo.allocationSize;
+	info.typeIndex = allocInfo.memoryTypeIndex;
+	info.type = dev.physicalDeviceTraits().memoryProperties().memoryTypes[index];
+
+	return VulkanMemory(mem, info);
 }
-
-VulkanMemory::VulkanMemory() noexcept = default;
-
-VulkanMemory::VulkanMemory(const VulkanDevice &dev, VkDeviceMemory handle, VkDeviceSize size, const VkMemoryType &type, uint32_t typeIndex)
-	: mHandle(handle),
-	mSize(size),
-	mType(type),
-	mTypeIndex(typeIndex) {}
-
-VulkanMemory::VulkanMemory(VulkanMemory &&memory) noexcept
-	: mHandle(std::move(memory.mHandle)),
-	mSize(memory.mSize),
-	mType(memory.mType),
-	mTypeIndex(memory.mTypeIndex) {}
-
-VulkanMemory& VulkanMemory::operator=(VulkanMemory &&memory) noexcept {
-
-	if (this == &memory) return *this;
-
-	mHandle = std::move(memory.mHandle);
-	mSize = memory.mSize;
-	mType = memory.mType;
-	mTypeIndex = memory.mTypeIndex;
-
-	return *this;
-}
-
-VkDeviceMemory VulkanMemory::handle() const noexcept { return mHandle; }
-
-VkDeviceSize VulkanMemory::size() const noexcept { return mSize; }
-
-VkMemoryType VulkanMemory::type() const noexcept { return mType; }
-
-uint32_t VulkanMemory::typeIndex() const noexcept { return mTypeIndex; }
