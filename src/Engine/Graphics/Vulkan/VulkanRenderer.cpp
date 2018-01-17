@@ -494,19 +494,7 @@ void VulkanRenderer::createPipeline()
 	}
 	
 	commandPool = Vulkan::createCommandPool(main_device, renderQueue, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
-	commandBuffers.push_back(std::move(Vulkan::allocateCommandBuffers(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1)[0]));
-	/*commandBuffers.resize(1);
-	for (auto &cb : commandBuffers) cb = VK_NULL_HANDLE;
-
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = commandPool.handle();
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
-
-	if (vk.vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
-		throw DevaExternalFailureException("Vulkan", "Failed to allocate command buffers!");
-	}*/
+	commandBuffers.push_back(Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY));
 
 	VkFenceCreateInfo fence_cinfo;
 	fence_cinfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;

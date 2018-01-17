@@ -35,6 +35,15 @@ std::vector<VulkanCommandBuffer> Vulkan::allocateCommandBuffers(
 	return cbufs;
 }
 
+VulkanCommandBuffer Vulkan::allocateCommandBuffer(
+	const VulkanDevice &device,
+	const VulkanCommandPool &cpool,
+	VkCommandBufferLevel level) {
+
+	return std::move(allocateCommandBuffers(device, cpool, level, 1)[0]);
+
+}
+
 VulkanCommandPool Vulkan::createCommandPool(const VulkanDevice &dev, uint32_t queueFamily, VkCommandPoolCreateFlags flags) {
 	VkCommandPoolCreateInfo cinfo = {};
 	cinfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
