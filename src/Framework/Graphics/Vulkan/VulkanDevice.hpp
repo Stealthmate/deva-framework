@@ -13,7 +13,7 @@ namespace DevaFramework
 
 		VkDevice handle;
 		VulkanDeviceFunctionSet vk;
-		std::vector<VulkanQueue> queues;
+		std::vector<std::vector<VulkanQueue>> queues;
 		VulkanPhysicalDevice physicalDevice;
 	};
 
@@ -26,7 +26,7 @@ namespace DevaFramework
 
 		DEVA_FRAMEWORK_API std::vector<std::pair<uint32_t, uint32_t>> getQueuesOfType(const VulkanDevice &dev, VkQueueFlags type);
 
-		DEVA_FRAMEWORK_API VkQueue getDeviceQueue(const VulkanDevice &dev, uint32_t family, uint32_t index);
+		DEVA_FRAMEWORK_API VulkanQueue getDeviceQueue(const VulkanDevice &dev, uint32_t family, uint32_t index);
 
 		DEVA_FRAMEWORK_API void destroyObject(VulkanDevice &dev);
 

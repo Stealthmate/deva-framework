@@ -13,7 +13,6 @@
 #include <DevaFramework\Util\Time.hpp>
 #include <limits>
 #include <unordered_set>
-//#include <memory>
 
 
 using namespace DevaFramework;
@@ -644,7 +643,7 @@ void VulkanRenderer::drawFrame()
 	if (queues.size() == 0)
 		throw DevaException("0 queues");
 
-	VkQueue q = Vulkan::getDeviceQueue(main_device, queues[0].first, queues[0].second);
+	VkQueue q = Vulkan::getDeviceQueue(main_device, queues[0].first, queues[0].second).handle;
 
 	vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 1000);
 	vk.vkResetFences(device, 1, &fence);

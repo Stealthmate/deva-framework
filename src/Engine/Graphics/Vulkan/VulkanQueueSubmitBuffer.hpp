@@ -18,8 +18,8 @@ namespace DevaEngine {
 	class VulkanQueueSubmitBuffer {
 	public:
 
-		DEVA_ENGINE_API VulkanQueueSubmitBuffer() : mQueue(VK_NULL_HANDLE) {}
-		DEVA_ENGINE_API VulkanQueueSubmitBuffer(VkQueue queue) : mQueue(queue) {}
+		DEVA_ENGINE_API VulkanQueueSubmitBuffer() = default;
+		DEVA_ENGINE_API VulkanQueueSubmitBuffer(DevaFramework::VulkanQueue queue) : mQueue(queue) {}
 
 		DEVA_ENGINE_API void enqueue(
 			const std::vector<VkCommandBuffer> &buffers,
@@ -32,7 +32,7 @@ namespace DevaEngine {
 
 	private:
 		std::vector<VulkanQueueSubmitCommand> mSubmitQueues;
-		VkQueue mQueue;
+		DevaFramework::VulkanQueue mQueue;
 	};
 
 }

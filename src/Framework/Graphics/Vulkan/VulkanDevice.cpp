@@ -25,36 +25,40 @@ VulkanDevice Vulkan::createDevice(
 	{
 		uint32_t qfami = createInfo.pQueueCreateInfos[i].queueFamilyIndex;
 		uint32_t qcount = createInfo.pQueueCreateInfos[i].queueCount;
+		std::vector<VulkanQueue> inqueues;
 		for (uint32_t j = 0;j < qcount;j++)
 		{
 			float prio = createInfo.pQueueCreateInfos[i].pQueuePriorities[j];
 
-			VulkanQueue info;
-			info.parentDevice = device.handle;
-			info.familyIndex = qfami;
-			info.index = j;
-			info.type = pdev.queueFamilyProperties[i].queueFlags;
-			info.priority = prio;
-			device.queues.push_back(info);
+			VulkanQueue queue;
+			queue.parentDevice = device.handle;
+			queue.familyIndex = qfami;
+			queue.index = j;
+			queue.type = pdev.queueFamilyProperties[i].queueFlags;
+			queue.priority = prio;
+
+			device.vk.vkGetDeviceQueue(device.handle, qfami, j, &queue.handle);
+
+			inqueues.push_back(queue);
 		}
+		device.queues.push_back(inqueues);
 	}
 
 	return device;
 }
 
-VkQueue Vulkan::getDeviceQueue(const VulkanDevice &dev, uint32_t family, uint32_t index) {
-	VkQueue q;
-	dev.vk.vkGetDeviceQueue(dev.handle, family, index, &q);
-	return q;
+VulkanQueue Vulkan::getDeviceQueue(const VulkanDevice &dev, uint32_t family, uint32_t index) {
+	return dev.queues[family][index];
 }
 
 std::vector<std::pair<uint32_t, uint32_t>> Vulkan::getQueuesOfType(const VulkanDevice &dev, VkQueueFlags flags) {
 	std::vector<std::pair<uint32_t, uint32_t>> res;
 
-	for (auto i = 0;i < dev.queues.size();i++) {
-		auto q = dev.queues[i];
-		if (flags & q.type) {
-			res.push_back({q.familyIndex, q.index});
+	for (auto i : dev.queues) {
+		for (auto q : i) {
+			if (flags & q.type) {
+				res.push_back({ q.familyIndex, q.index });
+			}
 		}
 	}
 

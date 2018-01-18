@@ -79,7 +79,6 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanBuffer.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanDestructibleHandle.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceBuilder.hpp
@@ -88,11 +87,13 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceQueue.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanException.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanHandle.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanImage.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanLogicalDevice.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanMemory.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanMemory.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanObject.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPhysicalDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPhysicalDevice.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipeline.hpp

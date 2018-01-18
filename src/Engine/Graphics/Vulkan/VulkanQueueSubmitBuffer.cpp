@@ -6,6 +6,11 @@ using namespace DevaEngine;
 void VulkanQueueSubmitBuffer::flush(const VulkanDevice &device, VkFence fence) {
 
 	auto dev = device.handle;
+
+	if (mQueue.parentDevice != dev) {
+		throw DevaException("Attempt to flush queue from different device");
+	}
+
 	auto vk = device.vk;
 
 	std::vector<VkSubmitInfo> submits;
@@ -24,7 +29,7 @@ void VulkanQueueSubmitBuffer::flush(const VulkanDevice &device, VkFence fence) {
 		submits.push_back(info);
 	}
 
-	VkResult res = vk.vkQueueSubmit(mQueue, static_cast<uint32_t>(submits.size()), submits.data(), fence);
+	VkResult res = vk.vkQueueSubmit(mQueue.handle, static_cast<uint32_t>(submits.size()), submits.data(), fence);
 	if (res != VK_SUCCESS) {
 		throw DevaException("Could not submit queue");
 	}
