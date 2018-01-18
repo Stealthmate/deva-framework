@@ -8,13 +8,12 @@
 
 namespace DevaFramework {
 
-	struct VulkanMemoryInfo {
+	struct VulkanMemory {
+		VkDeviceMemory handle;
 		VkDeviceSize size;
 		VkMemoryType type;
 		uint32_t typeIndex;
 	};
-
-	typedef VulkanObject<VkDeviceMemory, VulkanMemoryInfo> VulkanMemory;
 
 	namespace Vulkan {
 
@@ -25,8 +24,8 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API VulkanMemory allocateMemoryForImage(const VulkanDevice &dev, const VulkanImage &image, VkMemoryPropertyFlags properties);
 
 		template<> inline void destroyObject<VulkanMemory>(const VulkanDevice& dev, VulkanMemory &obj) {
-			dev.vk().vkFreeMemory(dev.handle(), obj.handle(), nullptr);
-			obj.reset();
+			dev.vk.vkFreeMemory(dev.handle, obj.handle, nullptr);
+			obj.handle = VK_NULL_HANDLE;
 		}
 	}
 }

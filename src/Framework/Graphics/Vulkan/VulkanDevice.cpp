@@ -2,23 +2,23 @@
 
 using namespace DevaFramework;
 
-VulkanDevice::VulkanDevice() noexcept {}
-
-const VulkanDeviceFunctionSet& VulkanDevice::vk() const noexcept {
-	return mVk;
-}
-
-VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysicalDeviceTraits &pdev, const VkDeviceCreateInfo &createInfo)
+VulkanDevice Vulkan::createDevice(
+	const VulkanInstance &vkInstance, 
+	const VulkanPhysicalDevice &pdev,
+	const VkDeviceCreateInfo &createInfo)
 {
-	VkResult result = vkInstance.vk().vkCreateDevice(pdev.handle(), &createInfo, nullptr, &mHandle);
+
+	VulkanDevice device;
+
+	VkResult result = vkInstance.vk.vkCreateDevice(pdev.handle, &createInfo, nullptr, &device.handle);
 	if (result != VK_SUCCESS)
 	{
 		throw DevaException("Could not create VkDevice!");
 	}
 
-	mVk = VulkanDeviceFunctionSet::load(mHandle, vkInstance);
+	device.vk = VulkanDeviceFunctionSet::load(device.handle, vkInstance);
 
-	mInfo.physicalDeviceTraits = pdev;
+	device.physicalDevice = pdev;
 
 	uint32_t nqci = createInfo.queueCreateInfoCount;
 	for (uint32_t i = 0;i < nqci;i++)
@@ -28,61 +28,40 @@ VulkanDevice::VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysica
 		for (uint32_t j = 0;j < qcount;j++)
 		{
 			float prio = createInfo.pQueueCreateInfos[i].pQueuePriorities[j];
-			VkQueue qhandle;
-			mVk.vkGetDeviceQueue(mHandle, qfami, j, &qhandle);
-			VulkanDeviceQueue queue{};
-			queue.mParentDevice = mHandle;
-			queue.mHandle = qhandle;
-			queue.mFamilyIndex = qfami;
-			queue.mIndex = j;
-			queue.mType = pdev.queueFamilyProperties()[i].queueFlags;
-			queue.mPriority = prio;
-			mInfo.queues.push_back(queue);
+
+			VulkanQueue info;
+			info.parentDevice = device.handle;
+			info.familyIndex = qfami;
+			info.index = j;
+			info.type = pdev.queueFamilyProperties[i].queueFlags;
+			info.priority = prio;
+			device.queues.push_back(info);
 		}
 	}
 
+	return device;
 }
 
-VulkanDevice::VulkanDevice(VulkanDevice &&dev) noexcept
-	: VulkanObject(std::move(dev)),
-	mVk(dev.mVk)
-{
-	dev.mVk = VulkanDeviceFunctionSet();
+VkQueue Vulkan::getDeviceQueue(const VulkanDevice &dev, uint32_t family, uint32_t index) {
+	VkQueue q;
+	dev.vk.vkGetDeviceQueue(dev.handle, family, index, &q);
+	return q;
 }
 
-VulkanDevice& VulkanDevice::operator=(VulkanDevice &&dev) noexcept {
-	swap(dev);
-	return *this;
-}
+std::vector<std::pair<uint32_t, uint32_t>> Vulkan::getQueuesOfType(const VulkanDevice &dev, VkQueueFlags flags) {
+	std::vector<std::pair<uint32_t, uint32_t>> res;
 
-std::vector<VulkanDeviceQueue> VulkanDevice::getQueuesOfFamily(VkQueueFlagBits type) const
-{
-	std::vector<VulkanDeviceQueue> queues;
-	for (auto & q : this->mInfo.queues)
-	{
-		if (q.type() & type) queues.push_back(q);
+	for (auto i = 0;i < dev.queues.size();i++) {
+		auto q = dev.queues[i];
+		if (flags & q.type) {
+			res.push_back({q.familyIndex, q.index});
+		}
 	}
-	return queues;
-}
 
-VulkanDevice::~VulkanDevice()
-{
-	if (mHandle != VK_NULL_HANDLE) {
-		mVk.vkDestroyDevice(mHandle, nullptr);
-	}
-}
-
-void VulkanDevice::swap(VulkanDevice &rhs) {
-	using std::swap;
-	VulkanObject::swap(rhs);
-	swap(mVk, rhs.mVk);
-}
-
-void DevaFramework::swap(VulkanDevice &lhs, VulkanDevice &rhs) {
-	lhs.swap(rhs);
+	return res;
 }
 
 void Vulkan::destroyObject(VulkanDevice &dev) {
-	dev.vk().vkDestroyDevice(dev.handle(), nullptr);
-	dev.reset();
+	dev.vk.vkDestroyDevice(dev.handle, nullptr);
+	dev.handle = VK_NULL_HANDLE;
 }

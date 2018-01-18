@@ -9,31 +9,24 @@
 
 namespace DevaFramework
 {
-	struct VulkanDeviceInfo {
-		std::vector<VulkanDeviceQueue> queues;
-		VulkanPhysicalDeviceTraits physicalDeviceTraits;
+	struct VulkanDevice {
+
+		VkDevice handle;
+		VulkanDeviceFunctionSet vk;
+		std::vector<VulkanQueue> queues;
+		VulkanPhysicalDevice physicalDevice;
 	};
-
-	class VulkanDevice : public VulkanObject<VkDevice, VulkanDeviceInfo> {
-	public:
-		DEVA_FRAMEWORK_API VulkanDevice() noexcept;
-		DEVA_FRAMEWORK_API VulkanDevice(const VulkanInstance &vkInstance, const VulkanPhysicalDeviceTraits &pdev, const VkDeviceCreateInfo &createInfo);
-		DEVA_FRAMEWORK_API VulkanDevice(VulkanDevice &&dev) noexcept;
-		DEVA_FRAMEWORK_API VulkanDevice& operator=(VulkanDevice &&dev) noexcept;
-		DEVA_FRAMEWORK_API ~VulkanDevice();
-		DEVA_FRAMEWORK_API void swap(VulkanDevice &rhs);
-
-
-		DEVA_FRAMEWORK_API const VulkanDeviceFunctionSet& vk() const noexcept;
-		DEVA_FRAMEWORK_API std::vector<VulkanDeviceQueue> getQueuesOfFamily(VkQueueFlagBits type) const;
-
-	private:
-		VulkanDeviceFunctionSet mVk;
-	};
-
-	DEVA_FRAMEWORK_API void swap(VulkanDevice &lhs, VulkanDevice &rhs);
 
 	namespace Vulkan {
+
+		DEVA_FRAMEWORK_API VulkanDevice createDevice(
+			const VulkanInstance &vkInstance, 
+			const VulkanPhysicalDevice &pdev, 
+			const VkDeviceCreateInfo &createInfo);
+
+		DEVA_FRAMEWORK_API std::vector<std::pair<uint32_t, uint32_t>> getQueuesOfType(const VulkanDevice &dev, VkQueueFlags type);
+
+		DEVA_FRAMEWORK_API VkQueue getDeviceQueue(const VulkanDevice &dev, uint32_t family, uint32_t index);
 
 		DEVA_FRAMEWORK_API void destroyObject(VulkanDevice &dev);
 
@@ -60,7 +53,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API const std::vector<VulkanDeviceQueue>& queues() const noexcept { return mQueues; }
 		DEVA_FRAMEWORK_API const VulkanPhysicalDeviceTraits& physicalDeviceTraits() const noexcept { return mPhysicalDeviceTraits; }
 
-		DEVA_FRAMEWORK_API std::vector<VulkanDeviceQueue> getQueuesOfFamily(VkQueueFlagBits type) const;
+		DEVA_FRAMEWORK_API std::vector<VulkanDeviceQueue> getQueuesOfType(VkQueueFlagBits type) const;
 
 
 	private:

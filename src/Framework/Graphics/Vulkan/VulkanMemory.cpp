@@ -17,10 +17,10 @@ VulkanMemory Vulkan::allocateMemoryForBuffer(const VulkanDevice &dev, const Vulk
 	VkMemoryAllocateInfo allocInfo;
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.pNext = nullptr;
-	allocInfo.allocationSize = buffer.info().size;
+	allocInfo.allocationSize = buffer.size;
 
-	uint32_t typeFilter = buffer.info().memoryRequirements.memoryTypeBits;
-	auto memProperties = dev.info().physicalDeviceTraits.memoryProperties();
+	uint32_t typeFilter = buffer.memoryRequirements.memoryTypeBits;
+	auto memProperties = dev.physicalDevice.memoryProperties;
 	uint32_t index;
 	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
 		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
@@ -28,47 +28,46 @@ VulkanMemory Vulkan::allocateMemoryForBuffer(const VulkanDevice &dev, const Vulk
 		}
 	}
 
-	allocInfo.memoryTypeIndex = findMemoryTypeIndex(dev.info().physicalDeviceTraits.memoryProperties(), buffer.info().memoryRequirements.memoryTypeBits, properties);
+	allocInfo.memoryTypeIndex = findMemoryTypeIndex(dev.physicalDevice.memoryProperties, buffer.memoryRequirements.memoryTypeBits, properties);
 
-	VkDeviceMemory mem;
-	VkResult result = dev.vk().vkAllocateMemory(dev.handle(), &allocInfo, nullptr, &mem);
+	VulkanMemory memory;
+
+	VkResult result = dev.vk.vkAllocateMemory(dev.handle, &allocInfo, nullptr, &memory.handle);
 	if (result != VK_SUCCESS) {
 		throw DevaExternalFailureException("Vulkan", "Could not allocated device memory");
 	}
 
-	VulkanMemoryInfo info;
-	info.size = allocInfo.allocationSize;
-	info.typeIndex = allocInfo.memoryTypeIndex;
-	info.type = dev.info().physicalDeviceTraits.memoryProperties().memoryTypes[index];
+	memory.size = allocInfo.allocationSize;
+	memory.typeIndex = allocInfo.memoryTypeIndex;
+	memory.type = dev.physicalDevice.memoryProperties.memoryTypes[index];
 
-	return VulkanMemory(mem, info);
+	return memory;
 }
 
 VulkanMemory Vulkan::allocateMemoryForImage(const VulkanDevice &device, const VulkanImage &image, VkMemoryPropertyFlags properties) {
-	auto dev = device.handle();
-	auto& vk = device.vk();
+	auto dev = device.handle;
+	auto& vk = device.vk;
+
+	VulkanMemory memory;
 
 	VkMemoryRequirements memreq;
-	vk.vkGetImageMemoryRequirements(dev, image.handle(), &memreq);
+	vk.vkGetImageMemoryRequirements(dev, image.handle, &memreq);
 
 	VkResult res;
 	VkMemoryAllocateInfo info;
 	info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	info.pNext = nullptr;
 	info.allocationSize = memreq.size;
-	info.memoryTypeIndex = findMemoryTypeIndex(device.info().physicalDeviceTraits.memoryProperties(), memreq.memoryTypeBits, properties);
+	info.memoryTypeIndex = findMemoryTypeIndex(device.physicalDevice.memoryProperties, memreq.memoryTypeBits, properties);
 
-	VkDeviceMemory imageMemory;
-
-	res = vk.vkAllocateMemory(dev, &info, nullptr, &imageMemory);
+	res = vk.vkAllocateMemory(dev, &info, nullptr, &memory.handle);
 	if (res != VK_SUCCESS) {
 		throw DevaException("Failed to allocate image memory!");
 	}
 
-	VulkanMemoryInfo memInfo;
-	memInfo.size = info.allocationSize;
-	memInfo.type = device.info().physicalDeviceTraits.memoryProperties().memoryTypes[info.memoryTypeIndex];
-	memInfo.typeIndex = info.memoryTypeIndex;
+	memory.size = info.allocationSize;
+	memory.type = device.physicalDevice.memoryProperties.memoryTypes[info.memoryTypeIndex];
+	memory.typeIndex = info.memoryTypeIndex;
 
-	return VulkanMemory(imageMemory, memInfo);
+	return memory;
 }

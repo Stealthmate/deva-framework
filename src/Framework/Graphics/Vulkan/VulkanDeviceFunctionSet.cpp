@@ -5,7 +5,7 @@ using namespace DevaFramework;
 
 #define LOAD(PFNNAME) \
 LOG_VULKAN.v("Getting Device PFN_" #PFNNAME "..."); \
-devf.PFNNAME = (PFN_##PFNNAME) vkinstance.vk().vkGetDeviceProcAddr(vkdevice, #PFNNAME); \
+devf.PFNNAME = (PFN_##PFNNAME) vkinstance.vk.vkGetDeviceProcAddr(vkdevice, #PFNNAME); \
 if(devf.PFNNAME == NULL) \
 { \
 	LOG_VULKAN.v("Device PFN_" #PFNNAME " not available. Assigning default implementation (throw exception)"); \

@@ -7,51 +7,31 @@
 
 namespace DevaFramework
 {
-	class VulkanInstance;
+	struct VulkanInstance;
 
-	//Immutable
+	struct VulkanPhysicalDevice {
+		VkPhysicalDevice handle;
+		VkPhysicalDeviceProperties properties;
+		VkPhysicalDeviceFeatures features;
+		std::vector<VkQueueFamilyProperties> queueFamilyProperties;
+		std::vector<VkExtensionProperties> extensionProperties;
+		std::vector<VkLayerProperties> layerProperties;
+		VkPhysicalDeviceMemoryProperties memoryProperties;
+	};
 
-	struct VulkanPhysicalDeviceTraits
-	{
-		struct SurfaceProperties {
+	namespace Vulkan {
+
+		struct PhysicalDeviceSurfaceProperties {
 			std::vector<VkSurfaceFormatKHR> formats;
 			VkSurfaceCapabilitiesKHR capabilities;
 			std::vector<VkPresentModeKHR> presentModes;
 		};
 
-		DEVA_FRAMEWORK_API static VulkanPhysicalDeviceTraits forDevice(const VulkanInstance &vkInstance, VkPhysicalDevice handle);
+		DEVA_FRAMEWORK_API VulkanPhysicalDevice getPhysicalDeviceStruct(const VulkanInstance &inst, VkPhysicalDevice pdev);
+		DEVA_FRAMEWORK_API PhysicalDeviceSurfaceProperties getSurfaceProperties(const VulkanInstance &inst, const VulkanPhysicalDevice &pdev, VkSurfaceKHR surface);
 
-		DEVA_FRAMEWORK_API VulkanPhysicalDeviceTraits();
-		DEVA_FRAMEWORK_API VulkanPhysicalDeviceTraits(const VulkanPhysicalDeviceTraits &pdev);
-		DEVA_FRAMEWORK_API VulkanPhysicalDeviceTraits(VulkanPhysicalDeviceTraits &&pdev);
-		DEVA_FRAMEWORK_API VulkanPhysicalDeviceTraits& operator=(const VulkanPhysicalDeviceTraits &pdev);
-		DEVA_FRAMEWORK_API VulkanPhysicalDeviceTraits& operator=(VulkanPhysicalDeviceTraits &&pdev);
-		DEVA_FRAMEWORK_API ~VulkanPhysicalDeviceTraits();
-
-		DEVA_FRAMEWORK_API VkPhysicalDevice handle() const { return mHandle; }
-		DEVA_FRAMEWORK_API const VkPhysicalDeviceProperties& properties() const { return mProperties; }
-		DEVA_FRAMEWORK_API const VkPhysicalDeviceFeatures& features() const { return mFeatures; }
-		DEVA_FRAMEWORK_API const std::vector<VkQueueFamilyProperties>& queueFamilyProperties() const { return mQueueFamilyProperties; }
-		DEVA_FRAMEWORK_API const std::vector<VkExtensionProperties>& extensionProperties() const { return mExtensionProperties; }
-		DEVA_FRAMEWORK_API const std::vector<VkLayerProperties>& layerProperties() const { return mLayerProperties; }
-		DEVA_FRAMEWORK_API const VkPhysicalDeviceMemoryProperties& memoryProperties() const { return mMemoryProperties; }
-
-		DEVA_FRAMEWORK_API SurfaceProperties getSurfaceProperties(const VulkanInstance &vkInstance, VkSurfaceKHR surface) const;
-
-		DEVA_FRAMEWORK_API std::string to_string() const;
-
-	private:
-
-		VkPhysicalDevice mHandle;
-		VkPhysicalDeviceProperties mProperties;
-		VkPhysicalDeviceFeatures mFeatures;
-		std::vector<VkQueueFamilyProperties> mQueueFamilyProperties;
-		std::vector<VkExtensionProperties> mExtensionProperties;
-		std::vector<VkLayerProperties> mLayerProperties;
-		VkPhysicalDeviceMemoryProperties mMemoryProperties;
-	};
-
-
+		DEVA_FRAMEWORK_API std::string toString(const VulkanPhysicalDevice &pdev);
+	}
 }
 
 #endif //DEVA_FRAMEWORK_GRAPHICS_VULKAN_PHYSICAL_DEVICE_TRAITS_HPP

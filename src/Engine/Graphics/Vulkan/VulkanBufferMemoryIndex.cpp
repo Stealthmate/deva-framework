@@ -12,7 +12,7 @@ typedef VulkanBufferMemoryIndex::BufID BufID;
 typedef VulkanBufferMemoryIndex::MemID MemID;
 
 bool VulkanBufferMemoryIndex::MemoryComparator::operator()(const VulkanMemory* lhs, const VulkanMemory* rhs) const {
-	return lhs->info().size < rhs->info().size;
+	return lhs->size < rhs->size;
 }
 
 BufID VulkanBufferMemoryIndex::addBuffer(VulkanBuffer &&buffer, const Uuid & memory) {
@@ -66,11 +66,11 @@ void VulkanBufferMemoryIndex::bindBufferMemory(const BufID & bufID, const MemID 
 		throw DevaInvalidArgumentException(strformat("Buffer {} has already been mapped to memory {}", bufID.str(), iMappedMem->second.str()));
 	}
 
-	auto device = dev.handle();
-	auto &vk = dev.vk();
-	VkResult result = vk.vkBindBufferMemory(device, iBuf->second.handle(), iMem->second.handle(), offset);
+	auto device = dev.handle;
+	auto &vk = dev.vk;
+	VkResult result = vk.vkBindBufferMemory(device, iBuf->second.handle, iMem->second.handle, offset);
 	if (result != VK_SUCCESS) {
-		throw DevaExternalFailureException("Vulkan", strformat("Could not bind buffer handle {} to memory handle {}", strm(iBuf->second.handle()), strm(iMem->second.handle())));
+		throw DevaExternalFailureException("Vulkan", strformat("Could not bind buffer handle {} to memory handle {}", strm(iBuf->second.handle), strm(iMem->second.handle)));
 	}
 
 	bufferToMemoryMap.insert({ bufID, memID });

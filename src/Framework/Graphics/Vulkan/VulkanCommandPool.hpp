@@ -9,8 +9,17 @@
 
 namespace DevaFramework {
 
-	typedef VulkanObject<VkCommandPool, VkCommandPoolCreateInfo> VulkanCommandPool;
-	typedef VulkanObject<VkCommandBuffer, VkCommandBufferAllocateInfo> VulkanCommandBuffer;
+	struct VulkanCommandPool {
+		VkCommandPool handle;
+		VkCommandPoolCreateFlags flags;
+		uint32_t queueFamilyIndex;
+	};
+
+	struct VulkanCommandBuffer {
+		VkCommandBuffer handle;
+		VulkanCommandPool commandPool;
+		VkCommandBufferLevel level;
+	};
 
 	namespace Vulkan {
 
@@ -28,8 +37,8 @@ namespace DevaFramework {
 			uint32_t count);
 
 		template <> inline void destroyObject(const VulkanDevice &dev, VulkanCommandPool &obj) {
-			dev.vk().vkDestroyCommandPool(dev.handle(), obj.handle(), nullptr);
-			obj.reset();
+			dev.vk.vkDestroyCommandPool(dev.handle, obj.handle, nullptr);
+			obj.handle = VK_NULL_HANDLE;
 		}
 
 	}

@@ -18,11 +18,11 @@ VulkanHandle<VkShaderModule> Vulkan::loadShaderFromFile(const VulkanDevice &dev,
 	createInfo.codeSize = src.size();
 	createInfo.pCode = (uint32_t*)src.buf().data();
 
-	auto& vk = dev.vk();
+	auto& vk = dev.vk;
 
-	VulkanHandle<VkShaderModule> shaderModule(dev.handle(), dev.vk().vkDestroyShaderModule);
+	VulkanHandle<VkShaderModule> shaderModule(dev.handle, dev.vk.vkDestroyShaderModule);
 
-	if (vk.vkCreateShaderModule(dev.handle(), &createInfo, nullptr, shaderModule.replace()) != VK_SUCCESS) {
+	if (vk.vkCreateShaderModule(dev.handle, &createInfo, nullptr, shaderModule.replace()) != VK_SUCCESS) {
 		throw DevaException("failed to create shader module!");
 	}
 
@@ -60,24 +60,24 @@ VulkanHandle<VkSurfaceKHR> Vulkan::createSurfaceFromWindow(const VulkanInstance 
 #error ANDROID NOT IMPLEMENTED!
 #endif
 
-	VulkanHandle<VkSurfaceKHR> surface(vkInstance.handle(), vkInstance.vk().vkDestroySurfaceKHR);
-	vkInstance.vk().vkCreateWin32SurfaceKHR(vkInstance.handle(), &surface_cinfo, nullptr, surface.replace());
+	VulkanHandle<VkSurfaceKHR> surface(vkInstance.handle, vkInstance.vk.vkDestroySurfaceKHR);
+	vkInstance.vk.vkCreateWin32SurfaceKHR(vkInstance.handle, &surface_cinfo, nullptr, surface.replace());
 	return surface;
 }
 
 
 std::vector<uint32_t> Vulkan::deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice handle, VkSurfaceKHR surface)
 {
-	auto &vk = vkInstance.vk();
-	auto pdev = VulkanPhysicalDeviceTraits::forDevice(vkInstance, handle);
+	auto &vk = vkInstance.vk;
+	auto pdev = Vulkan::getPhysicalDeviceStruct(vkInstance, handle);
 	std::vector<uint32_t> queues;
-	for (int i = 0;i < pdev.queueFamilyProperties().size();i++)
+	for (int i = 0;i < pdev.queueFamilyProperties.size();i++)
 	{
-		auto& q = pdev.queueFamilyProperties()[i];
+		auto& q = pdev.queueFamilyProperties[i];
 		if ((q.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) continue;
 
 		VkBool32 supportsPresent;
-		vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle(),
+		vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle,
 			i,
 			surface,
 			&supportsPresent);
@@ -91,8 +91,8 @@ std::vector<uint32_t> Vulkan::deviceQueueFamiliesSupportSurface(const VulkanInst
 
 VulkanHandle<VkSemaphore> Vulkan::createSemaphore(const VulkanDevice &dev) {
 
-	auto device = dev.handle();
-	auto &vk = dev.vk();
+	auto device = dev.handle;
+	auto &vk = dev.vk;
 
 	VkSemaphoreCreateInfo semaphoreInfo = {};
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -108,11 +108,10 @@ VulkanHandle<VkSemaphore> Vulkan::createSemaphore(const VulkanDevice &dev) {
 }
 
 bool Vulkan::vulkanBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanMemory &mem) {
-	auto req = buf.info().memoryRequirements;
-	auto memi = mem.info();
+	auto req = buf.memoryRequirements;
 	
-	if (req.size > memi.size) return false;
-	if (req.memoryTypeBits & (1 << memi.typeIndex == 0)) return false;
+	if (req.size > mem.size) return false;
+	if (req.memoryTypeBits & (1 << mem.typeIndex == 0)) return false;
 
 	return true;
 }

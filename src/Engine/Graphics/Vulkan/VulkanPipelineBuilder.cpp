@@ -146,8 +146,8 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::setRenderPass(VkRe
 
 VulkanGraphicsPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &dev)
 {
-	auto device = dev.handle();
-	auto & vk = dev.vk();
+	auto device = dev.handle;
+	auto & vk = dev.vk;
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;

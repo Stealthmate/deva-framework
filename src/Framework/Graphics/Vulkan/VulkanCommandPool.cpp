@@ -8,8 +8,8 @@ std::vector<VulkanCommandBuffer> Vulkan::allocateCommandBuffers(
 	VkCommandBufferLevel level,
 	uint32_t count) {
 
-	auto dev = device.handle();
-	auto vk = device.vk();
+	auto dev = device.handle;
+	auto vk = device.vk;
 
 	std::vector<VulkanCommandBuffer> cbufs;
 
@@ -17,7 +17,7 @@ std::vector<VulkanCommandBuffer> Vulkan::allocateCommandBuffers(
 	info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	info.pNext = nullptr;
 	info.level = level;
-	info.commandPool = cpool.handle();
+	info.commandPool = cpool.handle;
 	info.commandBufferCount = count;
 
 	VkResult res;
@@ -29,7 +29,11 @@ std::vector<VulkanCommandBuffer> Vulkan::allocateCommandBuffers(
 	}
 
 	for (auto b : cbufhandles) {
-		cbufs.push_back({ b, info });
+		VulkanCommandBuffer buf;
+		buf.handle = b;
+		buf.level = info.level;
+		buf.commandPool = cpool;
+		cbufs.push_back(buf);
 	}
 
 	return cbufs;
@@ -45,17 +49,23 @@ VulkanCommandBuffer Vulkan::allocateCommandBuffer(
 }
 
 VulkanCommandPool Vulkan::createCommandPool(const VulkanDevice &dev, uint32_t queueFamily, VkCommandPoolCreateFlags flags) {
+
+	VulkanCommandPool pool;
+
 	VkCommandPoolCreateInfo cinfo = {};
 	cinfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	cinfo.queueFamilyIndex = queueFamily;
 	cinfo.flags = flags; // Optional
-	auto device = dev.handle();
-	auto vk = dev.vk();
-	VkCommandPool handle;
-	VkResult result = vk.vkCreateCommandPool(device, &cinfo, nullptr, &handle);
+	auto device = dev.handle;
+	auto vk = dev.vk;
+
+	VkResult result = vk.vkCreateCommandPool(device, &cinfo, nullptr, &pool.handle);
 	if (result != VK_SUCCESS) {
 		throw DevaException("Could not create CommandPool!");
 	}
 
-	return VulkanCommandPool(handle, cinfo);
+	pool.flags = flags;
+	pool.queueFamilyIndex = queueFamily;
+
+	return pool;
 }

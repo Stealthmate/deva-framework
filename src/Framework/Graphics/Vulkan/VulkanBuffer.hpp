@@ -8,15 +8,13 @@
 
 namespace DevaFramework {
 
-
-	struct VulkanBufferInfo {
-		VkDeviceSize           size;
-		VkBufferUsageFlags     usage;
-		VkSharingMode          sharingMode;
-		VkMemoryRequirements memoryRequirements;
+	struct VulkanBuffer {
+		VkBuffer              handle;
+		VkDeviceSize          size;
+		VkBufferUsageFlags    usage;
+		VkSharingMode         sharingMode;
+		VkMemoryRequirements  memoryRequirements;
 	};
-
-	typedef VulkanObject<VkBuffer, VulkanBufferInfo> VulkanBuffer;
 
 	namespace Vulkan {
 		DEVA_FRAMEWORK_API VulkanBuffer createBuffer(
@@ -28,8 +26,8 @@ namespace DevaFramework {
 			const std::vector<uint32_t> &queues = std::vector<uint32_t>());
 		
 		template<> inline void destroyObject<VulkanBuffer>(const VulkanDevice& dev, VulkanBuffer &obj) {
-			dev.vk().vkDestroyBuffer(dev.handle(), obj.handle(), nullptr);
-			obj.reset();
+			dev.vk.vkDestroyBuffer(dev.handle, obj.handle, nullptr);
+			obj.handle = VK_NULL_HANDLE;
 		}
 	}
 }

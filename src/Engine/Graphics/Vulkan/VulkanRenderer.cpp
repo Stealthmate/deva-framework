@@ -39,8 +39,8 @@ namespace DevaEngine {
 		uint32_t maxSets)
 		: device(dev), supportedLayouts(layouts)
 	{
-		auto device = dev.handle();
-		auto &vk = dev.vk();
+		auto device = dev.handle;
+		auto &vk = dev.vk;
 
 
 		std::unordered_map<VkDescriptorType, uint32_t> poolSizes;
@@ -85,7 +85,7 @@ namespace DevaEngine {
 		info.pSetLayouts = layouts.data();
 
 		std::vector<VkDescriptorSet> sets(count);
-		if (device.vk().vkAllocateDescriptorSets(device.handle(), &info, sets.data()) != VK_SUCCESS)
+		if (device.vk.vkAllocateDescriptorSets(device.handle, &info, sets.data()) != VK_SUCCESS)
 			throw DevaException("Could not allocated descriptor sets");
 
 		return sets;
@@ -149,20 +149,20 @@ namespace
 
 	const bool VULKAN_LOADED = false;
 
-	bool pickGPU(const VulkanInstance &instance, VkSurfaceKHR surface, VulkanPhysicalDeviceTraits * gpu, uint32_t * queueIndex)
+	bool pickGPU(const VulkanInstance &instance, VkSurfaceKHR surface, VulkanPhysicalDevice * gpu, uint32_t * queueIndex)
 	{
-		auto vk = instance.vk();
-		auto pdevs = instance.info().physicalDevices;
+		auto vk = instance.vk;
+		auto pdevs = instance.physicalDevices;
 		for (auto &pdev : pdevs) {
-			if (pdev.properties().deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) continue;
-			auto& supportedQueues = Vulkan::deviceQueueFamiliesSupportSurface(instance, pdev.handle(), surface);
+			if (pdev.properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) continue;
+			auto& supportedQueues = Vulkan::deviceQueueFamiliesSupportSurface(instance, pdev.handle, surface);
 			for (int i = 0;i < supportedQueues.size();i++)
 			{
-				auto& q = pdev.queueFamilyProperties()[supportedQueues[i]];
+				auto& q = pdev.queueFamilyProperties[supportedQueues[i]];
 				if ((q.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) continue;
 
 				VkBool32 supportsPresent;
-				vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle(),
+				vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle,
 					supportedQueues[i],
 					surface,
 					&supportsPresent);
@@ -176,7 +176,7 @@ namespace
 		return false;
 	}
 
-	VulkanDevice createLogicalDevice(const VulkanInstance& instance, const VulkanPhysicalDeviceTraits &pdev, uint32_t queueIndex)
+	VulkanDevice createLogicalDevice(const VulkanInstance& instance, const VulkanPhysicalDevice &pdev, uint32_t queueIndex)
 	{
 		std::vector<float> priorities = { 1.0f };
 		VkDeviceQueueCreateInfo q_cinfo;
@@ -189,7 +189,7 @@ namespace
 		for (auto ext : DEVICE_EXTENSIONS)
 		{
 			bool supported = false;
-			for (auto &devext : pdev.extensionProperties())
+			for (auto &devext : pdev.extensionProperties)
 			{
 				supported = std::string(devext.extensionName).compare(ext) == 0;
 				if (supported) break;
@@ -209,9 +209,9 @@ namespace
 		dev_cinfo.ppEnabledExtensionNames = DEVICE_EXTENSIONS;
 		VkPhysicalDeviceFeatures features = EMPTY_FEATURES;
 		features.fillModeNonSolid = VK_TRUE;
-		if (pdev.features().fillModeNonSolid) dev_cinfo.pEnabledFeatures = &features;
+		if (pdev.features.fillModeNonSolid) dev_cinfo.pEnabledFeatures = &features;
 
-		return VulkanDevice(instance, pdev, dev_cinfo);
+		return Vulkan::createDevice(instance, pdev, dev_cinfo);
 	}
 
 	std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel> createLayout(
@@ -219,8 +219,8 @@ namespace
 		const std::vector<VkDescriptorSetLayoutBinding> &bindings,
 		VkDescriptorSetLayoutCreateFlags flags = 0) {
 
-		auto dev = device.handle();
-		auto &vk = device.vk();
+		auto dev = device.handle;
+		auto &vk = device.vk;
 
 		VkDescriptorSetLayoutCreateInfo cinfo;
 		cinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -287,9 +287,9 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 {
 	if (!VULKAN_LOADED) LoadVulkan();
 
-	this->instance = VulkanInstance::create(INSTANCE_CREATE_INFO);
+	this->instance = Vulkan::createInstance(INSTANCE_CREATE_INFO);
 
-	auto &vk = instance.vk();
+	auto &vk = instance.vk;
 
 	/* Setup callback creation information */
 	VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
@@ -300,14 +300,14 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	callbackCreateInfo.pUserData = nullptr;
 
 	/* Register the callback */
-	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle(), &callbackCreateInfo, nullptr, &callback);
+	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
 
 	this->surface = Vulkan::createSurfaceFromWindow(instance, wnd);
-	VulkanPhysicalDeviceTraits gpu;
+	VulkanPhysicalDevice gpu;
 	uint32_t queueIndex = 0;
 	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
 	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
-	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties().deviceName));
+	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties.deviceName));
 
 	this->renderQueue = queueIndex;
 
@@ -317,15 +317,16 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 
 void VulkanRenderer::attachToWindow(const Window &wnd)
 {
-	auto dev = instance.info().physicalDevices[0];
-	auto vk = instance.vk();
+	auto dev = instance.physicalDevices[0];
+	auto vk = instance.vk;
 
 	unsigned int queue = UINT_MAX;
-	auto & queues = Vulkan::deviceQueueFamiliesSupportSurface(instance, dev.handle(), surface);
+	auto & queues = Vulkan::deviceQueueFamiliesSupportSurface(instance, dev.handle, surface);
 
 	this->renderQueue = 0;
+	this->queueBuffer = VulkanQueueSubmitBuffer(Vulkan::getDeviceQueue(main_device, renderQueue, 0));
 
-	auto surfaceprops = dev.getSurfaceProperties(instance, this->surface);
+	auto surfaceprops = Vulkan::getSurfaceProperties(instance, dev, this->surface);
 
 	uint32_t formatCount = static_cast<uint32_t>(surfaceprops.formats.size());
 	if (formatCount == 1 && surfaceprops.formats[0].format == VK_FORMAT_UNDEFINED)
@@ -391,7 +392,6 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 }
 VulkanHandle<VkSemaphore> imageAvailableSemaphore;
 VulkanHandle<VkSemaphore> renderFinishedSemaphore;
-//std::vector<VkCommandBuffer> commandBuffers;
 VkRenderPass renderPass;
 VulkanHandle<VkDescriptorPool> dpool;
 
@@ -405,8 +405,8 @@ void VulkanRenderer::createPipeline()
 		.attachShader(frag, VK_SHADER_STAGE_FRAGMENT_BIT, "main")
 		.outputExtent(swapchain.extent);
 
-	auto &vk = main_device.vk();
-	auto device = main_device.handle();
+	auto &vk = main_device.vk;
+	auto device = main_device.handle;
 
 	VkAttachmentDescription colorAttachment = {};
 	colorAttachment.format = swapchain.format;
@@ -519,8 +519,8 @@ void VulkanRenderer::createPipeline()
 
 Uuid VulkanRenderer::loadImage(const Image &img) {
 
-	auto dev = this->main_device.handle();
-	auto vk = this->main_device.vk();
+	auto dev = this->main_device.handle;
+	auto vk = this->main_device.vk;
 
 	size_t imageSize = img.width * img.height;
 	Uuid bufid = bufmemIndex->addBuffer(Vulkan::createBuffer(
@@ -535,11 +535,11 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
 	void* mem = nullptr;
-	vk.vkMapMemory(dev, bufmemIndex->getMemory(memid).handle(), 0, imageSize, 0, &mem);
+	vk.vkMapMemory(dev, bufmemIndex->getMemory(memid).handle, 0, imageSize, 0, &mem);
 	memcpy(mem, img.getData().data(), imageSize);
-	vk.vkUnmapMemory(dev, bufmemIndex->getMemory(memid).handle());
+	vk.vkUnmapMemory(dev, bufmemIndex->getMemory(memid).handle);
 	
-	VkImage image;
+	VulkanImage image;
 	VkDeviceMemory texImgMem;
 
 	VkImageCreateInfo imageInfo = {};
@@ -558,20 +558,20 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imageInfo.flags = 0; // Optional
 
+	//TODO IMAGE
+
 	VkResult res;
-	res = vk.vkCreateImage(dev, &imageInfo, nullptr, &image);
+	res = vk.vkCreateImage(dev, &imageInfo, nullptr, &image.handle);
 	if (res != VK_SUCCESS) {
 		throw DevaException("Could not create image");
 	}
-	VulkanImage vimage(image, imageInfo);
 		
 	Uuid id = Uuid();
-	mImages.insert({ id, VulkanImage(image, imageInfo) });
+	mImages.insert({ id, image });
 
-	VulkanMemory imgmem = Vulkan::allocateMemoryForImage(main_device, vimage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	VulkanMemory imgmem = Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	vk.vkBindImageMemory(dev, image, imgmem.handle(), 0);
-
+	vk.vkBindImageMemory(dev, image.handle, imgmem.handle, 0);
 }
 
 bool drawn = false;
@@ -580,8 +580,8 @@ int i = 0;
 void VulkanRenderer::drawFrame()
 {
 	//if (drawn) return;
-	auto &vk = main_device.vk();
-	auto device = main_device.handle();
+	auto &vk = main_device.vk;
+	auto device = main_device.handle;
 	VkResult res = VK_SUCCESS;
 
 	if (drawn) {
@@ -598,7 +598,7 @@ void VulkanRenderer::drawFrame()
 	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 	beginInfo.pInheritanceInfo = nullptr; // Optional
 
-	vk.vkBeginCommandBuffer(commandBuffers[0].handle(), &beginInfo);
+	vk.vkBeginCommandBuffer(commandBuffers[0].handle, &beginInfo);
 	VkRenderPassBeginInfo renderPassInfo = {};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassInfo.renderPass = renderPass;
@@ -608,8 +608,8 @@ void VulkanRenderer::drawFrame()
 	VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
-	vk.vkCmdBeginRenderPass(commandBuffers[0].handle(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	vk.vkCmdBindPipeline(commandBuffers[0].handle(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getHandle());
+	vk.vkCmdBeginRenderPass(commandBuffers[0].handle, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vk.vkCmdBindPipeline(commandBuffers[0].handle, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getHandle());
 
 	bufmemIndex->purge();
 
@@ -617,18 +617,18 @@ void VulkanRenderer::drawFrame()
 		auto &obj = object.second;
 		VulkanBuffer& buf = bufmemIndex->getBuffer(object.second.buffer());
 		VkDeviceSize offsets[] = { obj.offsets().vertex };
-		VkBuffer handle = buf.handle();
+		VkBuffer handle = buf.handle;
 		VkDeviceSize offsetIndex = obj.offsets().index;
 		VkDescriptorSet dset = obj.getDescriptorSet();
 
-		vk.vkCmdBindVertexBuffers(commandBuffers[0].handle(), 0, 1, &handle, offsets);
-		vk.vkCmdBindIndexBuffer(commandBuffers[0].handle(), handle, obj.offsets().index, VK_INDEX_TYPE_UINT32);
-		vk.vkCmdBindDescriptorSets(commandBuffers[0].handle(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &dset, 0, nullptr);
-		vk.vkCmdDrawIndexed(commandBuffers[0].handle(), obj.indexCount(), 1, 0, 0, 0);
+		vk.vkCmdBindVertexBuffers(commandBuffers[0].handle, 0, 1, &handle, offsets);
+		vk.vkCmdBindIndexBuffer(commandBuffers[0].handle, handle, obj.offsets().index, VK_INDEX_TYPE_UINT32);
+		vk.vkCmdBindDescriptorSets(commandBuffers[0].handle, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &dset, 0, nullptr);
+		vk.vkCmdDrawIndexed(commandBuffers[0].handle, obj.indexCount(), 1, 0, 0, 0);
 	}
 
-	vk.vkCmdEndRenderPass(commandBuffers[0].handle());
-	if (vk.vkEndCommandBuffer(commandBuffers[0].handle()) != VK_SUCCESS) {
+	vk.vkCmdEndRenderPass(commandBuffers[0].handle);
+	if (vk.vkEndCommandBuffer(commandBuffers[0].handle) != VK_SUCCESS) {
 		throw DevaException("failed to record command buffer!");
 	}
 
@@ -638,31 +638,24 @@ void VulkanRenderer::drawFrame()
 
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-	VkCommandBuffer combuf = commandBuffers[0].handle();
-
-	VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
-	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-	submitInfo.waitSemaphoreCount = 1;
-	submitInfo.pWaitSemaphores = waitSemaphores;
-	submitInfo.pWaitDstStageMask = waitStages;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &combuf;
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
-	submitInfo.signalSemaphoreCount = 1;
-	submitInfo.pSignalSemaphores = signalSemaphores;
-	auto & queues = main_device.getQueuesOfFamily(VK_QUEUE_GRAPHICS_BIT);
+
+	auto queues = Vulkan::getQueuesOfType(main_device, VK_QUEUE_GRAPHICS_BIT);
 	if (queues.size() == 0)
 		throw DevaException("0 queues");
 
-	VkQueue q = queues[0].handle();
+	VkQueue q = Vulkan::getDeviceQueue(main_device, queues[0].first, queues[0].second);
 
 	vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 1000);
 	vk.vkResetFences(device, 1, &fence);
 
-	if (vk.vkQueueSubmit(q, 1, &submitInfo, fence) != VK_SUCCESS) {
-		throw DevaExternalFailureException("Vulkan", "Failed to submit draw command buffer!");
-	}
+	queueBuffer.enqueue(
+		{ commandBuffers[0].handle }, 
+		{ imageAvailableSemaphore }, 
+		{VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
+		{renderFinishedSemaphore});
+
+	queueBuffer.flush(main_device, fence);
 
 	VkPresentInfoKHR presentInfo = {};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -679,7 +672,6 @@ void VulkanRenderer::drawFrame()
 
 	i++;
 }
-
 
 void VulkanRenderer::renderExample()
 {
@@ -701,11 +693,11 @@ VulkanRenderer::~VulkanRenderer() {
 }
 
 void VulkanRenderer::destroy() {
-	auto inst = this->instance.handle();
-	auto &vki = this->instance.vk();
+	auto inst = this->instance.handle;
+	auto &vki = this->instance.vk;
 
-	auto dev = this->main_device.handle();
-	auto &vkd = this->main_device.vk();
+	auto dev = this->main_device.handle;
+	auto &vkd = this->main_device.vk;
 
 	if (inst != VK_NULL_HANDLE) {
 		vkd.vkDeviceWaitIdle(dev);
@@ -733,12 +725,12 @@ void VulkanRenderer::destroy() {
 
 		auto leftover = bufmemIndex->clear();
 		for (auto &i : leftover.first) {
-			//vkd.vkDestroyBuffer(dev, i.handle(), nullptr);
+			//vkd.vkDestroyBuffer(dev, i.handle, nullptr);
 			Vulkan::destroyObject(main_device, i);
 		}
 		leftover.first.clear();
 		for (auto &i : leftover.second) {
-			//vkd.vkFreeMemory(dev, i.handle(), nullptr);
+			//vkd.vkFreeMemory(dev, i.handle, nullptr);
 			Vulkan::destroyObject(main_device, i);
 		}
 		leftover.second.clear();
@@ -757,8 +749,8 @@ void VulkanRenderer::destroy() {
 
 void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableObject & object) {
 
-	auto dev = main_device.handle();
-	auto &vk = main_device.vk();
+	auto dev = main_device.handle;
+	auto &vk = main_device.vk;
 
 	auto &m = object.model;
 
@@ -770,7 +762,7 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	VulkanBufferMemoryIndex::BufID bufid(VulkanBufferMemoryIndex::BufID::NULL_ID);
 	for (auto id : bufmemIndex->getUnmappedBuffers()) {
 		auto &buf = bufmemIndex->getBuffer(id);
-		if (buf.info().size >= datasize) {
+		if (buf.size >= datasize) {
 			bufid = id;
 			break;
 		}
@@ -801,18 +793,18 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 
 	void* memory = nullptr;
 	VkDeviceSize offset = mvpsize;
-	vk.vkMapMemory(dev, mem.handle(), offset, vsize, 0, &memory);
+	vk.vkMapMemory(dev, mem.handle, offset, vsize, 0, &memory);
 	memcpy(memory, m.vertexData().data(), vsize);
-	vk.vkUnmapMemory(dev, mem.handle());
+	vk.vkUnmapMemory(dev, mem.handle);
 
 	offset = offset + vsize;
-	vk.vkMapMemory(dev, mem.handle(), offset, isize, 0, &memory);
+	vk.vkMapMemory(dev, mem.handle, offset, isize, 0, &memory);
 	memcpy(memory, m.faceIndices().data(), isize);
-	vk.vkUnmapMemory(dev, mem.handle());
+	vk.vkUnmapMemory(dev, mem.handle);
 
 	VkDescriptorSet dset = dpoolManager->allocateDescriptorSets({ dsLayouts.begin()->second.first }, 1)[0];
 	VkDescriptorBufferInfo dbufinfo;
-	dbufinfo.buffer = buf.handle();
+	dbufinfo.buffer = buf.handle;
 	dbufinfo.offset = 0;
 	dbufinfo.range = mvpsize;
 	VkWriteDescriptorSet descriptorWrite = {};
@@ -837,8 +829,8 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 
 std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
 {
-	auto dev = this->main_device.handle();
-	auto &vk = this->main_device.vk();
+	auto dev = this->main_device.handle;
+	auto &vk = this->main_device.vk;
 
 	for (auto &robj : renderObjects) {
 		bufmemIndex->removeBuffer(robj.second.buffer(), true);
@@ -861,8 +853,8 @@ std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
 
 void VulkanRenderer::unloadModel(const SceneObjectID &id) {
 
-	auto dev = main_device.handle();
-	auto &vk = main_device.vk();
+	auto dev = main_device.handle;
+	auto &vk = main_device.vk;
 
 	auto obj = renderObjects.find(id);
 	if (obj == renderObjects.end()) {
@@ -876,8 +868,8 @@ void VulkanRenderer::unloadModel(const SceneObjectID &id) {
 }
 
 void VulkanRenderer::updateModelMVP(const SceneObjectID &id, const mat4 &mvp) {
-	auto dev = main_device.handle();
-	auto &vk = main_device.vk();
+	auto dev = main_device.handle;
+	auto &vk = main_device.vk;
 
 	auto obji = renderObjects.find(id);
 	if (obji == renderObjects.end()) {
@@ -890,10 +882,10 @@ void VulkanRenderer::updateModelMVP(const SceneObjectID &id, const mat4 &mvp) {
 	void* memory = nullptr;
 
 	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100);
-	vk.vkMapMemory(dev, mem.handle(), obj.offsets().mvp, sizeof(float) * 16, 0, &memory);
+	vk.vkMapMemory(dev, mem.handle, obj.offsets().mvp, sizeof(float) * 16, 0, &memory);
 	auto rawmvp = mvp.rawData();
 	memcpy(memory, (const unsigned char*)rawmvp.first, rawmvp.second * sizeof(float));
-	vk.vkUnmapMemory(dev, mem.handle());
+	vk.vkUnmapMemory(dev, mem.handle);
 }
 
 void VulkanRenderer::ImplSceneUpdateListener::onNewObject(const Scene &scene, const SceneObjectID &objectID, const DrawableObject& object) {

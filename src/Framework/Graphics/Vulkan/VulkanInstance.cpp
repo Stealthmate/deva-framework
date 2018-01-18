@@ -30,11 +30,11 @@ namespace
 		NULL
 	};
 
-	std::vector<VulkanPhysicalDeviceTraits> getPhysicalDeviceTraits(const VulkanInstance &inst) {
+	std::vector<VulkanPhysicalDevice> getPhysicalDeviceTraits(const VulkanInstance &inst) {
 		VkResult result;
 
-		VkInstance in = inst.handle();
-		auto& vk = inst.vk();
+		VkInstance in = inst.handle;
+		auto& vk = inst.vk;
 
 		LOG_VULKAN.v("Enumerating physical devices (count)...");
 		uint32_t device_count = 0;
@@ -52,25 +52,26 @@ namespace
 		result = vk.vkEnumeratePhysicalDevices(in, &device_count, &deviceHandles[0]);
 		ERRCHK;
 
-		std::vector<VulkanPhysicalDeviceTraits> pdevs;
+		std::vector<VulkanPhysicalDevice> pdevs;
 		for (uint32_t i = 0; i <= device_count - 1; i++)
 		{
-			pdevs.emplace_back(VulkanPhysicalDeviceTraits::forDevice(inst, deviceHandles[i]));
+			pdevs.emplace_back(Vulkan::getPhysicalDeviceStruct(inst, deviceHandles[i]));
 		}
 
 		return pdevs;
 	}
 }
 
-VulkanInstance VulkanInstance::createDefault()
+VulkanInstance Vulkan::createInstanceDefault()
 {
-	return create(DEFAULT_INSTANCE_CREATE_INFO);
+	return createInstance(DEFAULT_INSTANCE_CREATE_INFO);
 }
 
-VulkanInstance VulkanInstance::create(const VkInstanceCreateInfo &info)
+VulkanInstance Vulkan::createInstance(const VkInstanceCreateInfo &info)
 {
 	LOG_VULKAN.v("Creating VulkanInstance...");
-	VkInstance instance_handle;
+
+	VulkanInstance instance;
 
 	if (!internal::vkCreateInstance)
 		throw DevaProgrammerErrorException("Vulkan not initialized (did you call DevaFramework::loadVulkan()?)");
@@ -83,49 +84,18 @@ VulkanInstance VulkanInstance::create(const VkInstanceCreateInfo &info)
 			throw DevaExternalFailureException("Vulkan", "Could not create VkInstance - extension " + extensions[i] + " not supported by system.");
 	}
 
-	auto result = internal::vkCreateInstance(&info, NULL, &instance_handle);
+	auto result = internal::vkCreateInstance(&info, NULL, &instance.handle);
 	ERRCHK;
 
-	return VulkanInstance(instance_handle);
-}
-
-VulkanInstance::VulkanInstance() noexcept {}
-
-VulkanInstance::VulkanInstance(VkInstance handle) : VulkanObject(handle, {})
-{
 	LOG_VULKAN.v("Loading instance-local functions...");
-	mVk = VulkanInstanceFunctionSet::load(mHandle);
-
-	mInfo.physicalDevices = getPhysicalDeviceTraits(*this);
-
+	instance.vk = VulkanInstanceFunctionSet::load(instance.handle);
+	instance.physicalDevices = getPhysicalDeviceTraits(instance);
 	LOG_VULKAN.i("Successfully initialized VulkanInstance");
-}
 
-VulkanInstance::VulkanInstance(VulkanInstance &&instance) noexcept
-	: VulkanObject(std::move(instance)),
-	mVk(instance.mVk)
-{
-	instance.mVk = VulkanInstanceFunctionSet();
-}
-
-VulkanInstance& VulkanInstance::operator=(VulkanInstance &&instance) noexcept
-{
-	swap(instance);
-
-	return *this;
-}
-
-void VulkanInstance::swap(VulkanInstance &rhs) {
-	using std::swap;
-	VulkanObject::swap(rhs);
-	swap(mVk, rhs.mVk);
+	return instance;
 }
 
 void Vulkan::destroyObject(VulkanInstance &instance) {
-	instance.vk().vkDestroyInstance(instance.handle(), nullptr);
-	instance.reset();
-}
-
-void DevaFramework::swap(VulkanInstance &lhs, VulkanInstance &rhs) {
-	lhs.swap(rhs);
+	instance.vk.vkDestroyInstance(instance.handle, nullptr);
+	instance.handle = VK_NULL_HANDLE;
 }

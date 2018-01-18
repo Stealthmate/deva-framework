@@ -20,43 +20,22 @@ VulkanBuffer Vulkan::createBuffer(
 	cinfo.queueFamilyIndexCount = static_cast<uint32_t>(queues.size());
 	cinfo.pQueueFamilyIndices = queues.size() > 0 ? queues.data() : nullptr;
 
-	auto dev = device.handle();
-	auto vk = device.vk();
+	auto dev = device.handle;
+	auto vk = device.vk;
 
-	VkBuffer buf;
-	VkResult result = vk.vkCreateBuffer(dev, &cinfo, nullptr, &buf);
+	VulkanBuffer buffer;
+
+	VkResult result = vk.vkCreateBuffer(dev, &cinfo, nullptr, &buffer.handle);
 	if (result != VK_SUCCESS) {
 		throw DevaExternalFailureException("Vulkan", "Could not create buffer");
 	}
 
-	VulkanBufferInfo info;
 
-	info.usage = usage;
-	info.sharingMode = sharingMode;
-	info.size = size;
+	buffer.usage = usage;
+	buffer.sharingMode = sharingMode;
+	buffer.size = size;
 
-	vk.vkGetBufferMemoryRequirements(dev, buf, &info.memoryRequirements);
+	vk.vkGetBufferMemoryRequirements(dev, buffer.handle, &buffer.memoryRequirements);
 
-	return VulkanBuffer(buf, info);
+	return buffer;
 }
-/*
-VulkanBuffer::VulkanBuffer() = default;
-
-VulkanBuffer::VulkanBuffer(VulkanBuffer &&buf)
-	: mHandle(std::move(buf.mHandle)),
-	mSize(buf.mSize),
-	mUsage(buf.mUsage),
-	mSharingMode(buf.mSharingMode),
-	mMemoryRequirements(buf.mMemoryRequirements) {}
-
-VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer &&buf) {
-	mHandle = std::move(buf.mHandle);
-	mSize = buf.mSize;
-	mUsage = buf.mUsage;
-	mSharingMode = buf.mSharingMode;
-	mMemoryRequirements = buf.mMemoryRequirements;
-
-	return *this;
-}
-
-VulkanBuffer::~VulkanBuffer() = default;*/

@@ -12,7 +12,7 @@ namespace DevaFramework {
 	class GraphicsState
 	{
 		static VkInstance this_instance;
-		static std::vector<VulkanPhysicalDeviceTraits> available_physical_devices;
+		static std::vector<VulkanPhysicalDevice> available_physical_devices;
 
 		static void initVulkan(const VkInstanceCreateInfo &vulkan_info);
 
