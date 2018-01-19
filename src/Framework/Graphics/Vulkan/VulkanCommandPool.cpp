@@ -69,3 +69,32 @@ VulkanCommandPool Vulkan::createCommandPool(const VulkanDevice &dev, uint32_t qu
 
 	return pool;
 }
+
+void Vulkan::freeCommandBuffers(const VulkanDevice &dev, const std::vector<VulkanCommandBuffer> &buffers) {
+	auto handle = dev.handle;
+	auto vk = dev.vk;
+
+	std::unordered_map<VkCommandPool, std::vector<VkCommandBuffer>> poolmap;
+
+	for (auto &b : buffers) {
+		auto &pv = poolmap.find(b.commandPool.handle);
+		if (pv != poolmap.end()) {
+			pv->second.push_back(b.handle);
+		} else {
+			poolmap.insert({ b.commandPool.handle, {b.handle} });
+		}
+	}
+
+	for (auto &p : poolmap) {
+		vk.vkFreeCommandBuffers(handle, p.first, p.second.size(), p.second.data());
+	}
+}
+
+void Vulkan::beginCommandBuffer(const VulkanDevice &dev, VkCommandBuffer buffer, VkCommandBufferUsageFlags usage) {
+	VkCommandBufferBeginInfo info;
+	info.flags = usage;
+	info.pInheritanceInfo = nullptr;
+	info.pNext = nullptr;
+	info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	dev.vk.vkBeginCommandBuffer(buffer, &info);
+}

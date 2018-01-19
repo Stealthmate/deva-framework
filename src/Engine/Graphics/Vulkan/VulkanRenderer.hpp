@@ -104,7 +104,7 @@ namespace DevaEngine
 		VkColorSpaceKHR colorSpace;
 		VkFormat colorFormat;
 
-		unsigned int renderQueue;
+		DevaFramework::VulkanQueue renderQueue;
 
 		DevaFramework::VulkanHandle<VkSurfaceKHR> surface;
 		VulkanSwapchain swapchain;

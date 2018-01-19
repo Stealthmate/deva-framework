@@ -36,6 +36,13 @@ namespace DevaFramework {
 			VkCommandBufferLevel level,
 			uint32_t count);
 
+		DEVA_FRAMEWORK_API void freeCommandBuffers(const VulkanDevice &dev, const std::vector<VulkanCommandBuffer> &buffers);
+
+		DEVA_FRAMEWORK_API void beginCommandBuffer(const VulkanDevice &dev, VkCommandBuffer buffer, VkCommandBufferUsageFlags flags);
+
+		DEVA_FRAMEWORK_API void submitSingleBuffer(const VulkanDevice &dev, VkQueue queue, VkCommandBuffer buffer);
+
+
 		template <> inline void destroyObject(const VulkanDevice &dev, VulkanCommandPool &obj) {
 			dev.vk.vkDestroyCommandPool(dev.handle, obj.handle, nullptr);
 			obj.handle = VK_NULL_HANDLE;

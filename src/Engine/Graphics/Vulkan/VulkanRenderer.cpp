@@ -308,7 +308,7 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
 	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties.deviceName));
 
-	this->renderQueue = queueIndex;
+	this->renderQueue = Vulkan::getDeviceQueue(main_device, queueIndex, 0);
 
 	attachToWindow(wnd);
 	createPipeline();
@@ -319,11 +319,12 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	auto dev = instance.physicalDevices[0];
 	auto vk = instance.vk;
 
-	unsigned int queue = UINT_MAX;
 	auto & queues = Vulkan::deviceQueueFamiliesSupportSurface(instance, dev.handle, surface);
+	assert(queues.size() > 0, "No queues");
 
-	this->renderQueue = 0;
-	this->queueBuffer = VulkanQueueSubmitBuffer(Vulkan::getDeviceQueue(main_device, renderQueue, 0));
+
+	this->renderQueue = Vulkan::getDeviceQueue(main_device, queues[0], 0);
+	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
 
 	auto surfaceprops = Vulkan::getSurfaceProperties(instance, dev, this->surface);
 
@@ -367,7 +368,7 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	if (imageCount > surfaceprops.capabilities.maxImageCount) imageCount = surfaceprops.capabilities.maxImageCount;
 
 	uint32_t indices = {
-		renderQueue
+		renderQueue.familyIndex
 	};
 
 	VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
@@ -491,8 +492,8 @@ void VulkanRenderer::createPipeline()
 			throw DevaException("failed to create framebuffer!");
 		}
 	}
-	
-	commandPool = Vulkan::createCommandPool(main_device, renderQueue, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+
+	commandPool = Vulkan::createCommandPool(main_device, renderQueue.familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	commandBuffers.push_back(Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY));
 
 	VkFenceCreateInfo fence_cinfo;
@@ -537,7 +538,7 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	vk.vkMapMemory(dev, bufmemIndex->getMemory(memid).handle, 0, imageSize, 0, &mem);
 	memcpy(mem, img.getData().data(), imageSize);
 	vk.vkUnmapMemory(dev, bufmemIndex->getMemory(memid).handle);
-	
+
 	VulkanImage image;
 	VkDeviceMemory texImgMem;
 
@@ -557,20 +558,72 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imageInfo.flags = 0; // Optional
 
+	VulkanMemory imgmem = Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	//TODO IMAGE
+	image.sharingMode = imageInfo.sharingMode;
+	image.size = imgmem.size;
+	image.usage = imageInfo.usage;
 
 	VkResult res;
 	res = vk.vkCreateImage(dev, &imageInfo, nullptr, &image.handle);
 	if (res != VK_SUCCESS) {
 		throw DevaException("Could not create image");
 	}
-		
+
 	Uuid id = Uuid();
 	mImages.insert({ id, image });
 
-	VulkanMemory imgmem = Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 	vk.vkBindImageMemory(dev, image.handle, imgmem.handle, 0);
+
+	VulkanCommandBuffer buffer = Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+	VkImageMemoryBarrier barrier = {};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = image.handle;
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+	barrier.srcAccessMask = 0; // TODO
+	barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT; // TODO
+
+	vk.vkCmdPipelineBarrier(buffer.handle, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+	vk.vkEndCommandBuffer(buffer.handle);
+	queueBuffer.enqueue({ buffer.handle }, {}, {}, {});
+	queueBuffer.flush(main_device, VK_NULL_HANDLE);
+	Vulkan::freeCommandBuffers(main_device, { buffer });
+
+	buffer = Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+	VkBufferImageCopy region = {};
+	region.bufferOffset = 0;
+	region.bufferRowLength = 0;
+	region.bufferImageHeight = 0;
+
+	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	region.imageSubresource.mipLevel = 0;
+	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.layerCount = 1;
+
+	region.imageOffset = { 0, 0, 0 };
+	region.imageExtent = {
+		img.width,
+		img.height,
+		1
+	};
+
+	vk.vkCmdCopyBufferToImage(buffer.handle, bufmemIndex->getBuffer(bufid).handle, image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+
+
 }
 
 bool drawn = false;
@@ -649,10 +702,10 @@ void VulkanRenderer::drawFrame()
 	vk.vkResetFences(device, 1, &fence);
 
 	queueBuffer.enqueue(
-		{ commandBuffers[0].handle }, 
-		{ imageAvailableSemaphore }, 
-		{VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
-		{renderFinishedSemaphore});
+		{ commandBuffers[0].handle },
+		{ imageAvailableSemaphore },
+		{ VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT },
+		{ renderFinishedSemaphore });
 
 	queueBuffer.flush(main_device, fence);
 
