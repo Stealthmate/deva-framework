@@ -301,7 +301,9 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	/* Register the callback */
 	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
 
-	this->surface = DevaFramework::Vulkan::createSurfaceFromWindow(instance, wnd);
+
+	surface = DevaFramework::Vulkan::createSurfaceFromWindow(instance, wnd);
+
 	VulkanPhysicalDevice gpu;
 	uint32_t queueIndex = 0;
 	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
@@ -309,8 +311,14 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties.deviceName));
 
 	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queueIndex, 0);
+	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
 
 	attachToWindow(wnd);
+
+	fence = DevaFramework::Vulkan::createFence(main_device);
+	imageAvailableSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
+	renderFinishedSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
+
 	createPipeline();
 }
 
@@ -319,14 +327,7 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	auto dev = instance.physicalDevices[0];
 	auto vk = instance.vk;
 
-	auto & queues = DevaFramework::Vulkan::deviceQueueFamiliesSupportSurface(instance, dev.handle, surface);
-	assert(queues.size() > 0, "No queues");
-
-
-	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queues[0], 0);
-	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
-
-	auto surfaceprops = DevaFramework::Vulkan::getSurfaceProperties(instance, dev, this->surface);
+	auto surfaceprops = DevaFramework::Vulkan::getSurfaceProperties(instance, dev, surface);
 
 	uint32_t formatCount = static_cast<uint32_t>(surfaceprops.formats.size());
 	if (formatCount == 1 && surfaceprops.formats[0].format == VK_FORMAT_UNDEFINED)
@@ -390,8 +391,6 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 
 	this->swapchain = VulkanSwapchain::createSwapchain(this->main_device, swapchainCreateInfo);
 }
-VulkanHandle<VkSemaphore> imageAvailableSemaphore;
-VulkanHandle<VkSemaphore> renderFinishedSemaphore;
 VkRenderPass renderPass;
 VulkanHandle<VkDescriptorPool> dpool;
 
@@ -493,25 +492,6 @@ void VulkanRenderer::createPipeline()
 	commandPool = DevaFramework::Vulkan::createCommandPool(main_device, renderQueue.familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	commandBuffers.push_back(DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY));
 
-	VkFenceCreateInfo fence_cinfo;
-	fence_cinfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fence_cinfo.flags = 0;
-	fence_cinfo.pNext = nullptr;
-	vk.vkCreateFence(device, &fence_cinfo, nullptr, &fence);
-
-	imageAvailableSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
-	renderFinishedSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
-
-	VkDescriptorPoolSize dpoolsize;
-	dpoolsize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	dpoolsize.descriptorCount = 1;
-	VkDescriptorPoolCreateInfo dpoolcinfo;
-	dpoolcinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	dpoolcinfo.pNext = nullptr;
-	dpoolcinfo.flags = 0;
-	dpoolcinfo.poolSizeCount = 1;
-	dpoolcinfo.pPoolSizes = &dpoolsize;
-	dpoolcinfo.maxSets = 1;
 }
 
 Uuid VulkanRenderer::loadImage(const Image &img) {
@@ -742,8 +722,8 @@ void VulkanRenderer::destroy() {
 	if (inst != VK_NULL_HANDLE) {
 		vkd.vkDeviceWaitIdle(dev);
 		vkd.vkDestroyRenderPass(dev, renderPass, nullptr);
-		imageAvailableSemaphore.replace();
-		renderFinishedSemaphore.replace();
+		vkd.vkDestroySemaphore(dev, imageAvailableSemaphore, nullptr);
+		vkd.vkDestroySemaphore(dev, renderFinishedSemaphore, nullptr);
 		vkd.vkDestroyFence(dev, fence, nullptr);
 		for (auto i : swapchain.imageViews) {
 			vkd.vkDestroyImageView(dev, i, nullptr);

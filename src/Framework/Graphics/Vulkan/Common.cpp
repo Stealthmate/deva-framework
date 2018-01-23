@@ -89,7 +89,20 @@ std::vector<uint32_t> Vulkan::deviceQueueFamiliesSupportSurface(const VulkanInst
 	return queues;
 }
 
-VulkanHandle<VkSemaphore> Vulkan::createSemaphore(const VulkanDevice &dev) {
+VkFence DevaFramework::Vulkan::createFence(const VulkanDevice & dev)
+{
+	VkFenceCreateInfo info;
+	info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	info.pNext = nullptr;
+	info.flags = 0;
+	VkFence fence;
+	VkResult res = dev.vk.vkCreateFence(dev.handle, &info, nullptr, &fence);
+	if (res != VK_SUCCESS)
+		throw DevaException("Could not create VkFence!");
+	return fence;
+}
+
+VkSemaphore Vulkan::createSemaphore(const VulkanDevice &dev) {
 
 	auto device = dev.handle;
 	auto &vk = dev.vk;
@@ -98,8 +111,8 @@ VulkanHandle<VkSemaphore> Vulkan::createSemaphore(const VulkanDevice &dev) {
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 	semaphoreInfo.pNext = nullptr;
 	semaphoreInfo.flags = 0;
-	VulkanHandle<VkSemaphore> sem(device, vk.vkDestroySemaphore);
-	VkResult result = vk.vkCreateSemaphore(device, &semaphoreInfo, nullptr, sem.replace());
+	VkSemaphore sem;
+	VkResult result = vk.vkCreateSemaphore(device, &semaphoreInfo, nullptr, &sem);
 	if (result != VK_SUCCESS) {
 		throw DevaException("Could not create semaphore!");
 	}

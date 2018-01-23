@@ -25,7 +25,8 @@ namespace DevaFramework {
 			const VertexBuffer &vb,
 			const std::vector<uint32_t> &locations);
 
-		DEVA_FRAMEWORK_API VulkanHandle<VkSemaphore> createSemaphore(const VulkanDevice &dev);
+		DEVA_FRAMEWORK_API VkFence createFence(const VulkanDevice &dev);
+		DEVA_FRAMEWORK_API VkSemaphore createSemaphore(const VulkanDevice &dev);
 
 		template <class T>
 		DEVA_FRAMEWORK_API T vulkanCopyHandle(const T &o1, const T &o2);

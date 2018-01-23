@@ -125,6 +125,9 @@ namespace DevaEngine
 
 		VulkanRenderPass vrp;
 
+		VkSemaphore imageAvailableSemaphore;
+		VkSemaphore renderFinishedSemaphore;
+
 		void drawFrame();
 
 		void loadDrawableObject(const SceneObjectID&id, const DrawableObject & object);
