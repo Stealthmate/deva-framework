@@ -3,7 +3,7 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 
-void DevaEngine::Vulkan::renderPassRecord(const VulkanDevice &device, VkCommandBuffer buffer, const VulkanRenderPass &rp) {
+void DevaEngine::Vulkan::renderPassRecord(const VulkanDevice &device, VkCommandBuffer buffer, const VulkanRenderPassRecord &rp) {
 	auto dev = device.handle;
 	auto &vk = device.vk;
 

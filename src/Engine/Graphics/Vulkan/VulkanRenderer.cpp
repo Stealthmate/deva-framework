@@ -391,7 +391,7 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 
 	this->swapchain = VulkanSwapchain::createSwapchain(this->main_device, swapchainCreateInfo);
 }
-VkRenderPass renderPass;
+
 VulkanHandle<VkDescriptorPool> dpool;
 
 void VulkanRenderer::createPipeline()
@@ -416,8 +416,9 @@ void VulkanRenderer::createPipeline()
 	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	renderPass.attachments.push_back(colorAttachment);
 
-	VkAttachmentReference colorAttachmentRef = {};
+	VkAttachmentReference colorAttachmentRef = {0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
 	colorAttachmentRef.attachment = 0;
 	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
@@ -425,6 +426,7 @@ void VulkanRenderer::createPipeline()
 	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 	subpass.colorAttachmentCount = 1;
 	subpass.pColorAttachments = &colorAttachmentRef;
+	renderPass.subpasses.push_back({ VK_PIPELINE_BIND_POINT_GRAPHICS, {{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL}} });
 
 	VkRenderPassCreateInfo renderPassInfo = {};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -435,12 +437,12 @@ void VulkanRenderer::createPipeline()
 	renderPassInfo.dependencyCount = 0;
 	renderPassInfo.pDependencies = nullptr;
 
-	if (vk.vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+	if (vk.vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass.handle) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
 	}
 
 	plb.setTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-		.setRenderPass(renderPass, 0);
+		.setRenderPass(renderPass.handle, 0);
 
 	DevaFramework::Vulkan::VertexInputBinding vib(0, VK_VERTEX_INPUT_RATE_VERTEX, 28);
 	vib.addAttribute(DevaFramework::Vulkan::makeVAD(0, 0, VK_FORMAT_R32G32B32A32_SFLOAT, 0));
@@ -468,7 +470,7 @@ void VulkanRenderer::createPipeline()
 	vrp.pipeline = pipeline.getHandle();
 	vrp.renderArea = swapchain.extent;
 	vrp.clearVals = { { 0.0f, 0.0f, 0.0f, 0.0f } };
-	vrp.renderPass = renderPass;
+	vrp.renderPass = renderPass.handle;
 
 	for (size_t i = 0; i < swapchain.imageViews.size(); i++) {
 		VkImageView attachments[] = {
@@ -477,7 +479,7 @@ void VulkanRenderer::createPipeline()
 
 		VkFramebufferCreateInfo framebufferInfo = {};
 		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderPass;
+		framebufferInfo.renderPass = renderPass.handle;
 		framebufferInfo.attachmentCount = 1;
 		framebufferInfo.pAttachments = attachments;
 		framebufferInfo.width = swapchain.extent.width;
@@ -721,7 +723,7 @@ void VulkanRenderer::destroy() {
 
 	if (inst != VK_NULL_HANDLE) {
 		vkd.vkDeviceWaitIdle(dev);
-		vkd.vkDestroyRenderPass(dev, renderPass, nullptr);
+		vkd.vkDestroyRenderPass(dev, renderPass.handle, nullptr);
 		vkd.vkDestroySemaphore(dev, imageAvailableSemaphore, nullptr);
 		vkd.vkDestroySemaphore(dev, renderFinishedSemaphore, nullptr);
 		vkd.vkDestroyFence(dev, fence, nullptr);

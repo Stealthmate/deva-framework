@@ -9,6 +9,7 @@
 #include <DevaFramework/Graphics/Vulkan/VulkanCommandPool.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanBuffer.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanImage.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanRenderPass.hpp>
 #include "VulkanRenderObject.hpp"
 #include "VulkanBufferMemoryIndex.hpp"
 #include "VulkanSwapchain.hpp"
@@ -65,6 +66,7 @@ namespace DevaEngine
 		VkDescriptorPool poolHandle;
 
 	};
+
 
 	class VulkanRenderer : public Renderer
 	{
@@ -123,10 +125,11 @@ namespace DevaEngine
 
 		VulkanQueueSubmitBuffer queueBuffer;
 
-		VulkanRenderPass vrp;
+		VulkanRenderPassRecord renderPassRecord;
 
 		VkSemaphore imageAvailableSemaphore;
 		VkSemaphore renderFinishedSemaphore;
+		DevaFramework::VulkanRenderPass renderPass;
 
 		void drawFrame();
 
