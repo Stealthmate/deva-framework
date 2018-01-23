@@ -628,6 +628,9 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 
 bool drawn = false;
 int i = 0;
+#include"VulkanPresenter.hpp"
+#include "Subrenderer.hpp"
+
 
 void VulkanRenderer::drawFrame()
 {
@@ -651,18 +654,13 @@ void VulkanRenderer::drawFrame()
 	beginInfo.pInheritanceInfo = nullptr; // Optional
 
 	vk.vkBeginCommandBuffer(commandBuffers[0].handle, &beginInfo);
-	VkRenderPassBeginInfo renderPassInfo = {};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = renderPass;
-	renderPassInfo.framebuffer = swapchain.framebuffers[i];
-	renderPassInfo.renderArea.offset = { 0, 0 };
-	renderPassInfo.renderArea.extent = swapchain.extent;
-	VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues = &clearColor;
-	vk.vkCmdBeginRenderPass(commandBuffers[0].handle, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	vk.vkCmdBindPipeline(commandBuffers[0].handle, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getHandle());
 
+	VulkanRenderPass vrp;
+	vrp.framebuffer = swapchain.framebuffers[i];
+	vrp.pipeline = pipeline.getHandle();
+	vrp.renderArea = swapchain.extent;
+	vrp.clearVals = { { 0.0f, 0.0f, 0.0f, 0.0f } };
+	vrp.renderPass = renderPass;
 	bufmemIndex->purge();
 
 	for (auto& object : renderObjects) {
@@ -673,13 +671,25 @@ void VulkanRenderer::drawFrame()
 		VkDeviceSize offsetIndex = obj.offsets().index;
 		VkDescriptorSet dset = obj.getDescriptorSet();
 
-		vk.vkCmdBindVertexBuffers(commandBuffers[0].handle, 0, 1, &handle, offsets);
-		vk.vkCmdBindIndexBuffer(commandBuffers[0].handle, handle, obj.offsets().index, VK_INDEX_TYPE_UINT32);
-		vk.vkCmdBindDescriptorSets(commandBuffers[0].handle, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &dset, 0, nullptr);
-		vk.vkCmdDrawIndexed(commandBuffers[0].handle, obj.indexCount(), 1, 0, 0, 0);
+		VulkanDrawableInfo vdi;
+		vdi.vertexBuffers = { handle };
+		vdi.indexBuffer = handle;
+		vdi.indexOffset = obj.offsets().index;
+		vdi.indexType = VK_INDEX_TYPE_UINT32;
+		vdi.pipelineLayout = pipeline.getPipelineLayout();
+		vdi.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		vdi.vertexOffsets = { obj.offsets().vertex };
+		vdi.descriptorSets = { dset };
+		vdi.indexCount = obj.indexCount();
+		vdi.instanceCount = 1;
+		vdi.firstIndex = 0;
+		vdi.vertexOffset = 0;
+		vdi.firstInstance = 0;
+		vrp.objs.push_back(vdi);
 	}
 
-	vk.vkCmdEndRenderPass(commandBuffers[0].handle);
+	Vulkan::renderPassRecord(main_device, commandBuffers[0].handle, vrp);
+
 	if (vk.vkEndCommandBuffer(commandBuffers[0].handle) != VK_SUCCESS) {
 		throw DevaException("failed to record command buffer!");
 	}
@@ -692,11 +702,11 @@ void VulkanRenderer::drawFrame()
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
 
-	auto queues = Vulkan::getQueuesOfType(main_device, VK_QUEUE_GRAPHICS_BIT);
+	auto queues = DevaFramework::Vulkan::getQueuesOfType(main_device, VK_QUEUE_GRAPHICS_BIT);
 	if (queues.size() == 0)
 		throw DevaException("0 queues");
 
-	VkQueue q = Vulkan::getDeviceQueue(main_device, queues[0].first, queues[0].second).handle;
+	VkQueue q = DevaFramework::Vulkan::getDeviceQueue(main_device, queues[0].first, queues[0].second).handle;
 
 	vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 1000);
 	vk.vkResetFences(device, 1, &fence);
@@ -709,17 +719,8 @@ void VulkanRenderer::drawFrame()
 
 	queueBuffer.flush(main_device, fence);
 
-	VkPresentInfoKHR presentInfo = {};
-	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	DevaFramework::Vulkan::present(main_device, renderQueue.handle, { renderFinishedSemaphore }, { swapchain.handle }, { imageIndex });
 
-	presentInfo.waitSemaphoreCount = 1;
-	presentInfo.pWaitSemaphores = signalSemaphores;
-	presentInfo.swapchainCount = 1;
-	presentInfo.pSwapchains = &swapchain.handle;
-	presentInfo.pImageIndices = &imageIndex;
-	presentInfo.pResults = nullptr; // Optional
-
-	vk.vkQueuePresentKHR(q, &presentInfo);
 	drawn = true;
 
 	i++;
@@ -778,15 +779,15 @@ void VulkanRenderer::destroy() {
 		auto leftover = bufmemIndex->clear();
 		for (auto &i : leftover.first) {
 			//vkd.vkDestroyBuffer(dev, i.handle, nullptr);
-			Vulkan::destroyObject(main_device, i);
+			DevaFramework::Vulkan::destroyObject(main_device, i);
 		}
 		leftover.first.clear();
 		for (auto &i : leftover.second) {
 			//vkd.vkFreeMemory(dev, i.handle, nullptr);
-			Vulkan::destroyObject(main_device, i);
+			DevaFramework::Vulkan::destroyObject(main_device, i);
 		}
 		leftover.second.clear();
-		Vulkan::destroyObject(main_device, commandPool);
+		DevaFramework::Vulkan::destroyObject(main_device, commandPool);
 		//this->dpoolManager->clear();
 		vkd.vkDestroyPipelineLayout(dev, pipeline.getPipelineLayout(), nullptr);
 		vkd.vkDestroyPipeline(dev, pipeline.getHandle(), nullptr);
@@ -794,8 +795,8 @@ void VulkanRenderer::destroy() {
 
 		vki.vkDestroyDebugReportCallbackEXT(inst, callback, nullptr);
 
-		Vulkan::destroyObject(main_device);
-		Vulkan::destroyObject(instance);
+		DevaFramework::Vulkan::destroyObject(main_device);
+		DevaFramework::Vulkan::destroyObject(instance);
 	}
 }
 
@@ -821,7 +822,7 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	}
 
 	if (bufid == Uuid::NULL_ID) {
-		bufid = bufmemIndex->addBuffer(Vulkan::createBuffer(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
+		bufid = bufmemIndex->addBuffer(DevaFramework::Vulkan::createBuffer(main_device, 0, datasize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE));
 	}
 
 	auto &buf = bufmemIndex->getBuffer(bufid);
@@ -831,13 +832,13 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	auto memories = bufmemIndex->getUnmappedMemoryBlocks();
 	for (auto id : memories) {
 		auto &mem = bufmemIndex->getMemory(id);
-		if (Vulkan::vulkanBufferCompatibleWithMemory(buf, mem)) {
+		if (DevaFramework::Vulkan::isBufferCompatibleWithMemory(buf, mem)) {
 			memid = id;
 			break;
 		}
 	}
 	if (memid == Uuid::NULL_ID) {
-		memid = bufmemIndex->addMemory(Vulkan::allocateMemoryForBuffer(main_device, buf, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+		memid = bufmemIndex->addMemory(DevaFramework::Vulkan::allocateMemoryForBuffer(main_device, buf, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 	}
 
 	auto &mem = bufmemIndex->getMemory(memid);

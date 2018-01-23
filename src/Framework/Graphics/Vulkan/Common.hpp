@@ -30,7 +30,7 @@ namespace DevaFramework {
 		template <class T>
 		DEVA_FRAMEWORK_API T vulkanCopyHandle(const T &o1, const T &o2);
 
-		DEVA_FRAMEWORK_API bool vulkanBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanMemory &mem);
+		DEVA_FRAMEWORK_API bool isBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanMemory &mem);
 
 		DEVA_FRAMEWORK_API VkResult submitBuffers(VkQueue queue);
 	}
