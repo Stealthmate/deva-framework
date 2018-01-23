@@ -154,7 +154,7 @@ namespace
 		auto pdevs = instance.physicalDevices;
 		for (auto &pdev : pdevs) {
 			if (pdev.properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) continue;
-			auto& supportedQueues = Vulkan::deviceQueueFamiliesSupportSurface(instance, pdev.handle, surface);
+			auto& supportedQueues = DevaFramework::Vulkan::deviceQueueFamiliesSupportSurface(instance, pdev.handle, surface);
 			for (int i = 0;i < supportedQueues.size();i++)
 			{
 				auto& q = pdev.queueFamilyProperties[supportedQueues[i]];
@@ -210,7 +210,7 @@ namespace
 		features.fillModeNonSolid = VK_TRUE;
 		if (pdev.features.fillModeNonSolid) dev_cinfo.pEnabledFeatures = &features;
 
-		return Vulkan::createDevice(instance, pdev, dev_cinfo);
+		return DevaFramework::Vulkan::createDevice(instance, pdev, dev_cinfo);
 	}
 
 	std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel> createLayout(
@@ -286,7 +286,7 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 {
 	if (!VULKAN_LOADED) LoadVulkan();
 
-	this->instance = Vulkan::createInstance(INSTANCE_CREATE_INFO);
+	this->instance = DevaFramework::Vulkan::createInstance(INSTANCE_CREATE_INFO);
 
 	auto &vk = instance.vk;
 
@@ -301,14 +301,14 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	/* Register the callback */
 	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
 
-	this->surface = Vulkan::createSurfaceFromWindow(instance, wnd);
+	this->surface = DevaFramework::Vulkan::createSurfaceFromWindow(instance, wnd);
 	VulkanPhysicalDevice gpu;
 	uint32_t queueIndex = 0;
 	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
 	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
 	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties.deviceName));
 
-	this->renderQueue = Vulkan::getDeviceQueue(main_device, queueIndex, 0);
+	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queueIndex, 0);
 
 	attachToWindow(wnd);
 	createPipeline();
@@ -319,14 +319,14 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	auto dev = instance.physicalDevices[0];
 	auto vk = instance.vk;
 
-	auto & queues = Vulkan::deviceQueueFamiliesSupportSurface(instance, dev.handle, surface);
+	auto & queues = DevaFramework::Vulkan::deviceQueueFamiliesSupportSurface(instance, dev.handle, surface);
 	assert(queues.size() > 0, "No queues");
 
 
-	this->renderQueue = Vulkan::getDeviceQueue(main_device, queues[0], 0);
+	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queues[0], 0);
 	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
 
-	auto surfaceprops = Vulkan::getSurfaceProperties(instance, dev, this->surface);
+	auto surfaceprops = DevaFramework::Vulkan::getSurfaceProperties(instance, dev, this->surface);
 
 	uint32_t formatCount = static_cast<uint32_t>(surfaceprops.formats.size());
 	if (formatCount == 1 && surfaceprops.formats[0].format == VK_FORMAT_UNDEFINED)
@@ -397,8 +397,8 @@ VulkanHandle<VkDescriptorPool> dpool;
 
 void VulkanRenderer::createPipeline()
 {
-	auto vert = Vulkan::loadShaderFromFile(this->main_device, "../shaders/vshader.spv");
-	auto frag = Vulkan::loadShaderFromFile(this->main_device, "../shaders/fshader.spv");
+	auto vert = DevaFramework::Vulkan::loadShaderFromFile(this->main_device, "../shaders/vshader.spv");
+	auto frag = DevaFramework::Vulkan::loadShaderFromFile(this->main_device, "../shaders/fshader.spv");
 
 	VulkanGraphicsPipelineBuilder plb;
 	plb.attachShader(vert, VK_SHADER_STAGE_VERTEX_BIT, "main")
@@ -439,11 +439,11 @@ void VulkanRenderer::createPipeline()
 	if (vk.vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
 	}
-	//asd
+
 	plb.setTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.setRenderPass(renderPass, 0);
 
-	Vulkan::VertexInputBinding vib(0, VK_VERTEX_INPUT_RATE_VERTEX, 28);
+	DevaFramework::Vulkan::VertexInputBinding vib(0, VK_VERTEX_INPUT_RATE_VERTEX, 28);
 	VkVertexInputAttributeDescription vad;
 	vad.binding = 0;
 	vad.format = VK_FORMAT_R32G32B32A32_SFLOAT;
@@ -474,6 +474,11 @@ void VulkanRenderer::createPipeline()
 
 	this->pipeline = plb.build(this->main_device);
 
+	vrp.pipeline = pipeline.getHandle();
+	vrp.renderArea = swapchain.extent;
+	vrp.clearVals = { { 0.0f, 0.0f, 0.0f, 0.0f } };
+	vrp.renderPass = renderPass;
+
 	for (size_t i = 0; i < swapchain.imageViews.size(); i++) {
 		VkImageView attachments[] = {
 			swapchain.imageViews[i]
@@ -493,8 +498,8 @@ void VulkanRenderer::createPipeline()
 		}
 	}
 
-	commandPool = Vulkan::createCommandPool(main_device, renderQueue.familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
-	commandBuffers.push_back(Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY));
+	commandPool = DevaFramework::Vulkan::createCommandPool(main_device, renderQueue.familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+	commandBuffers.push_back(DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY));
 
 	VkFenceCreateInfo fence_cinfo;
 	fence_cinfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -502,8 +507,8 @@ void VulkanRenderer::createPipeline()
 	fence_cinfo.pNext = nullptr;
 	vk.vkCreateFence(device, &fence_cinfo, nullptr, &fence);
 
-	imageAvailableSemaphore = Vulkan::createSemaphore(main_device);
-	renderFinishedSemaphore = Vulkan::createSemaphore(main_device);
+	imageAvailableSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
+	renderFinishedSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
 
 	VkDescriptorPoolSize dpoolsize;
 	dpoolsize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -523,13 +528,13 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	auto vk = this->main_device.vk;
 
 	size_t imageSize = img.width * img.height;
-	Uuid bufid = bufmemIndex->addBuffer(Vulkan::createBuffer(
+	Uuid bufid = bufmemIndex->addBuffer(DevaFramework::Vulkan::createBuffer(
 		this->main_device,
 		0,
 		imageSize,
 		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 		VK_SHARING_MODE_EXCLUSIVE));
-	Uuid memid = bufmemIndex->addMemory(Vulkan::allocateMemoryForBuffer(
+	Uuid memid = bufmemIndex->addMemory(DevaFramework::Vulkan::allocateMemoryForBuffer(
 		this->main_device,
 		bufmemIndex->getBuffer(bufid),
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
@@ -558,7 +563,7 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imageInfo.flags = 0; // Optional
 
-	VulkanMemory imgmem = Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	VulkanMemory imgmem = DevaFramework::Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	//TODO IMAGE
 	image.sharingMode = imageInfo.sharingMode;
 	image.size = imgmem.size;
@@ -576,8 +581,8 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 
 	vk.vkBindImageMemory(dev, image.handle, imgmem.handle, 0);
 
-	VulkanCommandBuffer buffer = Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-	Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+	VulkanCommandBuffer buffer = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
 	VkImageMemoryBarrier barrier = {};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -600,10 +605,10 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	vk.vkEndCommandBuffer(buffer.handle);
 	queueBuffer.enqueue({ buffer.handle }, {}, {}, {});
 	queueBuffer.flush(main_device, VK_NULL_HANDLE);
-	Vulkan::freeCommandBuffers(main_device, { buffer });
+	DevaFramework::Vulkan::freeCommandBuffers(main_device, { buffer });
 
-	buffer = Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-	Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+	buffer = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	VkBufferImageCopy region = {};
 	region.bufferOffset = 0;
 	region.bufferRowLength = 0;
@@ -648,19 +653,9 @@ void VulkanRenderer::drawFrame()
 
 	if (i == swapchain.framebuffers.size()) i = 0;
 
-	VkCommandBufferBeginInfo beginInfo = {};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-	beginInfo.pInheritanceInfo = nullptr; // Optional
-
-	vk.vkBeginCommandBuffer(commandBuffers[0].handle, &beginInfo);
-
-	VulkanRenderPass vrp;
 	vrp.framebuffer = swapchain.framebuffers[i];
-	vrp.pipeline = pipeline.getHandle();
-	vrp.renderArea = swapchain.extent;
-	vrp.clearVals = { { 0.0f, 0.0f, 0.0f, 0.0f } };
-	vrp.renderPass = renderPass;
+	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
 	bufmemIndex->purge();
 
 	for (auto& object : renderObjects) {
@@ -758,17 +753,14 @@ void VulkanRenderer::destroy() {
 		imageAvailableSemaphore.replace();
 		renderFinishedSemaphore.replace();
 		vkd.vkDestroyFence(dev, fence, nullptr);
-		vkd.vkDestroySwapchainKHR(dev, this->swapchain.handle, nullptr);
-		this->surface.replace();
-		for (auto i : swapchain.framebuffers) {
-			vkd.vkDestroyFramebuffer(dev, i, nullptr);
-		}
-		/*for (auto i : swapchain.images) {
-			vkd.vkDestroyImage(dev, i, nullptr);
-		}*/
 		for (auto i : swapchain.imageViews) {
 			vkd.vkDestroyImageView(dev, i, nullptr);
 		}
+		for (auto i : swapchain.framebuffers) {
+			vkd.vkDestroyFramebuffer(dev, i, nullptr);
+		}
+		vkd.vkDestroySwapchainKHR(dev, this->swapchain.handle, nullptr);
+		this->surface.replace();
 
 		for (auto &i : dsLayouts) {
 			vkd.vkDestroyDescriptorSetLayout(dev, i.second.first, nullptr);

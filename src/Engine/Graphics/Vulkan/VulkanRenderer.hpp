@@ -14,6 +14,7 @@
 #include "VulkanSwapchain.hpp"
 #include "VulkanPipeline.hpp"
 #include "VulkanQueueSubmitBuffer.hpp"
+#include "Subrenderer.hpp"
 namespace DevaEngine
 {
 
@@ -121,6 +122,8 @@ namespace DevaEngine
 		std::unordered_map<DevaFramework::Uuid, DevaFramework::VulkanImage> mImages;
 
 		VulkanQueueSubmitBuffer queueBuffer;
+
+		VulkanRenderPass vrp;
 
 		void drawFrame();
 
