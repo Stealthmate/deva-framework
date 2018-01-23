@@ -115,3 +115,14 @@ bool Vulkan::isBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanM
 
 	return true;
 }
+
+VkVertexInputAttributeDescription Vulkan::makeVAD(uint32_t location, uint32_t binding, VkFormat format, uint32_t offset)
+{
+	VkVertexInputAttributeDescription vad;
+	vad.location = location;
+	vad.binding = binding;
+	vad.format = format;
+	vad.offset = offset;
+
+	return vad;
+}

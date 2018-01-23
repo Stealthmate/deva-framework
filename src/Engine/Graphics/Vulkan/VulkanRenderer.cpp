@@ -444,18 +444,10 @@ void VulkanRenderer::createPipeline()
 		.setRenderPass(renderPass, 0);
 
 	DevaFramework::Vulkan::VertexInputBinding vib(0, VK_VERTEX_INPUT_RATE_VERTEX, 28);
-	VkVertexInputAttributeDescription vad;
-	vad.binding = 0;
-	vad.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-	vad.location = 0;
-	vad.offset = 0;
-	vib.addAttribute(vad);
-	vad.offset = 16;
-	vad.location = 1;
-	vad.format = VK_FORMAT_R32G32B32_SFLOAT;
-	vib.addAttribute(vad);
-
+	vib.addAttribute(DevaFramework::Vulkan::makeVAD(0, 0, VK_FORMAT_R32G32B32A32_SFLOAT, 0));
+	vib.addAttribute(DevaFramework::Vulkan::makeVAD(1, 0, VK_FORMAT_R32G32B32_SFLOAT, 16));
 	plb.addVertexInputBinding(vib);
+
 	VkDescriptorSetLayoutBinding binding;
 	binding.binding = 0;
 	binding.descriptorCount = 1;

@@ -33,6 +33,8 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API bool isBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanMemory &mem);
 
 		DEVA_FRAMEWORK_API VkResult submitBuffers(VkQueue queue);
+
+		DEVA_FRAMEWORK_API VkVertexInputAttributeDescription makeVAD(uint32_t location, uint32_t binding, VkFormat format, uint32_t offset);
 	}
 
 }
