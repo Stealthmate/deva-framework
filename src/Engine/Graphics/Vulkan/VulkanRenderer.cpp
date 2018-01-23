@@ -160,12 +160,8 @@ namespace
 				auto& q = pdev.queueFamilyProperties[supportedQueues[i]];
 				if ((q.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) continue;
 
-				VkBool32 supportsPresent;
-				vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle,
-					supportedQueues[i],
-					surface,
-					&supportsPresent);
-				if (supportsPresent == VK_TRUE) {
+				VkBool32 supportsPresent = DevaFramework::Vulkan::doesDeviceQueueSupportSurface(instance, pdev, supportedQueues[i], surface);
+				if (supportsPresent) {
 					*queueIndex = supportedQueues[i];
 					*gpu = pdev;
 					return true;
@@ -187,13 +183,8 @@ namespace
 		q_cinfo.flags = 0;
 		for (auto ext : DEVICE_EXTENSIONS)
 		{
-			bool supported = false;
-			for (auto &devext : pdev.extensionProperties)
-			{
-				supported = std::string(devext.extensionName).compare(ext) == 0;
-				if (supported) break;
-			}
-			if (!supported) throw DevaException("Cannot create VulkanDevice: Unsupported extension " + std::string(ext));
+			if (!DevaFramework::Vulkan::doesDeviceSupportExtension(pdev, ext)) 
+				throw DevaException("Cannot create VulkanDevice: Unsupported extension " + std::string(ext));
 		}
 
 		VkDeviceCreateInfo dev_cinfo;
@@ -467,10 +458,10 @@ void VulkanRenderer::createPipeline()
 
 	this->pipeline = plb.build(this->main_device);
 
-	vrp.pipeline = pipeline.getHandle();
-	vrp.renderArea = swapchain.extent;
-	vrp.clearVals = { { 0.0f, 0.0f, 0.0f, 0.0f } };
-	vrp.renderPass = renderPass.handle;
+	renderPassRecord.pipeline = pipeline.getHandle();
+	renderPassRecord.renderArea = swapchain.extent;
+	renderPassRecord.clearVals = { { 0.0f, 0.0f, 0.0f, 0.0f } };
+	renderPassRecord.renderPass = renderPass.handle;
 
 	for (size_t i = 0; i < swapchain.imageViews.size(); i++) {
 		VkImageView attachments[] = {
@@ -627,7 +618,7 @@ void VulkanRenderer::drawFrame()
 
 	if (i == swapchain.framebuffers.size()) i = 0;
 
-	vrp.framebuffer = swapchain.framebuffers[i];
+	renderPassRecord.framebuffer = swapchain.framebuffers[i];
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 	bufmemIndex->purge();
@@ -654,10 +645,10 @@ void VulkanRenderer::drawFrame()
 		vdi.firstIndex = 0;
 		vdi.vertexOffset = 0;
 		vdi.firstInstance = 0;
-		vrp.objs.push_back(vdi);
+		renderPassRecord.objs.push_back(vdi);
 	}
 
-	Vulkan::renderPassRecord(main_device, commandBuffers[0].handle, vrp);
+	Vulkan::renderPassRecord(main_device, commandBuffers[0].handle, renderPassRecord);
 
 	if (vk.vkEndCommandBuffer(commandBuffers[0].handle) != VK_SUCCESS) {
 		throw DevaException("failed to record command buffer!");

@@ -27,6 +27,13 @@ namespace DevaFramework
 			std::vector<VkPresentModeKHR> presentModes;
 		};
 
+		DEVA_FRAMEWORK_API bool doesDeviceSupportExtension(const VulkanPhysicalDevice &pdev, const char * ext);
+		DEVA_FRAMEWORK_API bool doesDeviceQueueSupportSurface(
+			const VulkanInstance &inst, 
+			const VulkanPhysicalDevice &pdev, 
+			uint32_t queue, 
+			VkSurfaceKHR surface);
+
 		DEVA_FRAMEWORK_API VulkanPhysicalDevice getPhysicalDeviceStruct(const VulkanInstance &inst, VkPhysicalDevice pdev);
 		DEVA_FRAMEWORK_API PhysicalDeviceSurfaceProperties getSurfaceProperties(const VulkanInstance &inst, const VulkanPhysicalDevice &pdev, VkSurfaceKHR surface);
 

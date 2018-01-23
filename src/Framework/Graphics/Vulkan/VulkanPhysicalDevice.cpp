@@ -174,6 +174,31 @@ str += "\n";
 	}
 }
 
+bool DevaFramework::Vulkan::doesDeviceSupportExtension(const VulkanPhysicalDevice & pdev, const char * ext)
+{
+	bool supported = false;
+	for (auto &devext : pdev.extensionProperties)
+	{
+		supported = std::string(devext.extensionName).compare(ext) == 0;
+		if (supported) return true;
+	}
+	return false;
+}
+
+bool DevaFramework::Vulkan::doesDeviceQueueSupportSurface(
+	const VulkanInstance & inst, 
+	const VulkanPhysicalDevice & pdev, 
+	uint32_t queue, 
+	VkSurfaceKHR surface)
+{
+	VkBool32 supportsPresent;
+	inst.vk.vkGetPhysicalDeviceSurfaceSupportKHR(pdev.handle,
+		queue,
+		surface,
+		&supportsPresent);
+	return supportsPresent == VK_TRUE;
+}
+
 VulkanPhysicalDevice Vulkan::getPhysicalDeviceStruct(const VulkanInstance &vkInstance, VkPhysicalDevice handle)
 {
 	auto & vk = vkInstance.vk;
