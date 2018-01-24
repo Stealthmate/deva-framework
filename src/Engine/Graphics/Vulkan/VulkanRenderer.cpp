@@ -432,6 +432,25 @@ void VulkanRenderer::createPipeline()
 		throw std::runtime_error("failed to create render pass!");
 	}
 
+	for (size_t i = 0; i < swapchain.imageViews.size(); i++) {
+		VkImageView attachments[] = {
+			swapchain.imageViews[i]
+		};
+
+		VkFramebufferCreateInfo framebufferInfo = {};
+		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.renderPass = renderPass.handle;
+		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.pAttachments = attachments;
+		framebufferInfo.width = swapchain.extent.width;
+		framebufferInfo.height = swapchain.extent.height;
+		framebufferInfo.layers = 1;
+
+		if (vk.vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapchain.framebuffers[i]) != VK_SUCCESS) {
+			throw DevaException("failed to create framebuffer!");
+		}
+	}
+
 	plb.setTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.setRenderPass(renderPass.handle, 0);
 
@@ -462,25 +481,6 @@ void VulkanRenderer::createPipeline()
 	renderPassRecord.renderArea = swapchain.extent;
 	renderPassRecord.clearVals = { { 0.0f, 0.0f, 0.0f, 0.0f } };
 	renderPassRecord.renderPass = renderPass.handle;
-
-	for (size_t i = 0; i < swapchain.imageViews.size(); i++) {
-		VkImageView attachments[] = {
-			swapchain.imageViews[i]
-		};
-
-		VkFramebufferCreateInfo framebufferInfo = {};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderPass.handle;
-		framebufferInfo.attachmentCount = 1;
-		framebufferInfo.pAttachments = attachments;
-		framebufferInfo.width = swapchain.extent.width;
-		framebufferInfo.height = swapchain.extent.height;
-		framebufferInfo.layers = 1;
-
-		if (vk.vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapchain.framebuffers[i]) != VK_SUCCESS) {
-			throw DevaException("failed to create framebuffer!");
-		}
-	}
 
 	commandPool = DevaFramework::Vulkan::createCommandPool(main_device, renderQueue.familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	commandBuffers.push_back(DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY));
