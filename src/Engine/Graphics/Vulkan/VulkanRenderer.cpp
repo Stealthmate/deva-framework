@@ -183,7 +183,7 @@ namespace
 		q_cinfo.flags = 0;
 		for (auto ext : DEVICE_EXTENSIONS)
 		{
-			if (!DevaFramework::Vulkan::doesDeviceSupportExtension(pdev, ext)) 
+			if (!DevaFramework::Vulkan::doesDeviceSupportExtension(pdev, ext))
 				throw DevaException("Cannot create VulkanDevice: Unsupported extension " + std::string(ext));
 		}
 
@@ -292,8 +292,7 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	/* Register the callback */
 	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
 
-
-	surface = DevaFramework::Vulkan::createSurfaceFromWindow(instance, wnd);
+	surface = DevaFramework::Vulkan::createSurfaceForWindow(instance, wnd);
 
 	VulkanPhysicalDevice gpu;
 	uint32_t queueIndex = 0;
@@ -304,11 +303,19 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queueIndex, 0);
 	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
 
-	attachToWindow(wnd);
+	/**
+		VulkanRender constructor with surface?
+		Decouple renderer and window
+	*/
 
-	fence = DevaFramework::Vulkan::createFence(main_device);
-	imageAvailableSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
-	renderFinishedSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
+	attachToWindow(wnd);
+	createRenderPass();
+
+	{
+		fence = DevaFramework::Vulkan::createFence(main_device, VK_FENCE_CREATE_SIGNALED_BIT);
+		imageAvailableSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
+		renderFinishedSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
+	}
 
 	createPipeline();
 }
@@ -380,7 +387,43 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	swapchainCreateInfo.presentMode = presentMode;
 	swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-	this->swapchain = VulkanSwapchain::createSwapchain(this->main_device, swapchainCreateInfo);
+	this->swapchain = DevaEngine::Vulkan::createSwapchain(this->main_device, swapchainCreateInfo);
+}
+
+void VulkanRenderer::createRenderPass() {
+	VkAttachmentDescription colorAttachment = {};
+	colorAttachment.format = swapchain.format;
+	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	renderPass.attachments.push_back(colorAttachment);
+
+	VkAttachmentReference colorAttachmentRef = { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
+	colorAttachmentRef.attachment = 0;
+	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription subpass = {};
+	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+	renderPass.subpasses.push_back({ VK_PIPELINE_BIND_POINT_GRAPHICS,{ { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL } } });
+
+	VkRenderPassCreateInfo renderPassInfo = {};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+	renderPassInfo.dependencyCount = 0;
+	renderPassInfo.pDependencies = nullptr;
+
+	if (main_device.vk.vkCreateRenderPass(main_device.handle, &renderPassInfo, nullptr, &renderPass.handle) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create render pass!");
+	}
 }
 
 VulkanHandle<VkDescriptorPool> dpool;
@@ -397,40 +440,6 @@ void VulkanRenderer::createPipeline()
 
 	auto &vk = main_device.vk;
 	auto device = main_device.handle;
-
-	VkAttachmentDescription colorAttachment = {};
-	colorAttachment.format = swapchain.format;
-	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-	renderPass.attachments.push_back(colorAttachment);
-
-	VkAttachmentReference colorAttachmentRef = {0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	VkSubpassDescription subpass = {};
-	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
-	renderPass.subpasses.push_back({ VK_PIPELINE_BIND_POINT_GRAPHICS, {{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL}} });
-
-	VkRenderPassCreateInfo renderPassInfo = {};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = 1;
-	renderPassInfo.pAttachments = &colorAttachment;
-	renderPassInfo.subpassCount = 1;
-	renderPassInfo.pSubpasses = &subpass;
-	renderPassInfo.dependencyCount = 0;
-	renderPassInfo.pDependencies = nullptr;
-
-	if (vk.vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass.handle) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create render pass!");
-	}
 
 	for (size_t i = 0; i < swapchain.imageViews.size(); i++) {
 		VkImageView attachments[] = {
@@ -596,50 +605,34 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 
 }
 
-bool drawn = false;
-int i = 0;
 #include"VulkanPresenter.hpp"
 #include "Subrenderer.hpp"
 
 
 void VulkanRenderer::drawFrame()
 {
-	//if (drawn) return;
 	auto &vk = main_device.vk;
 	auto device = main_device.handle;
-	VkResult res = VK_SUCCESS;
 
-	if (drawn) {
-		do {
-			res = vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 100);
-		} while (res == VK_TIMEOUT);
-	}
+	VkResult res = vk.vkWaitForFences(device, 1, &fence, VK_TRUE, std::numeric_limits<uint32_t>::max());
 	if (res != VK_SUCCESS) LOG.w("FENCE NOT COMPLETE " + strm(res));
+	vk.vkResetFences(device, 1, &fence);
 
-	if (i == swapchain.framebuffers.size()) i = 0;
-
-	renderPassRecord.framebuffer = swapchain.framebuffers[i];
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-
-	bufmemIndex->purge();
 
 	for (auto& object : renderObjects) {
 		auto &obj = object.second;
-		VulkanBuffer& buf = bufmemIndex->getBuffer(object.second.buffer());
-		VkDeviceSize offsets[] = { obj.offsets().vertex };
-		VkBuffer handle = buf.handle;
-		VkDeviceSize offsetIndex = obj.offsets().index;
-		VkDescriptorSet dset = obj.getDescriptorSet();
+		VulkanBuffer& buf = bufmemIndex->getBuffer(obj.buffer());
 
 		VulkanDrawableInfo vdi;
-		vdi.vertexBuffers = { handle };
-		vdi.indexBuffer = handle;
+		vdi.vertexBuffers = { buf.handle };
+		vdi.indexBuffer = buf.handle;
 		vdi.indexOffset = obj.offsets().index;
 		vdi.indexType = VK_INDEX_TYPE_UINT32;
 		vdi.pipelineLayout = pipeline.getPipelineLayout();
 		vdi.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 		vdi.vertexOffsets = { obj.offsets().vertex };
-		vdi.descriptorSets = { dset };
+		vdi.descriptorSets = { obj.getDescriptorSet() };
 		vdi.indexCount = obj.indexCount();
 		vdi.instanceCount = 1;
 		vdi.firstIndex = 0;
@@ -648,28 +641,16 @@ void VulkanRenderer::drawFrame()
 		renderPassRecord.objs.push_back(vdi);
 	}
 
+	uint32_t imageIndex;
+	vk.vkAcquireNextImageKHR(device, swapchain.handle, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+
+	renderPassRecord.framebuffer = swapchain.framebuffers[imageIndex];
+
 	Vulkan::renderPassRecord(main_device, commandBuffers[0].handle, renderPassRecord);
 
 	if (vk.vkEndCommandBuffer(commandBuffers[0].handle) != VK_SUCCESS) {
 		throw DevaException("failed to record command buffer!");
 	}
-
-
-	uint32_t imageIndex;
-	vk.vkAcquireNextImageKHR(device, swapchain.handle, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
-
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
-
-	auto queues = DevaFramework::Vulkan::getQueuesOfType(main_device, VK_QUEUE_GRAPHICS_BIT);
-	if (queues.size() == 0)
-		throw DevaException("0 queues");
-
-	VkQueue q = DevaFramework::Vulkan::getDeviceQueue(main_device, queues[0].first, queues[0].second).handle;
-
-	vk.vkWaitForFences(device, 1, &fence, VK_TRUE, 1000);
-	vk.vkResetFences(device, 1, &fence);
 
 	queueBuffer.enqueue(
 		{ commandBuffers[0].handle },
@@ -680,10 +661,6 @@ void VulkanRenderer::drawFrame()
 	queueBuffer.flush(main_device, fence);
 
 	DevaFramework::Vulkan::present(main_device, renderQueue.handle, { renderFinishedSemaphore }, { swapchain.handle }, { imageIndex });
-
-	drawn = true;
-
-	i++;
 }
 
 void VulkanRenderer::renderExample()

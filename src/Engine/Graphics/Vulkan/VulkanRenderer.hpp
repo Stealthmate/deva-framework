@@ -107,6 +107,8 @@ namespace DevaEngine
 		VkColorSpaceKHR colorSpace;
 		VkFormat colorFormat;
 
+		std::vector<VkFramebuffer> framebuffers;
+
 		DevaFramework::VulkanQueue renderQueue;
 
 		DevaFramework::VulkanHandle<VkSurfaceKHR> surface;
@@ -130,6 +132,9 @@ namespace DevaEngine
 		VkSemaphore imageAvailableSemaphore;
 		VkSemaphore renderFinishedSemaphore;
 		DevaFramework::VulkanRenderPass renderPass;
+
+		void createRenderPass();
+
 
 		void drawFrame();
 

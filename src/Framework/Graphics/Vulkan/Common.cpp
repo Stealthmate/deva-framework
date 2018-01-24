@@ -31,8 +31,9 @@ VulkanHandle<VkShaderModule> Vulkan::loadShaderFromFile(const VulkanDevice &dev,
 	return shaderModule;
 }
 
-VulkanHandle<VkSurfaceKHR> Vulkan::createSurfaceFromWindow(const VulkanInstance &vkInstance, const Window &wnd)
+VulkanHandle<VkSurfaceKHR> Vulkan::createSurfaceForWindow(const VulkanInstance &vkInstance, const Window &wnd)
 {
+	VulkanHandle<VkSurfaceKHR> surface(vkInstance.handle, vkInstance.vk.vkDestroySurfaceKHR);
 	auto os = wnd.getOSHandles();
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 	VkWin32SurfaceCreateInfoKHR surface_cinfo =
@@ -43,6 +44,7 @@ VulkanHandle<VkSurfaceKHR> Vulkan::createSurfaceFromWindow(const VulkanInstance 
 		(HINSTANCE)os->win32_hinstance(),
 		(HWND)os->win32_hwnd()
 	};
+	vkInstance.vk.vkCreateWin32SurfaceKHR(vkInstance.handle, &surface_cinfo, nullptr, surface.replace());
 #endif
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
 #error WAYLAND NOT IMPLEMENTED!
@@ -60,8 +62,6 @@ VulkanHandle<VkSurfaceKHR> Vulkan::createSurfaceFromWindow(const VulkanInstance 
 #error ANDROID NOT IMPLEMENTED!
 #endif
 
-	VulkanHandle<VkSurfaceKHR> surface(vkInstance.handle, vkInstance.vk.vkDestroySurfaceKHR);
-	vkInstance.vk.vkCreateWin32SurfaceKHR(vkInstance.handle, &surface_cinfo, nullptr, surface.replace());
 	return surface;
 }
 
@@ -89,12 +89,12 @@ std::vector<uint32_t> Vulkan::deviceQueueFamiliesSupportSurface(const VulkanInst
 	return queues;
 }
 
-VkFence DevaFramework::Vulkan::createFence(const VulkanDevice & dev)
+VkFence DevaFramework::Vulkan::createFence(const VulkanDevice & dev, VkFenceCreateFlags flags)
 {
 	VkFenceCreateInfo info;
 	info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	info.pNext = nullptr;
-	info.flags = 0;
+	info.flags = flags;
 	VkFence fence;
 	VkResult res = dev.vk.vkCreateFence(dev.handle, &info, nullptr, &fence);
 	if (res != VK_SUCCESS)

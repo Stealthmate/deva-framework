@@ -6,39 +6,29 @@ namespace {
 
 }
 
-VulkanSwapchain VulkanSwapchain::createSwapchain(const VulkanDevice &dev, const VkSwapchainCreateInfoKHR &createInfo)
+VulkanSwapchain DevaEngine::Vulkan::createSwapchain(const VulkanDevice &dev, const VkSwapchainCreateInfoKHR &createInfo)
 {
-	VkSwapchainKHR swapchain;
-	auto result = dev.vk.vkCreateSwapchainKHR(dev.handle, &createInfo, nullptr, &swapchain);
+	VulkanSwapchain swapchain;
+	auto result = dev.vk.vkCreateSwapchainKHR(dev.handle, &createInfo, nullptr, &swapchain.handle);
 	if (result != VK_SUCCESS)
 		throw DevaException("Could not create Swapchain");
-	return VulkanSwapchain(dev, swapchain, createInfo);
-}
 
-VulkanSwapchain::VulkanSwapchain()
-{
-	this->handle = VK_NULL_HANDLE;
-}
-
-VulkanSwapchain::VulkanSwapchain(const VulkanDevice &dev, const VkSwapchainKHR &swapchain, const VkSwapchainCreateInfoKHR &createInfo)
-{
-	this->handle = swapchain;
-	this->format = createInfo.imageFormat;
-	this->extent = createInfo.imageExtent;
+	swapchain.format = createInfo.imageFormat;
+	swapchain.extent = createInfo.imageExtent;
 	auto vk = dev.vk;
 	uint32_t imageCount = -1;
-	vk.vkGetSwapchainImagesKHR(dev.handle, this->handle, &imageCount, nullptr);
-	this->images.resize(imageCount);
-	vk.vkGetSwapchainImagesKHR(dev.handle, this->handle, &imageCount, this->images.data());
+	vk.vkGetSwapchainImagesKHR(dev.handle, swapchain.handle, &imageCount, nullptr);
+	swapchain.images.resize(imageCount);
+	vk.vkGetSwapchainImagesKHR(dev.handle, swapchain.handle, &imageCount, swapchain.images.data());
 
-	this->imageViews.resize(imageCount);
-	for (int i = 0; i < this->images.size(); i++)
+	swapchain.imageViews.resize(imageCount);
+	for (int i = 0; i < swapchain.images.size(); i++)
 	{
 		VkImageViewCreateInfo cinfo = {};
 		cinfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		cinfo.image = this->images[i];
+		cinfo.image = swapchain.images[i];
 		cinfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		cinfo.format = this->format;
+		cinfo.format = swapchain.format;
 		cinfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
 		cinfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 		cinfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -49,10 +39,12 @@ VulkanSwapchain::VulkanSwapchain(const VulkanDevice &dev, const VkSwapchainKHR &
 		cinfo.subresourceRange.baseArrayLayer = 0;
 		cinfo.subresourceRange.layerCount = 1;
 
-		if (vk.vkCreateImageView(dev.handle, &cinfo, nullptr, &this->imageViews[i]) != VK_SUCCESS) {
+		if (vk.vkCreateImageView(dev.handle, &cinfo, nullptr, &swapchain.imageViews[i]) != VK_SUCCESS) {
 			throw DevaException("failed to create image views!");
 		}
 	}
 
-	framebuffers.resize(imageViews.size());
+	swapchain.framebuffers.resize(swapchain.imageViews.size());
+
+	return swapchain;
 }

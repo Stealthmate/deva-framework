@@ -8,11 +8,7 @@
 #include <DevaFramework\Graphics\Vulkan\VulkanHandle.hpp>
 
 namespace DevaEngine {
-	class VulkanSwapchain {
-
-	public:
-
-		DEVA_ENGINE_API static VulkanSwapchain createSwapchain(const DevaFramework::VulkanDevice &dev, const VkSwapchainCreateInfoKHR &createInfo);
+	struct VulkanSwapchain {
 
 		VkSwapchainKHR handle;
 		std::vector<VkImage> images;
@@ -20,13 +16,13 @@ namespace DevaEngine {
 		VkExtent2D extent;
 		VkFormat format;
 		std::vector<VkFramebuffer> framebuffers;
-	
-		DEVA_ENGINE_API VulkanSwapchain();
-
-	private:
-		VulkanSwapchain(const DevaFramework::VulkanDevice &dev, const VkSwapchainKHR &swapchain, const VkSwapchainCreateInfoKHR &createInfo);
-
 	};
+
+	namespace Vulkan {
+		DEVA_ENGINE_API VulkanSwapchain createSwapchain(
+			const DevaFramework::VulkanDevice &dev,
+			const VkSwapchainCreateInfoKHR &info);
+	}
 }
 
 #endif //DEVA_ENGINE_VULKAN_SWAPCHAIN_HPP
