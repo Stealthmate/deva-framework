@@ -650,6 +650,8 @@ void VulkanRenderer::drawFrame()
 	if (res != VK_SUCCESS) LOG.w("FENCE NOT COMPLETE " + strm(res));
 	vk.vkResetFences(device, 1, &fence);
 
+	vk.vkFreeCommandBuffers(device, commandPool.handle, 1, &commandBuffers[0].handle);
+	commandBuffers[0] = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 	for (auto& object : renderObjects) {
