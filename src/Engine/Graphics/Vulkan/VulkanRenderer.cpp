@@ -119,7 +119,8 @@ namespace
 
 	const char* INSTANCE_LAYERS[] =
 	{
-		"VK_LAYER_LUNARG_standard_validation"
+		"VK_LAYER_LUNARG_standard_validation",
+		"VK_LAYER_LUNARG_parameter_validation"
 	};
 
 	const VkInstanceCreateInfo INSTANCE_CREATE_INFO =
@@ -303,11 +304,6 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queueIndex, 0);
 	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
 
-	/**
-		VulkanRender constructor with surface?
-		Decouple renderer and window
-	*/
-
 	attachToWindow(wnd);
 	createRenderPass();
 
@@ -427,7 +423,7 @@ void VulkanRenderer::createRenderPass() {
 }
 
 VulkanHandle<VkDescriptorPool> dpool;
-
+#include <DevaFramework\Graphics\ImageReaders.hpp>
 void VulkanRenderer::createPipeline()
 {
 	auto vert = DevaFramework::Vulkan::loadShaderFromFile(this->main_device, "../shaders/vshader.spv");
@@ -494,14 +490,55 @@ void VulkanRenderer::createPipeline()
 	commandPool = DevaFramework::Vulkan::createCommandPool(main_device, renderQueue.familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	commandBuffers.push_back(DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY));
 
+	loadImage(Image::loadImageFromFile("./resources/SS1.png", ImageFormat::PNG));
+}
+
+std::tuple<VkImageMemoryBarrier, VkPipelineStageFlags, VkPipelineStageFlags> transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout) {
+	VkImageMemoryBarrier barrier = {};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = oldLayout;
+	barrier.newLayout = newLayout;
+
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = image;
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+	barrier.srcAccessMask = 0; // TODO
+	barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT; // TODO
+
+	VkPipelineStageFlags sourceStage;
+	VkPipelineStageFlags destinationStage;
+
+	if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+	else {
+		throw std::invalid_argument("unsupported layout transition!");
+	}
+
+	return { barrier, sourceStage, destinationStage };
 }
 
 Uuid VulkanRenderer::loadImage(const Image &img) {
-
 	auto dev = this->main_device.handle;
 	auto vk = this->main_device.vk;
-
-	size_t imageSize = img.width * img.height;
+	RawImage ri = readPNG("./resources/SS1.png");
+	size_t imageSize = img.width * img.height * 4;
 	Uuid bufid = bufmemIndex->addBuffer(DevaFramework::Vulkan::createBuffer(
 		this->main_device,
 		0,
@@ -512,6 +549,7 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 		this->main_device,
 		bufmemIndex->getBuffer(bufid),
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+	bufmemIndex->bindBufferMemory(bufid, memid, main_device, 0);
 
 	void* mem = nullptr;
 	vk.vkMapMemory(dev, bufmemIndex->getMemory(memid).handle, 0, imageSize, 0, &mem);
@@ -519,7 +557,6 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	vk.vkUnmapMemory(dev, bufmemIndex->getMemory(memid).handle);
 
 	VulkanImage image;
-	VkDeviceMemory texImgMem;
 
 	VkImageCreateInfo imageInfo = {};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -537,17 +574,16 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imageInfo.flags = 0; // Optional
 
-	VulkanMemory imgmem = DevaFramework::Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	//TODO IMAGE
-	image.sharingMode = imageInfo.sharingMode;
-	image.size = imgmem.size;
-	image.usage = imageInfo.usage;
-
 	VkResult res;
 	res = vk.vkCreateImage(dev, &imageInfo, nullptr, &image.handle);
 	if (res != VK_SUCCESS) {
 		throw DevaException("Could not create image");
 	}
+
+	VulkanMemory imgmem = DevaFramework::Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	image.sharingMode = imageInfo.sharingMode;
+	image.size = imgmem.size;
+	image.usage = imageInfo.usage;
 
 	Uuid id = Uuid();
 	mImages.insert({ id, image });
@@ -555,34 +591,20 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 
 	vk.vkBindImageMemory(dev, image.handle, imgmem.handle, 0);
 
+	VkSubmitInfo submitInfo = {};
 	VulkanCommandBuffer buffer = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-
-	VkImageMemoryBarrier barrier = {};
-	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-	barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-
-	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	barrier.image = image.handle;
-	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	barrier.subresourceRange.baseMipLevel = 0;
-	barrier.subresourceRange.levelCount = 1;
-	barrier.subresourceRange.baseArrayLayer = 0;
-	barrier.subresourceRange.layerCount = 1;
-	barrier.srcAccessMask = 0; // TODO
-	barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT; // TODO
-
-	vk.vkCmdPipelineBarrier(buffer.handle, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
-
+	auto barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
 	vk.vkEndCommandBuffer(buffer.handle);
-	queueBuffer.enqueue({ buffer.handle }, {}, {}, {});
-	queueBuffer.flush(main_device, VK_NULL_HANDLE);
-	DevaFramework::Vulkan::freeCommandBuffers(main_device, { buffer });
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &buffer.handle;
+	vk.vkResetFences(dev, 1, &fence);
+	vk.vkQueueSubmit(renderQueue.handle, 1, &submitInfo, fence);
+	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 10000);
 
-	buffer = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	VkBufferImageCopy region = {};
 	region.bufferOffset = 0;
 	region.bufferRowLength = 0;
@@ -600,9 +622,26 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 		1
 	};
 
+	buffer = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	vk.vkCmdCopyBufferToImage(buffer.handle, bufmemIndex->getBuffer(bufid).handle, image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+	vk.vkEndCommandBuffer(buffer.handle);
+	vk.vkResetFences(dev, 1, &fence);
+	vk.vkQueueSubmit(renderQueue.handle, 1, &submitInfo, fence);
+	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 10000);
 
+	barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
+	vk.vkEndCommandBuffer(buffer.handle);
+	vk.vkResetFences(dev, 1, &fence);
+	vk.vkQueueSubmit(renderQueue.handle, 1, &submitInfo, fence);
+	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 10000);
 
+	vk.vkFreeCommandBuffers(dev, this->commandPool.handle, 1, &buffer.handle);
+	bufmemIndex->removeBuffer(bufid, true);
+
+	return Uuid();
 }
 
 #include"VulkanPresenter.hpp"
