@@ -63,7 +63,7 @@ DevaEngineInstance::DevaEngineInstance(DevaEngineInstance &&instance)
 	instance.mID = UINT64_MAX;
 }
 
-constexpr int FRAMERATEMARK = 1000;
+constexpr int FRAMERATEMARK = 100;
 std::array<long long, FRAMERATEMARK> framerate;
 static int i = 0;
 static double fps = 0;

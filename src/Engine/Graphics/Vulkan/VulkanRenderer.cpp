@@ -120,7 +120,8 @@ namespace
 	const char* INSTANCE_LAYERS[] =
 	{
 		"VK_LAYER_LUNARG_standard_validation",
-		"VK_LAYER_LUNARG_parameter_validation"
+		"VK_LAYER_LUNARG_parameter_validation",
+		"VK_LAYER_LUNARG_core_validation"
 	};
 
 	const VkInstanceCreateInfo INSTANCE_CREATE_INFO =
@@ -537,8 +538,8 @@ std::tuple<VkImageMemoryBarrier, VkPipelineStageFlags, VkPipelineStageFlags> tra
 Uuid VulkanRenderer::loadImage(const Image &img) {
 	auto dev = this->main_device.handle;
 	auto vk = this->main_device.vk;
-	RawImage ri = readPNG("./resources/SS1.png");
-	size_t imageSize = img.width * img.height * 4;
+
+	size_t imageSize = img.getData().size();
 	Uuid bufid = bufmemIndex->addBuffer(DevaFramework::Vulkan::createBuffer(
 		this->main_device,
 		0,
@@ -588,7 +589,6 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	Uuid id = Uuid();
 	mImages.insert({ id, image });
 
-
 	vk.vkBindImageMemory(dev, image.handle, imgmem.handle, 0);
 
 	VkSubmitInfo submitInfo = {};
@@ -597,13 +597,6 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	auto barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
-	vk.vkEndCommandBuffer(buffer.handle);
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &buffer.handle;
-	vk.vkResetFences(dev, 1, &fence);
-	vk.vkQueueSubmit(renderQueue.handle, 1, &submitInfo, fence);
-	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 10000);
 
 	VkBufferImageCopy region = {};
 	region.bufferOffset = 0;
@@ -622,21 +615,21 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 		1
 	};
 
-	buffer = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	vk.vkCmdCopyBufferToImage(buffer.handle, bufmemIndex->getBuffer(bufid).handle, image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-	vk.vkEndCommandBuffer(buffer.handle);
-	vk.vkResetFences(dev, 1, &fence);
-	vk.vkQueueSubmit(renderQueue.handle, 1, &submitInfo, fence);
-	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 10000);
 
 	barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
 	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
+	
 	vk.vkEndCommandBuffer(buffer.handle);
+
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &buffer.handle;
+
 	vk.vkResetFences(dev, 1, &fence);
 	vk.vkQueueSubmit(renderQueue.handle, 1, &submitInfo, fence);
-	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 10000);
+	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100000000);
 
 	vk.vkFreeCommandBuffers(dev, this->commandPool.handle, 1, &buffer.handle);
 	bufmemIndex->removeBuffer(bufid, true);
