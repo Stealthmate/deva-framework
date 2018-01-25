@@ -1,6 +1,11 @@
 #include "Common.hpp"
 #include "VulkanException.hpp"
 
+#include "VulkanInstance.hpp"
+#include "VulkanDevice.hpp"
+#include "VulkanBuffer.hpp"
+#include "VulkanMemory.hpp"
+
 #include "../../Util/Common.hpp"
 #include "../../Window/Window.hpp"
 

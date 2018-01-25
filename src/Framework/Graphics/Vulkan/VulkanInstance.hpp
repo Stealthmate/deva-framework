@@ -2,9 +2,8 @@
 #define DEVA_FRAMEWORK_GRAPHICS_VULKAN_VULKAN_INSTANCE
 
 #include "Config.hpp"
-#include "VulkanObject.hpp"
 #include "VulkanPhysicalDevice.hpp"
-#include "InstanceFunctionSet.hpp"
+#include "VulkanInstanceFunctionSet.hpp"
 
 namespace DevaFramework
 {

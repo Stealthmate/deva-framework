@@ -3,10 +3,10 @@
 
 #include "Config.hpp"
 
-#include "VulkanInstance.hpp"
-
 namespace DevaFramework
 {
+	struct VulkanInstance;
+
 	struct VulkanDeviceFunctionSet
 	{
 		DEVA_FRAMEWORK_API static VulkanDeviceFunctionSet load(VkDevice vkDevice, const VulkanInstance &vkInstance);

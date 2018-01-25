@@ -1,6 +1,8 @@
 #include "VulkanDeviceFunctionSet.hpp"
 #include "ImplDefaultVulkanDeviceFunctionSet.hpp"
 
+#include "VulkanInstance.hpp"
+
 using namespace DevaFramework;
 
 #define LOAD(PFNNAME) \

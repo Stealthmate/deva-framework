@@ -1,5 +1,10 @@
 #include "VulkanDevice.hpp"
 
+#include "VulkanInstance.hpp"
+#include "VulkanDeviceFunctionSet.hpp"
+#include "VulkanDeviceQueue.hpp"
+#include "VulkanPhysicalDevice.hpp"
+
 using namespace DevaFramework;
 
 VulkanDevice Vulkan::createDevice(

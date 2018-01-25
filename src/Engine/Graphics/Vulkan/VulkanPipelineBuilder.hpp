@@ -7,7 +7,7 @@
 #include "VulkanSwapchain.hpp"
 #include "VulkanPipeline.hpp"
 
-#include <DevaFramework\Graphics\Vulkan\VertexInputBinding.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanVertexInputBinding.hpp>
 
 namespace DevaEngine {
 

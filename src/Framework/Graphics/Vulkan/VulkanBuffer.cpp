@@ -1,5 +1,8 @@
 #include "VulkanBuffer.hpp"
 
+#include "VulkanDevice.hpp"
+#include "VulkanDeviceFunctionSet.hpp"
+
 using namespace DevaFramework;
 
 VulkanBuffer Vulkan::createBuffer(
@@ -38,4 +41,9 @@ VulkanBuffer Vulkan::createBuffer(
 	vk.vkGetBufferMemoryRequirements(dev, buffer.handle, &buffer.memoryRequirements);
 
 	return buffer;
+}
+
+void DevaFramework::Vulkan::destroyObject(const VulkanDevice &dev, VulkanBuffer &buf) {
+	dev.vk.vkDestroyBuffer(dev.handle, buf.handle, nullptr);
+	buf.handle = VK_NULL_HANDLE;
 }

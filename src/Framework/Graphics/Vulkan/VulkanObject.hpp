@@ -1,9 +1,0 @@
-#ifndef DEVA_FRAMEWORK_GRAPHICS_VULKAN_VULKAN_OBJECT_HPP
-#define DEVA_FRAMEWORK_GRAPHICS_VULKAN_VULKAN_OBJECT_HPP
-
-#include "Config.hpp"
-#include <functional>
-namespace DevaFramework {
-}
-
-#endif //DEVA_FRAMEWORK_GRAPHICS_VULKAN_VULKAN_OBJECT_HPP

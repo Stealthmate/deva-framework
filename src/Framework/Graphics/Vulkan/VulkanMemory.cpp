@@ -1,5 +1,9 @@
 #include "VulkanMemory.hpp"
 
+#include "VulkanDevice.hpp"
+#include "VulkanBuffer.hpp"
+#include "VulkanImage.hpp"
+
 using namespace DevaFramework;
 
 uint32_t Vulkan::findMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties &pdevMemProp, uint32_t memoryBits, VkMemoryPropertyFlags properties) {
@@ -70,4 +74,9 @@ VulkanMemory Vulkan::allocateMemoryForImage(const VulkanDevice &device, const Vu
 	memory.typeIndex = info.memoryTypeIndex;
 
 	return memory;
+}
+
+void Vulkan::destroyObject(const VulkanDevice &dev, VulkanMemory &mem) {
+	dev.vk.vkFreeMemory(dev.handle, mem.handle, nullptr);
+	mem.handle = VK_NULL_HANDLE;
 }

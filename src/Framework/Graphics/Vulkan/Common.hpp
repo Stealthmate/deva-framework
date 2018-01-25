@@ -4,18 +4,19 @@
 #include "Config.hpp"
 
 #include "VulkanHandle.hpp"
-#include "VulkanInstance.hpp"
-#include "VulkanPhysicalDevice.hpp"
-#include "VulkanBuffer.hpp"
-#include "VulkanMemory.hpp"
-
-#include "..\VertexBuffer.hpp"
 
 #include <vector>
 
 namespace DevaFramework {
 
+	struct VulkanInstance;
+	struct VulkanDevice;
+	struct VulkanBuffer;
+	struct VulkanMemory;
+	struct VertexBuffer;
+
 	class Window;
+
 	namespace Vulkan
 	{
 		DEVA_FRAMEWORK_API VulkanHandle<VkShaderModule> loadShaderFromFile(const VulkanDevice &dev, const char *filepath);

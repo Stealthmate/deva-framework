@@ -1,4 +1,4 @@
-#include "VertexInputBinding.hpp"
+#include "VulkanVertexInputBinding.hpp"
 
 using namespace DevaFramework;
 using namespace DevaFramework::Vulkan;

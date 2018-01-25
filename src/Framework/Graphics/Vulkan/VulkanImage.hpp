@@ -2,10 +2,10 @@
 #define DEVA_FRAMEWORK_GRAPHICS_VULKAN_VULKAN_IMAGE_HPP
 
 #include "Config.hpp"
-#include "VulkanObject.hpp"
-#include "VulkanDevice.hpp"
 
 namespace DevaFramework {
+
+	struct VulkanDevice;
 
 	struct VulkanImage {
 		VkImage              handle;
@@ -16,10 +16,7 @@ namespace DevaFramework {
 	};
 
 	namespace Vulkan {
-		template<> inline void destroyObject<VulkanImage>(const VulkanDevice &dev, VulkanImage &obj) {
-			dev.vk.vkDestroyImage(dev.handle, obj.handle, nullptr);
-			obj.handle = VK_NULL_HANDLE;
-		}
+		DEVA_FRAMEWORK_API void destroyObject(const VulkanDevice &dev, VulkanImage &obj);
 	}
 }
 

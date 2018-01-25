@@ -5,28 +5,35 @@ set(
 	${CURDIR}/Graphics/DrawableObject.cpp
 	${CURDIR}/Graphics/DrawableObject.hpp
 	${CURDIR}/Graphics/DrawableObjectBuilder.hpp
+	${CURDIR}/Graphics/RenderAPI.hpp
 	${CURDIR}/Graphics/Renderer.cpp
 	${CURDIR}/Graphics/Renderer.hpp
+	${CURDIR}/Graphics/RenderSurface.hpp
 	${CURDIR}/Graphics/Scene.cpp
 	${CURDIR}/Graphics/Scene.hpp
 	${CURDIR}/Graphics/SceneBuilder.cpp
 	${CURDIR}/Graphics/SceneBuilder.hpp
+	${CURDIR}/Graphics/ScreenRenderer.hpp
 	${CURDIR}/Graphics/GUI/Component.hpp
 	${CURDIR}/Graphics/Vulkan/Config.hpp
 	${CURDIR}/Graphics/Vulkan/DescriptorPoolManager.cpp
 	${CURDIR}/Graphics/Vulkan/DescriptorPoolManager.hpp
+	${CURDIR}/Graphics/Vulkan/Subrenderer.cpp
+	${CURDIR}/Graphics/Vulkan/Subrenderer.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanGraphicsPipeline.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipeline.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipelineBuilder.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipelineBuilder.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanPresenter.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanQueueSubmitBuffer.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanQueueSubmitBuffer.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderer.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderer.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderObject.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderObject.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanRenderPass.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanSwapchain.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanSwapchain.hpp
 	${CURDIR}/Input/Config.hpp
@@ -46,5 +53,6 @@ set(
 	${CURDIR}/Init.hpp
 	${CURDIR}/Keymap.hpp
 	${CURDIR}/Perspective.hpp
+	${CURDIR}/Preferences.hpp
 	${CURDIR}/Shape.hpp
 )

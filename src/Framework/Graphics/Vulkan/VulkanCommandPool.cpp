@@ -1,5 +1,8 @@
 #include "VulkanCommandPool.hpp"
 
+#include "VulkanDevice.hpp"
+#include <unordered_map>
+
 using namespace DevaFramework;
 
 std::vector<VulkanCommandBuffer> Vulkan::allocateCommandBuffers(
@@ -9,7 +12,7 @@ std::vector<VulkanCommandBuffer> Vulkan::allocateCommandBuffers(
 	uint32_t count) {
 
 	auto dev = device.handle;
-	auto vk = device.vk;
+	auto &vk = device.vk;
 
 	std::vector<VulkanCommandBuffer> cbufs;
 
@@ -97,4 +100,9 @@ void Vulkan::beginCommandBuffer(const VulkanDevice &dev, VkCommandBuffer buffer,
 	info.pNext = nullptr;
 	info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	dev.vk.vkBeginCommandBuffer(buffer, &info);
+}
+
+void Vulkan::destroyObject(const VulkanDevice &dev, VulkanCommandPool &pool) {
+	dev.vk.vkDestroyCommandPool(dev.handle, pool.handle, nullptr);
+	pool.handle = VK_NULL_HANDLE;
 }

@@ -3,11 +3,9 @@
 
 #include "Config.hpp"
 
-#include "VulkanDevice.hpp"
-#include "VulkanHandle.hpp"
-#include "VulkanObject.hpp"
-
 namespace DevaFramework {
+
+	struct VulkanDevice;
 
 	struct VulkanCommandPool {
 		VkCommandPool handle;
@@ -43,10 +41,7 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API void submitSingleBuffer(const VulkanDevice &dev, VkQueue queue, VkCommandBuffer buffer);
 
 
-		template <> inline void destroyObject(const VulkanDevice &dev, VulkanCommandPool &obj) {
-			dev.vk.vkDestroyCommandPool(dev.handle, obj.handle, nullptr);
-			obj.handle = VK_NULL_HANDLE;
-		}
+		DEVA_FRAMEWORK_API void destroyObject(const VulkanDevice &dev, VulkanCommandPool &obj);
 
 	}
 }
