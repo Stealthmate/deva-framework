@@ -267,57 +267,6 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 
 VkDebugReportCallbackEXT callback;
 
-VulkanRenderAPI::VulkanRenderAPI(const VulkanRendererCreateInfo &createInfo) : VulkanRenderAPI()
-{
-	if (!VULKAN_LOADED) LoadVulkan();
-
-	VkInstanceCreateInfo instanceInfo = INSTANCE_CREATE_INFO;
-	if (createInfo.extensions.size() > 0) {
-		instanceInfo.ppEnabledExtensionNames = createInfo.extensions.data();
-		instanceInfo.enabledExtensionCount = createInfo.extensions.size();
-	}
-	if (createInfo.layers.size() > 0) {
-		instanceInfo.ppEnabledLayerNames = createInfo.layers.data();
-		instanceInfo.enabledLayerCount = createInfo.layers.size();
-	}
-	this->instance = DevaFramework::Vulkan::createInstance(instanceInfo);
-
-	auto &vk = instance.vk;
-
-	/* Setup callback creation information */
-	VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
-	callbackCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
-	callbackCreateInfo.pNext = nullptr;
-	callbackCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
-	callbackCreateInfo.pfnCallback = &debug;
-	callbackCreateInfo.pUserData = nullptr;
-
-	/* Register the callback */
-	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
-
-	surface = DevaFramework::Vulkan::createSurfaceForWindow(instance, *createInfo.wnd);
-
-	VulkanPhysicalDevice gpu;
-	uint32_t queueIndex = 0;
-	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
-	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
-	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties.deviceName));
-
-	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queueIndex, 0);
-	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
-
-	attachToWindow(*createInfo.wnd);
-	createRenderPass();
-
-	{
-		fence = DevaFramework::Vulkan::createFence(main_device, VK_FENCE_CREATE_SIGNALED_BIT);
-		imageAvailableSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
-		renderFinishedSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
-	}
-
-	createPipeline();
-}
-
 void VulkanRenderAPI::onInit(const Preferences &prefs) {
 	auto layers = prefs.getPreference("vklayers");
 	std::vector<char*> layerList;
@@ -701,11 +650,6 @@ Uuid VulkanRenderAPI::loadImage(const Image &img) {
 #include "Subrenderer.hpp"
 
 void VulkanRenderAPI::drawScene() {
-	drawFrame();
-}
-
-void VulkanRenderAPI::drawFrame()
-{
 	auto &vk = main_device.vk;
 	auto device = main_device.handle;
 

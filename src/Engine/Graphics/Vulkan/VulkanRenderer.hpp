@@ -78,11 +78,8 @@ namespace DevaEngine
 	public:
 
 		DEVA_ENGINE_API VulkanRenderAPI();
-		DEVA_ENGINE_API VulkanRenderAPI(const VulkanRendererCreateInfo &info);
 		DEVA_ENGINE_API VulkanRenderAPI(VulkanRenderAPI &&renderer);
 		DEVA_ENGINE_API virtual ~VulkanRenderAPI();
-
-		DEVA_ENGINE_API void attachToWindow(const DevaFramework::Window &wnd);
 
 		DEVA_ENGINE_API virtual void createPipeline();
 
@@ -136,9 +133,7 @@ namespace DevaEngine
 		DevaFramework::VulkanRenderPass renderPass;
 
 		void createRenderPass();
-
-
-		void drawFrame();
+		void attachToWindow(const DevaFramework::Window &wnd);
 	};
 }
 
