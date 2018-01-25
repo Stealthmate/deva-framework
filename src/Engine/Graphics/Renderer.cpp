@@ -1,5 +1,7 @@
 #include "Renderer.hpp"
 
+#include "Scene.hpp"
+
 using namespace DevaEngine;
 using namespace DevaFramework;
 
@@ -59,6 +61,8 @@ void Renderer::render() {
 	api->drawScene();
 }
 
+
+#include "ScreenRenderer.hpp"
 ScreenRenderer::ScreenRenderer(
 	const Preferences &prefs,
 	std::unique_ptr<RenderAPI> api,

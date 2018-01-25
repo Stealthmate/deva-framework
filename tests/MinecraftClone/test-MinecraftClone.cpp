@@ -5,6 +5,9 @@
 #include <DevaFramework\Math\Vector.hpp>
 #include <DevaFramework\Graphics\ModelBuilder.hpp>
 
+#include <DevaEngine\Graphics\Scene.hpp>
+#include <DevaEngine\Graphics\Renderer.hpp>
+
 using namespace DevaFramework;
 using namespace DevaEngine;
 using namespace std;

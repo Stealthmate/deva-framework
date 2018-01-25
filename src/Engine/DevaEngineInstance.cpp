@@ -1,6 +1,9 @@
 #define NOMINMAX
 #include "DevaEngineInstance.hpp"
 
+#include "Graphics\Renderer.hpp"
+#include "Graphics\ScreenRenderer.hpp"
+
 #include <vector>
 
 using namespace DevaEngine;

@@ -2,10 +2,13 @@
 
 #define NOMINMAX
 #include "VulkanRenderer.hpp"
+#include "../../Preferences.hpp"
 
 #include "VulkanPipelineBuilder.hpp"
 #include "VulkanBufferMemoryIndex.hpp"
 
+#include <DevaFramework\Core\Uuid.hpp>
+#include <DevaFramework\Graphics\Image.hpp>
 #include <DevaFramework\Graphics\Vulkan\Common.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanCommandPool.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanBuffer.hpp>

@@ -5,6 +5,10 @@
 #include <DevaFramework\Graphics\ModelBuilder.hpp>
 #include <DevaFramework\Math\MatrixFactory.hpp>
 #include <DevaFramework\Math\Common.hpp>
+#include <DevaFramework\Core\Uuid.hpp>
+
+#include <DevaEngine\Graphics\Scene.hpp>
+#include <DevaEngine\Graphics\Renderer.hpp>
 
 using namespace DevaEngine;
 using namespace DevaFramework;

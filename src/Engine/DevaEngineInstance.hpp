@@ -13,6 +13,7 @@
 #include "Preferences.hpp"
 namespace DevaEngine
 {
+	class Renderer;
 
 	struct DevaEngineInstanceCreateInfo
 	{
