@@ -15,7 +15,7 @@ namespace DevaEngine {
 			VkDeviceSize index;
 		};
 
-		friend class VulkanRenderer;
+		friend class VulkanRenderAPI;
 
 		DEVA_ENGINE_API DevaFramework::Vulkan::VulkanBufferID buffer() const;
 		DEVA_ENGINE_API uint32_t indexCount() const;

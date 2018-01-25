@@ -67,37 +67,39 @@ namespace DevaEngine
 
 	};
 
+	struct VulkanRendererCreateInfo {
+		const DevaFramework::Window * wnd;
+		std::vector<char*> extensions;
+		std::vector<char*> layers;
+	};
 
-	class VulkanRenderer : public Renderer
+	class VulkanRenderAPI : public RenderAPI
 	{
 	public:
 
-		DEVA_ENGINE_API VulkanRenderer();
-		DEVA_ENGINE_API VulkanRenderer(const DevaFramework::Window &wnd);
-		DEVA_ENGINE_API VulkanRenderer(VulkanRenderer &&renderer);
-		DEVA_ENGINE_API virtual ~VulkanRenderer();
+		DEVA_ENGINE_API VulkanRenderAPI();
+		DEVA_ENGINE_API VulkanRenderAPI(const VulkanRendererCreateInfo &info);
+		DEVA_ENGINE_API VulkanRenderAPI(VulkanRenderAPI &&renderer);
+		DEVA_ENGINE_API virtual ~VulkanRenderAPI();
 
 		DEVA_ENGINE_API void attachToWindow(const DevaFramework::Window &wnd);
 
 		DEVA_ENGINE_API virtual void createPipeline();
 
-		DEVA_ENGINE_API virtual void renderExample() override;
-
-		DEVA_ENGINE_API virtual std::shared_ptr<Scene> render(std::shared_ptr<Scene> scene) override;
-
 		DEVA_ENGINE_API void destroy();
 
-		DEVA_ENGINE_API virtual DevaFramework::Uuid loadImage(const DevaFramework::Image &img);
+		DEVA_ENGINE_API virtual void onInit(const Preferences &prefs);
+		DEVA_ENGINE_API virtual void onSetupRenderTargetWindow(const DevaFramework::Window &wnd);
+		DEVA_ENGINE_API virtual void onSetupRenderTargetImage(const DevaFramework::Image &img);
+		DEVA_ENGINE_API virtual ImageID loadImage(const DevaFramework::Image &img);
+		DEVA_ENGINE_API virtual void drawScene();
+
+		DEVA_ENGINE_API virtual void loadObject(const RenderObjectID &id, const RenderObject &ro);
+		DEVA_ENGINE_API virtual void updateObjectMVP(const RenderObjectID &roid, const DevaFramework::mat4 &mvp);
+		DEVA_ENGINE_API virtual void unloadObject(const RenderObjectID &roid);
 
 	private:
-
-		class ImplSceneUpdateListener;
-		friend class ImplSceneUpdateListener;
-
-		std::shared_ptr<Scene::SceneUpdateObserver> sceneListener;
 		std::unique_ptr<VulkanBufferMemoryIndex> bufmemIndex;
-
-		std::shared_ptr<Scene> currentScene;
 
 		std::unique_ptr<VulkanDescriptorPool> dpoolManager;
 
@@ -137,10 +139,6 @@ namespace DevaEngine
 
 
 		void drawFrame();
-
-		void loadDrawableObject(const SceneObjectID&id, const DrawableObject & object);
-		void unloadModel(const SceneObjectID &id);
-		void updateModelMVP(const SceneObjectID &id, const DevaFramework::mat4 &mvp);
 	};
 }
 

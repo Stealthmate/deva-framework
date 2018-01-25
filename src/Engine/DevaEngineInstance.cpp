@@ -50,7 +50,7 @@ DevaEngineInstance::DevaEngineInstance()
 DevaEngineInstance::DevaEngineInstance(const DevaEngineInstanceCreateInfo &info, uint64_t id)
 	: wnd(std::move(Window::openWindow(info.window_width, info.window_height, info.window_name))), inputlstnr(new InputListener()), mID(id)
 {
-	renderer = std::make_unique<VulkanRenderer>(*wnd);
+	renderer = std::unique_ptr<ScreenRenderer>(new ScreenRenderer(Preferences(), std::unique_ptr<RenderAPI>(new VulkanRenderAPI()), *wnd));
 	wnd->getEventObserver().attachListener(
 		std::static_pointer_cast<WindowEventListener, impl_WindowListener>(
 			std::shared_ptr<impl_WindowListener>(new impl_WindowListener())));
@@ -86,7 +86,7 @@ bool DevaEngineInstance::update()
 {
 	auto t1 = getSystemTime(TimeUnit::MICROSECONDS);
 	//if (t1 - lastFrame < 12000) return wnd->update();
-	renderer->renderExample();
+	renderer->render();
 	bool result = wnd->update();
 	auto t2 = getSystemTime(TimeUnit::MICROSECONDS);
 	if (lastFrame == 0) t2 = t2 - t1;

@@ -42,7 +42,7 @@ int main() {
 
 	auto engine = DevaEngineInstance::createInstance(info);
 	auto &renderer = engine->getRenderer();
-	renderer.render(scene);
+	renderer.prepareScene(scene);
 
 	size_t c = 0;
 	while (engine->update()) {

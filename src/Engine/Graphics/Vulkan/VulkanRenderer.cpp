@@ -20,17 +20,7 @@ using namespace DevaEngine;
 
 namespace DevaEngine {
 
-	class VulkanRenderer::ImplSceneUpdateListener : public Scene::SceneUpdateObserver {
-	public:
-
-		VulkanRenderer & renderer;
-
-		ImplSceneUpdateListener(VulkanRenderer& renderer) : renderer(renderer) {}
-
-		virtual void onNewObject(const Scene &scene, const SceneObjectID &id, const DrawableObject &object);
-		virtual void onObjectUpdated(const Scene &scene, const SceneObjectID &id, const DrawableObject &object);
-		virtual void onObjectRemoved(const Scene &scene, const SceneObjectID &id, const DrawableObject &object);
-	};
+	
 
 	VulkanDescriptorPool::VulkanDescriptorPool(
 		const DevaFramework::VulkanDevice &dev,
@@ -239,10 +229,9 @@ namespace
 	}
 }
 
-VulkanRenderer::VulkanRenderer() :
+VulkanRenderAPI::VulkanRenderAPI() :
 	instance(VulkanInstance()),
-	bufmemIndex(new VulkanBufferMemoryIndex()),
-	sceneListener(new VulkanRenderer::ImplSceneUpdateListener(*this)) {}
+	bufmemIndex(new VulkanBufferMemoryIndex()) {}
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 	VkDebugReportFlagsEXT       flags,
@@ -275,11 +264,20 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 
 VkDebugReportCallbackEXT callback;
 
-VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRenderer()
+VulkanRenderAPI::VulkanRenderAPI(const VulkanRendererCreateInfo &createInfo) : VulkanRenderAPI()
 {
 	if (!VULKAN_LOADED) LoadVulkan();
 
-	this->instance = DevaFramework::Vulkan::createInstance(INSTANCE_CREATE_INFO);
+	VkInstanceCreateInfo instanceInfo = INSTANCE_CREATE_INFO;
+	if (createInfo.extensions.size() > 0) {
+		instanceInfo.ppEnabledExtensionNames = createInfo.extensions.data();
+		instanceInfo.enabledExtensionCount = createInfo.extensions.size();
+	}
+	if (createInfo.layers.size() > 0) {
+		instanceInfo.ppEnabledLayerNames = createInfo.layers.data();
+		instanceInfo.enabledLayerCount = createInfo.layers.size();
+	}
+	this->instance = DevaFramework::Vulkan::createInstance(instanceInfo);
 
 	auto &vk = instance.vk;
 
@@ -294,6 +292,61 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	/* Register the callback */
 	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
 
+	surface = DevaFramework::Vulkan::createSurfaceForWindow(instance, *createInfo.wnd);
+
+	VulkanPhysicalDevice gpu;
+	uint32_t queueIndex = 0;
+	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
+	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
+	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties.deviceName));
+
+	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queueIndex, 0);
+	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
+
+	attachToWindow(*createInfo.wnd);
+	createRenderPass();
+
+	{
+		fence = DevaFramework::Vulkan::createFence(main_device, VK_FENCE_CREATE_SIGNALED_BIT);
+		imageAvailableSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
+		renderFinishedSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
+	}
+
+	createPipeline();
+}
+
+void VulkanRenderAPI::onInit(const Preferences &prefs) {
+	auto layers = prefs.getPreference("vklayers");
+	std::vector<char*> layerList;
+	if (layers.has_value() && layers.type() == typeid(std::vector<std::string>)) {
+		auto val = std::any_cast<std::vector<std::string>>(layers);
+		for (auto &l : val) {
+			layerList.push_back(&l[0]);
+		}
+	}
+
+	if (!VULKAN_LOADED) LoadVulkan();
+
+	VkInstanceCreateInfo instanceInfo(INSTANCE_CREATE_INFO);
+	instanceInfo.enabledLayerCount = layerList.size();
+	instanceInfo.ppEnabledLayerNames = layerList.data();
+	this->instance = DevaFramework::Vulkan::createInstance(instanceInfo);
+
+	auto &vk = instance.vk;
+
+	/* Setup callback creation information */
+	VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
+	callbackCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
+	callbackCreateInfo.pNext = nullptr;
+	callbackCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
+	callbackCreateInfo.pfnCallback = &debug;
+	callbackCreateInfo.pUserData = nullptr;
+
+	/* Register the callback */
+	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
+}
+
+void VulkanRenderAPI::onSetupRenderTargetWindow(const Window &wnd) {
 	surface = DevaFramework::Vulkan::createSurfaceForWindow(instance, wnd);
 
 	VulkanPhysicalDevice gpu;
@@ -317,7 +370,11 @@ VulkanRenderer::VulkanRenderer(const DevaFramework::Window &wnd) : VulkanRendere
 	createPipeline();
 }
 
-void VulkanRenderer::attachToWindow(const Window &wnd)
+void VulkanRenderAPI::onSetupRenderTargetImage(const Image &img) {
+	throw DevaUnsupportedOperationException("Image rendering not supported yet");
+}
+
+void VulkanRenderAPI::attachToWindow(const Window &wnd)
 {
 	auto dev = instance.physicalDevices[0];
 	auto vk = instance.vk;
@@ -387,7 +444,7 @@ void VulkanRenderer::attachToWindow(const Window &wnd)
 	this->swapchain = DevaEngine::Vulkan::createSwapchain(this->main_device, swapchainCreateInfo);
 }
 
-void VulkanRenderer::createRenderPass() {
+void VulkanRenderAPI::createRenderPass() {
 	VkAttachmentDescription colorAttachment = {};
 	colorAttachment.format = swapchain.format;
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -425,7 +482,7 @@ void VulkanRenderer::createRenderPass() {
 
 VulkanHandle<VkDescriptorPool> dpool;
 #include <DevaFramework\Graphics\ImageReaders.hpp>
-void VulkanRenderer::createPipeline()
+void VulkanRenderAPI::createPipeline()
 {
 	auto vert = DevaFramework::Vulkan::loadShaderFromFile(this->main_device, "../shaders/vshader.spv");
 	auto frag = DevaFramework::Vulkan::loadShaderFromFile(this->main_device, "../shaders/fshader.spv");
@@ -535,7 +592,7 @@ std::tuple<VkImageMemoryBarrier, VkPipelineStageFlags, VkPipelineStageFlags> tra
 	return { barrier, sourceStage, destinationStage };
 }
 
-Uuid VulkanRenderer::loadImage(const Image &img) {
+Uuid VulkanRenderAPI::loadImage(const Image &img) {
 	auto dev = this->main_device.handle;
 	auto vk = this->main_device.vk;
 
@@ -640,8 +697,11 @@ Uuid VulkanRenderer::loadImage(const Image &img) {
 #include"VulkanPresenter.hpp"
 #include "Subrenderer.hpp"
 
+void VulkanRenderAPI::drawScene() {
+	drawFrame();
+}
 
-void VulkanRenderer::drawFrame()
+void VulkanRenderAPI::drawFrame()
 {
 	auto &vk = main_device.vk;
 	auto device = main_device.handle;
@@ -697,12 +757,7 @@ void VulkanRenderer::drawFrame()
 	DevaFramework::Vulkan::present(main_device, renderQueue.handle, { renderFinishedSemaphore }, { swapchain.handle }, { imageIndex });
 }
 
-void VulkanRenderer::renderExample()
-{
-	drawFrame();
-}
-
-VulkanRenderer::VulkanRenderer(VulkanRenderer &&renderer) :
+VulkanRenderAPI::VulkanRenderAPI(VulkanRenderAPI &&renderer) :
 	instance(std::move(renderer.instance)),
 	main_device(std::move(renderer.main_device)),
 	swapchain(std::move(renderer.swapchain)),
@@ -712,11 +767,11 @@ VulkanRenderer::VulkanRenderer(VulkanRenderer &&renderer) :
 	commandPool(std::move(renderer.commandPool)),
 	pipeline(std::move(renderer.pipeline)) {}
 
-VulkanRenderer::~VulkanRenderer() {
+VulkanRenderAPI::~VulkanRenderAPI() {
 	destroy();
 }
 
-void VulkanRenderer::destroy() {
+void VulkanRenderAPI::destroy() {
 	auto inst = this->instance.handle;
 	auto &vki = this->instance.vk;
 
@@ -768,12 +823,12 @@ void VulkanRenderer::destroy() {
 	}
 }
 
-void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableObject & object) {
+void VulkanRenderAPI::loadObject(const RenderObjectID &id, const RenderObject &object) {
 
 	auto dev = main_device.handle;
 	auto &vk = main_device.vk;
 
-	auto &m = object.model;
+	auto &m = *object.model;
 
 	size_t mvpsize = 16 * sizeof(float);
 	size_t vsize = m.vertexCount() * m.vertexSize();
@@ -848,31 +903,7 @@ void VulkanRenderer::loadDrawableObject(const SceneObjectID &id, const DrawableO
 	renderObjects.insert({ id, VulkanRenderObject(bufid, static_cast<uint32_t>(m.faceIndices().size()), offsets, dset) });
 }
 
-std::shared_ptr<Scene> VulkanRenderer::render(std::shared_ptr<Scene> scene)
-{
-	auto dev = this->main_device.handle;
-	auto &vk = this->main_device.vk;
-
-	for (auto &robj : renderObjects) {
-		bufmemIndex->removeBuffer(robj.second.buffer(), true);
-	}
-	bufmemIndex->purge();
-
-	if (currentScene) ::unregisterObserver(*currentScene, *sceneListener);
-	auto oldScene = currentScene;
-	currentScene = scene;
-	::registerObserver(*currentScene, *sceneListener);
-
-	auto &objs = currentScene->getAllObjectIDs();
-	GuidGenerator ggen;
-	for (auto &object : objs) {
-		loadDrawableObject(object, currentScene->getObject(object));
-	}
-
-	return oldScene;
-}
-
-void VulkanRenderer::unloadModel(const SceneObjectID &id) {
+void VulkanRenderAPI::unloadObject(const RenderObjectID &id) {
 
 	auto dev = main_device.handle;
 	auto &vk = main_device.vk;
@@ -888,7 +919,7 @@ void VulkanRenderer::unloadModel(const SceneObjectID &id) {
 	renderObjects.erase(obj);
 }
 
-void VulkanRenderer::updateModelMVP(const SceneObjectID &id, const mat4 &mvp) {
+void VulkanRenderAPI::updateObjectMVP(const RenderObjectID &id, const mat4 &mvp) {
 	auto dev = main_device.handle;
 	auto &vk = main_device.vk;
 
@@ -907,16 +938,4 @@ void VulkanRenderer::updateModelMVP(const SceneObjectID &id, const mat4 &mvp) {
 	auto rawmvp = mvp.rawData();
 	memcpy(memory, (const unsigned char*)rawmvp.first, rawmvp.second * sizeof(float));
 	vk.vkUnmapMemory(dev, mem.handle);
-}
-
-void VulkanRenderer::ImplSceneUpdateListener::onNewObject(const Scene &scene, const SceneObjectID &objectID, const DrawableObject& object) {
-	renderer.loadDrawableObject(objectID, object);
-}
-
-void VulkanRenderer::ImplSceneUpdateListener::onObjectRemoved(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
-	renderer.unloadModel(objectID);
-}
-
-void VulkanRenderer::ImplSceneUpdateListener::onObjectUpdated(const Scene &scene, const SceneObjectID &objectID, const DrawableObject &object) {
-	renderer.updateModelMVP(objectID, scene.getObjectTransform(objectID));
 }

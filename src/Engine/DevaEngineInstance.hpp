@@ -10,7 +10,7 @@
 #include <DevaFramework\Graphics\Vulkan.hpp>
 
 #include <memory>
-
+#include "Preferences.hpp"
 namespace DevaEngine
 {
 
@@ -19,6 +19,7 @@ namespace DevaEngine
 		uint32_t window_width;
 		uint32_t window_height;
 		std::string window_name;
+		Preferences prefs;
 
 		DEVA_ENGINE_API DevaEngineInstanceCreateInfo();
 	};

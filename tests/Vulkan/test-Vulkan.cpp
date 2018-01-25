@@ -93,7 +93,7 @@ int main()
 		auto engine = DevaEngineInstance::createInstance(info);
 		LOG.i("SUCCESS!");
 		auto &renderer = engine->getRenderer();
-		renderer.render(scene);
+		renderer.prepareScene(scene);
 
 		int deg = 0;
 		int dm = 3;
