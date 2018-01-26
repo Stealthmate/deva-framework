@@ -71,6 +71,7 @@ namespace DevaEngine
 		std::vector<DevaFramework::Vulkan::VulkanBufferID> vertexBuffers;
 		DevaFramework::Vulkan::VulkanBufferID indexBuffer;
 		DevaFramework::Vulkan::VulkanBufferID mvpBuffer;
+		size_t index;
 	};
 
 	class UpdateStager {

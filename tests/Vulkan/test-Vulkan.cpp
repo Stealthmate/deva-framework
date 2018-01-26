@@ -44,7 +44,7 @@ int main()
 	std::vector<std::string> layers;
 	layers.push_back("VK_LAYER_LUNARG_standard_validation");
 	layers.push_back("VK_LAYER_LUNARG_parameter_validation");
-	//layers.push_back("VK_LAYER_LUANRG_object_tracker");
+	layers.push_back("VK_LAYER_LUNARG_object_tracker");
 	layers.push_back("VK_LAYER_LUNARG_core_validation");
 	info.prefs.setPreference("vklayers", layers);
 	std::vector<std::string> extensions;

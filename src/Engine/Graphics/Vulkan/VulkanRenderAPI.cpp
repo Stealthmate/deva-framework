@@ -649,9 +649,9 @@ void VulkanRenderAPI::drawScene() {
 	commandBuffers[0] = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-	for (auto& object : renderObjects) {
+	/*for (auto& object : renderObjects) {
 		renderPassRecord.objs.push_back(object.second.first);
-	}
+	}*/
 
 	uint32_t imageIndex;
 	vk.vkAcquireNextImageKHR(device, swapchain.handle, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
@@ -826,7 +826,9 @@ void VulkanRenderAPI::loadObject(const RenderObjectID &id, const RenderObject &o
 	vroi.mvpBuffer = bufid;
 	vroi.vertexBuffers = { bufid };
 
-	renderObjects.insert({ id, {drawobj, vroi} });
+	renderPassRecord.objs.push_back(drawobj);
+	vroi.index = renderPassRecord.objs.size() - 1;
+	renderObjects.insert({ id,{ drawobj, vroi } });
 }
 
 void VulkanRenderAPI::unloadObject(const RenderObjectID &id) {
@@ -850,6 +852,9 @@ void VulkanRenderAPI::unloadObject(const RenderObjectID &id) {
 		bufmemIndex->removeBuffer(i, false);
 	}
 
+	auto i = renderPassRecord.objs.begin();
+	std::advance(i, vroi.index);
+	renderPassRecord.objs.erase(i);
 	renderObjects.erase(obj);
 }
 
