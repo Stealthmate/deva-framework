@@ -650,23 +650,6 @@ void VulkanRenderAPI::drawScene() {
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 	for (auto& object : renderObjects) {
-		/*auto &obj = object.second;
-		VulkanBuffer& buf = bufmemIndex->getBuffer(obj.vertexBuffers);
-
-		VulkanRenderObject vdi;
-		vdi.vertexBuffers = { buf.handle };
-		vdi.indexBuffer = buf.handle;
-		vdi.indexOffset = obj.offsets().index;
-		vdi.indexType = VK_INDEX_TYPE_UINT32;
-		vdi.pipelineLayout = pipeline.getPipelineLayout();
-		vdi.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		vdi.vertexOffsets = { obj.offsets().vertex };
-		vdi.descriptorSets = { obj.getDescriptorSet() };
-		vdi.indexCount = obj.indexCount();
-		vdi.instanceCount = 1;
-		vdi.firstIndex = 0;
-		vdi.vertexOffset = 0;
-		vdi.firstInstance = 0;*/
 		renderPassRecord.objs.push_back(object.second.first);
 	}
 
@@ -889,4 +872,55 @@ void VulkanRenderAPI::updateObjectMVP(const RenderObjectID &id, const mat4 &mvp)
 	auto rawmvp = mvp.rawData();
 	memcpy(memory, (const unsigned char*)rawmvp.first, rawmvp.second * sizeof(float));
 	vk.vkUnmapMemory(dev, mem.handle);
+
+	VkBufferCopy bc;
+	bc.srcOffset = obj.first.mvpOffset;
+	bc.size = sizeof(float) * 16;
+	bc.dstOffset = obj.first.mvpOffset;
+}
+
+void UpdateStager::stageUpdate(
+	const DevaFramework::VulkanDevice &device,
+	void * srcData,
+	VkDeviceSize dataSize,
+	VkBuffer dst,
+	VkDeviceSize dstOffset
+) {
+
+	if (dataSize > usedCap)
+		throw DevaException("Attempt to write beyond buffer size");
+
+	auto dev = device.handle;
+	auto &vk = device.vk;
+
+	void * mem = nullptr;
+	vk.vkMapMemory(dev, memory, usedCap, dataSize, 0, &mem);
+	std::copy((byte_t*)srcData, (byte_t*)srcData + dataSize, (byte_t*)mem);
+	vk.vkUnmapMemory(dev, memory);
+	mem = nullptr;
+
+	usedCap += dataSize;
+
+	PrebufInfo info;
+	info.srcOffset = usedCap - dataSize;
+	info.size = dataSize;
+	info.dst = dst;
+	info.dstOffset = dstOffset;
+
+	queue.push_back(info);
+}
+
+void UpdateStager::recordFlush(const VulkanDevice &device, VkCommandBuffer buf) {
+	auto dev = device.handle;
+	auto &vk = device.vk;
+
+	for (auto &u : queue) {
+
+		VkBufferCopy bc;
+		bc.srcOffset = u.srcOffset;
+		bc.dstOffset = u.dstOffset;
+		bc.size = u.size;
+
+		vk.vkCmdCopyBuffer(buf, prebuffer, u.dst, 1, &bc);
+	}
 }

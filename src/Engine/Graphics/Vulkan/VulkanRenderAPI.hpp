@@ -73,6 +73,37 @@ namespace DevaEngine
 		DevaFramework::Vulkan::VulkanBufferID mvpBuffer;
 	};
 
+	class UpdateStager {
+	public:
+		struct PrebufInfo {
+			VkDeviceSize srcOffset;
+			VkDeviceSize size;
+			VkBuffer dst;
+			VkDeviceSize dstOffset;
+		};
+
+		void stageUpdate(
+			const DevaFramework::VulkanDevice &device,
+			void * srcData,
+			VkDeviceSize dataSize,
+			VkBuffer dst,
+			VkDeviceSize dstOffset
+		);
+
+		void recordFlush(const DevaFramework::VulkanDevice &device, VkCommandBuffer buffer);
+
+		VkDeviceSize sizeLeft() const;
+
+	private:
+
+		std::vector<PrebufInfo> queue;
+
+		VkBuffer prebuffer;
+		VkDeviceMemory memory;
+		VkDeviceSize capacity;
+		VkDeviceSize usedCap;
+	};
+
 	class VulkanRenderAPI : public RenderAPI
 	{
 	public:
@@ -109,10 +140,13 @@ namespace DevaEngine
 		VulkanSwapchain swapchain;
 		VulkanGraphicsPipeline pipeline;
 
+		DevaFramework::Vulkan::VulkanBufferID prebuffer;
+
 		DevaFramework::VulkanCommandPool commandPool;
 		std::vector<DevaFramework::VulkanCommandBuffer> commandBuffers;
 
 		std::unordered_map<DevaFramework::Uuid, std::pair<VulkanRenderObject, VulkanRenderObjectResources>> renderObjects;
+		std::vector<VkSemaphore> objectUpdateSemaphores;
 
 		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel>> dsLayouts;
 		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;
