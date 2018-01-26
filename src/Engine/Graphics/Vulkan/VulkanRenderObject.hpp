@@ -1,42 +1,42 @@
-#ifndef DEVA_ENGINE_GRAPHICS_VULKAN_VULKAN_RENDER_OBJECT_HPP
-#define DEVA_ENGINE_GRAPHICS_VULKAN_VULKAN_RENDER_OBJECT_HPP
+#ifndef DEVA_ENGINE_GRAPHICS_VULKAN_SUBRENDERER_HPP
+#define DEVA_ENGINE_GRAPHICS_VULKAN_SUBRENDERER_HPP
 
 #include "Config.hpp"
-#include "../DrawableObject.hpp"
 
 namespace DevaEngine {
 
-	class VulkanRenderObject {
-	public:
+	struct VulkanRenderObject {
+		std::vector<VkBuffer> vertexBuffers;
+		std::vector<VkDeviceSize> vertexOffsets;
+		VkBuffer indexBuffer;
+		VkDeviceSize indexOffset;
+		VkIndexType indexType;
+		VkBuffer mvpBuffer;
+		VkDeviceSize mvpOffset;
+		std::vector<VkDescriptorSet> descriptorSets;
+		VkPipelineLayout pipelineLayout;
+		VkPipelineBindPoint pipelineBindPoint;
 
-		struct Offsets {
-			VkDeviceSize mvp;
-			VkDeviceSize vertex;
-			VkDeviceSize index;
-		};
-
-		friend class VulkanRenderAPI;
-
-		DEVA_ENGINE_API DevaFramework::Vulkan::VulkanBufferID buffer() const;
-		DEVA_ENGINE_API uint32_t indexCount() const;
-		DEVA_ENGINE_API Offsets offsets() const;
-		DEVA_ENGINE_API VkDescriptorSet getDescriptorSet() const;
-
-	private:
-
-		VulkanRenderObject(
-			const DevaFramework::Vulkan::VulkanBufferID &buffer, 
-			uint32_t indexCount, 
-			Offsets offsets,
-			VkDescriptorSet dset);
-
-		DevaFramework::Vulkan::VulkanBufferID mBufferVertexIndex;
-		uint32_t mIndexCount;
-		Offsets mOffsets;
-		VkDescriptorSet mDescriptorSet;
+		uint32_t indexCount;
+		uint32_t instanceCount;
+		uint32_t firstIndex;
+		int32_t vertexOffset;
+		uint32_t firstInstance;
 	};
 
+	struct VulkanRenderPassRecord {
+
+		VkFramebuffer framebuffer;
+		VkRenderPass renderPass;
+		VkExtent2D renderArea;
+		std::vector<VkClearValue> clearVals;
+		VkPipeline pipeline;
+		std::vector<VulkanRenderObject> objs;
+	};
+
+	namespace Vulkan {
+		void recordRenderPass(const DevaFramework::VulkanDevice &device, VkCommandBuffer buffer, const VulkanRenderPassRecord &rp);
+	}
 }
 
-
-#endif // DEVA_ENGINE_GRAPHICS_VULKAN_VULKAN_RENDER_OBJECT_HPP
+#endif //DEVA_ENGINE_GRAPHICS_VULKAN_SUBRENDERER_HPP

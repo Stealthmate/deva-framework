@@ -1,9 +1,9 @@
-#include "Subrenderer.hpp"
+#include "VulkanRenderObject.hpp"
 
 using namespace DevaFramework;
 using namespace DevaEngine;
 
-void DevaEngine::Vulkan::renderPassRecord(const VulkanDevice &device, VkCommandBuffer buffer, const VulkanRenderPassRecord &rp) {
+void DevaEngine::Vulkan::recordRenderPass(const VulkanDevice &device, VkCommandBuffer buffer, const VulkanRenderPassRecord &rp) {
 	auto dev = device.handle;
 	auto &vk = device.vk;
 
@@ -26,9 +26,4 @@ void DevaEngine::Vulkan::renderPassRecord(const VulkanDevice &device, VkCommandB
 	}
 
 	vk.vkCmdEndRenderPass(buffer);
-}
-
-VulkanDrawableInfo DevaEngine::Vulkan::convertRenderObjectToDrawable(const VulkanRenderObject &vro) {
-	VulkanDrawableInfo vd;
-	return vd;
 }

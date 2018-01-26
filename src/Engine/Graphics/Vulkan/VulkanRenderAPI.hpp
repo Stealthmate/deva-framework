@@ -15,7 +15,7 @@
 #include "VulkanSwapchain.hpp"
 #include "VulkanPipeline.hpp"
 #include "VulkanQueueSubmitBuffer.hpp"
-#include "Subrenderer.hpp"
+
 namespace DevaEngine
 {
 
@@ -67,7 +67,7 @@ namespace DevaEngine
 
 	};
 
-	struct VulkanDrawableResourceUsageInfo {
+	struct VulkanRenderObjectResources {
 		std::vector<DevaFramework::Vulkan::VulkanBufferID> vertexBuffers;
 		DevaFramework::Vulkan::VulkanBufferID indexBuffer;
 		DevaFramework::Vulkan::VulkanBufferID mvpBuffer;
@@ -112,7 +112,7 @@ namespace DevaEngine
 		DevaFramework::VulkanCommandPool commandPool;
 		std::vector<DevaFramework::VulkanCommandBuffer> commandBuffers;
 
-		std::unordered_map<DevaFramework::Uuid, std::pair<VulkanDrawableInfo, VulkanDrawableResourceUsageInfo>> renderObjects;
+		std::unordered_map<DevaFramework::Uuid, std::pair<VulkanRenderObject, VulkanRenderObjectResources>> renderObjects;
 
 		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel>> dsLayouts;
 		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;

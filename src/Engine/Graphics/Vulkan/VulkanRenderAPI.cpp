@@ -8,12 +8,18 @@
 #include "VulkanBufferMemoryIndex.hpp"
 
 #include <DevaFramework\Core\Uuid.hpp>
+
 #include <DevaFramework\Graphics\Image.hpp>
+#include <DevaFramework\Graphics\Model.hpp>
 #include <DevaFramework\Graphics\Vulkan\Common.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanCommandPool.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanBuffer.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanMemory.hpp>
+
 #include <DevaFramework\Util\Time.hpp>
+
+
+
 #include <limits>
 #include <unordered_set>
 
@@ -630,7 +636,6 @@ Uuid VulkanRenderAPI::loadImage(const Image &img) {
 }
 
 #include"VulkanPresenter.hpp"
-#include "Subrenderer.hpp"
 
 void VulkanRenderAPI::drawScene() {
 	auto &vk = main_device.vk;
@@ -648,7 +653,7 @@ void VulkanRenderAPI::drawScene() {
 		/*auto &obj = object.second;
 		VulkanBuffer& buf = bufmemIndex->getBuffer(obj.vertexBuffers);
 
-		VulkanDrawableInfo vdi;
+		VulkanRenderObject vdi;
 		vdi.vertexBuffers = { buf.handle };
 		vdi.indexBuffer = buf.handle;
 		vdi.indexOffset = obj.offsets().index;
@@ -670,7 +675,7 @@ void VulkanRenderAPI::drawScene() {
 
 	renderPassRecord.framebuffer = swapchain.framebuffers[imageIndex];
 
-	Vulkan::renderPassRecord(main_device, commandBuffers[0].handle, renderPassRecord);
+	Vulkan::recordRenderPass(main_device, commandBuffers[0].handle, renderPassRecord);
 
 	if (vk.vkEndCommandBuffer(commandBuffers[0].handle) != VK_SUCCESS) {
 		throw DevaException("failed to record command buffer!");
@@ -811,7 +816,7 @@ void VulkanRenderAPI::loadObject(const RenderObjectID &id, const RenderObject &o
 	descriptorWrite.pTexelBufferView = nullptr; // Optional
 	vk.vkUpdateDescriptorSets(dev, 1, &descriptorWrite, 0, nullptr);
 
-	VulkanDrawableInfo drawobj;
+	VulkanRenderObject drawobj;
 
 	drawobj.vertexBuffers = { buf.handle };
 	drawobj.vertexOffsets = { mvpsize };
@@ -833,7 +838,7 @@ void VulkanRenderAPI::loadObject(const RenderObjectID &id, const RenderObject &o
 	drawobj.instanceCount = 1;
 	drawobj.vertexOffset = 0;
 
-	VulkanDrawableResourceUsageInfo vroi;
+	VulkanRenderObjectResources vroi;
 	vroi.indexBuffer = bufid;
 	vroi.mvpBuffer = bufid;
 	vroi.vertexBuffers = { bufid };
