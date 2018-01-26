@@ -13,6 +13,8 @@ namespace DevaEngine {
 		VkBuffer indexBuffer;
 		VkDeviceSize indexOffset;
 		VkIndexType indexType;
+		VkBuffer mvpBuffer;
+		VkDeviceSize mvpOffset;
 		std::vector<VkDescriptorSet> descriptorSets;
 		VkPipelineLayout pipelineLayout;
 		VkPipelineBindPoint pipelineBindPoint;

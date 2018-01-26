@@ -645,8 +645,8 @@ void VulkanRenderAPI::drawScene() {
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 	for (auto& object : renderObjects) {
-		auto &obj = object.second;
-		VulkanBuffer& buf = bufmemIndex->getBuffer(obj.buffer());
+		/*auto &obj = object.second;
+		VulkanBuffer& buf = bufmemIndex->getBuffer(obj.vertexBuffers);
 
 		VulkanDrawableInfo vdi;
 		vdi.vertexBuffers = { buf.handle };
@@ -661,8 +661,8 @@ void VulkanRenderAPI::drawScene() {
 		vdi.instanceCount = 1;
 		vdi.firstIndex = 0;
 		vdi.vertexOffset = 0;
-		vdi.firstInstance = 0;
-		renderPassRecord.objs.push_back(vdi);
+		vdi.firstInstance = 0;*/
+		renderPassRecord.objs.push_back(object.second.first);
 	}
 
 	uint32_t imageIndex;
@@ -811,12 +811,34 @@ void VulkanRenderAPI::loadObject(const RenderObjectID &id, const RenderObject &o
 	descriptorWrite.pTexelBufferView = nullptr; // Optional
 	vk.vkUpdateDescriptorSets(dev, 1, &descriptorWrite, 0, nullptr);
 
-	VulkanRenderObject::Offsets offsets;
-	offsets.mvp = 0;
-	offsets.vertex = mvpsize;
-	offsets.index = vsize + mvpsize;
+	VulkanDrawableInfo drawobj;
 
-	renderObjects.insert({ id, VulkanRenderObject(bufid, static_cast<uint32_t>(m.faceIndices().size()), offsets, dset) });
+	drawobj.vertexBuffers = { buf.handle };
+	drawobj.vertexOffsets = { mvpsize };
+
+	drawobj.indexBuffer = buf.handle;
+	drawobj.indexOffset = vsize + mvpsize;
+	drawobj.indexCount = m.faceIndices().size();
+	drawobj.indexType = VK_INDEX_TYPE_UINT32;
+	drawobj.firstIndex = 0;
+
+	drawobj.pipelineLayout = pipeline.getPipelineLayout();
+	drawobj.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+
+	drawobj.mvpBuffer = buf.handle;
+	drawobj.mvpOffset = 0;
+	drawobj.descriptorSets = { dset };
+
+	drawobj.firstInstance = 0;
+	drawobj.instanceCount = 1;
+	drawobj.vertexOffset = 0;
+
+	VulkanDrawableResourceUsageInfo vroi;
+	vroi.indexBuffer = bufid;
+	vroi.mvpBuffer = bufid;
+	vroi.vertexBuffers = { bufid };
+
+	renderObjects.insert({ id, {drawobj, vroi} });
 }
 
 void VulkanRenderAPI::unloadObject(const RenderObjectID &id) {
@@ -829,9 +851,17 @@ void VulkanRenderAPI::unloadObject(const RenderObjectID &id) {
 		throw DevaInvalidArgumentException(strformat("Object ID {} does not exist in renderer", (std::string)id));
 	}
 
-	VulkanRenderObject &vro = obj->second;
+	auto &vro = obj->second.first;
+	auto &vroi = obj->second.second;
 
-	bufmemIndex->removeBuffer(vro.buffer(), false);
+	std::unordered_set<DevaFramework::Vulkan::VulkanBufferID> bufids;
+	bufids.insert(vroi.indexBuffer);
+	bufids.insert(vroi.mvpBuffer);
+	bufids.insert(vroi.vertexBuffers.begin(), vroi.vertexBuffers.end());
+	for (auto &i : bufids) {
+		bufmemIndex->removeBuffer(i, false);
+	}
+
 	renderObjects.erase(obj);
 }
 
@@ -845,12 +875,12 @@ void VulkanRenderAPI::updateObjectMVP(const RenderObjectID &id, const mat4 &mvp)
 	}
 	auto &obj = obji->second;
 
-	auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(obj.buffer()));
+	auto &mem = bufmemIndex->getMemory(bufmemIndex->getBufferMemory(obj.second.mvpBuffer));
 
 	void* memory = nullptr;
 
 	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100);
-	vk.vkMapMemory(dev, mem.handle, obj.offsets().mvp, sizeof(float) * 16, 0, &memory);
+	vk.vkMapMemory(dev, mem.handle, obj.first.mvpOffset, sizeof(float) * 16, 0, &memory);
 	auto rawmvp = mvp.rawData();
 	memcpy(memory, (const unsigned char*)rawmvp.first, rawmvp.second * sizeof(float));
 	vk.vkUnmapMemory(dev, mem.handle);

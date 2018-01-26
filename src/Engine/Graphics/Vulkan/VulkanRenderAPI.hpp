@@ -67,10 +67,10 @@ namespace DevaEngine
 
 	};
 
-	struct VulkanRendererCreateInfo {
-		const DevaFramework::Window * wnd;
-		std::vector<char*> extensions;
-		std::vector<char*> layers;
+	struct VulkanDrawableResourceUsageInfo {
+		std::vector<DevaFramework::Vulkan::VulkanBufferID> vertexBuffers;
+		DevaFramework::Vulkan::VulkanBufferID indexBuffer;
+		DevaFramework::Vulkan::VulkanBufferID mvpBuffer;
 	};
 
 	class VulkanRenderAPI : public RenderAPI
@@ -112,7 +112,7 @@ namespace DevaEngine
 		DevaFramework::VulkanCommandPool commandPool;
 		std::vector<DevaFramework::VulkanCommandBuffer> commandBuffers;
 
-		std::unordered_map<DevaFramework::Uuid, VulkanRenderObject> renderObjects;
+		std::unordered_map<DevaFramework::Uuid, std::pair<VulkanDrawableInfo, VulkanDrawableResourceUsageInfo>> renderObjects;
 
 		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel>> dsLayouts;
 		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;
