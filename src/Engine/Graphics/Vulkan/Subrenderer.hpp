@@ -34,30 +34,6 @@ namespace DevaEngine {
 		std::vector<VulkanDrawableInfo> objs;
 	};
 
-	class VulkanPresenter {
-
-	public:
-
-		DevaFramework::VulkanDevice device;
-		std::vector<DevaFramework::VulkanQueue> renderQueues;
-		std::vector<VkImageView> outputImages;
-
-	};
-
-	class VulkanRenderDrawer {
-	public:
-
-		DEVA_ENGINE_API VulkanRenderDrawer(const DevaFramework::VulkanDevice &dev, const DevaFramework::VulkanQueue &queue);
-		DEVA_ENGINE_API void addObject(const VulkanRenderObject &obj);
-
-	private:
-		DevaFramework::VulkanDevice device;
-		DevaFramework::VulkanQueue renderQueue;
-		VulkanQueueSubmitBuffer queueBuffer;
-		VulkanRenderPassRecord renderPassRecord;
-		std::unordered_map<DevaFramework::Uuid, VulkanRenderObject> renderObjects;
-	};
-
 	namespace Vulkan {
 		void renderPassRecord(const DevaFramework::VulkanDevice &device, VkCommandBuffer buffer, const VulkanRenderPassRecord &rp);
 		VulkanDrawableInfo convertRenderObjectToDrawable(const VulkanRenderObject &vro);

@@ -484,8 +484,6 @@ void VulkanRenderAPI::createPipeline()
 
 	commandPool = DevaFramework::Vulkan::createCommandPool(main_device, renderQueue.familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 	commandBuffers.push_back(DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY));
-
-	loadImage(Image::loadImageFromFile("./resources/SS1.png", ImageFormat::PNG));
 }
 
 std::tuple<VkImageMemoryBarrier, VkPipelineStageFlags, VkPipelineStageFlags> transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout) {
