@@ -29,8 +29,8 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanPresenter.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanQueueSubmitBuffer.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanQueueSubmitBuffer.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanRenderer.cpp
-	${CURDIR}/Graphics/Vulkan/VulkanRenderer.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanRenderAPI.cpp
+	${CURDIR}/Graphics/Vulkan/VulkanRenderAPI.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderObject.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderObject.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderPass.cpp

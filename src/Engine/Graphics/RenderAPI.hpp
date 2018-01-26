@@ -7,7 +7,7 @@
 
 namespace DevaFramework {
 	class Window;
-	class Image;
+	struct Image;
 	class Model;
 	class Uuid;
 }
@@ -29,6 +29,7 @@ namespace DevaEngine {
 		virtual void onInit(const Preferences &prefs) = 0;
 		virtual void onSetupRenderTargetWindow(const DevaFramework::Window &wnd) = 0;
 		virtual void onSetupRenderTargetImage(const DevaFramework::Image &img) = 0;
+		virtual void onDestroy() = 0;
 
 		virtual void loadObject(const RenderObjectID &id, const RenderObject &ro) = 0;
 		virtual void updateObjectMVP(const RenderObjectID &roid, const DevaFramework::mat4 &mvp) = 0;

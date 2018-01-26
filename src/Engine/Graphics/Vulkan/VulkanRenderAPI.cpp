@@ -1,7 +1,7 @@
 #define DEVA_DO_NOT_DEFINE_UUID_OPERATORS_IN_STD
 
 #define NOMINMAX
-#include "VulkanRenderer.hpp"
+#include "VulkanRenderAPI.hpp"
 #include "../../Preferences.hpp"
 
 #include "VulkanPipelineBuilder.hpp"
@@ -21,9 +21,11 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 
+using DevaFramework::Vulkan::LOG_VULKAN;
+
 namespace DevaEngine {
 
-	
+
 
 	VulkanDescriptorPool::VulkanDescriptorPool(
 		const DevaFramework::VulkanDevice &dev,
@@ -102,41 +104,21 @@ namespace
 		0                                   //apiVersion
 	};
 
-	size_t N_EXTENSIONS = 3;
-	const char * EXTENSIONS[] =
-	{
-		VK_KHR_SURFACE_EXTENSION_NAME,
-		VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-		VK_EXT_DEBUG_REPORT_EXTENSION_NAME
-	};
-
-	const char* INSTANCE_LAYERS[] =
-	{
-		"VK_LAYER_LUNARG_standard_validation",
-		"VK_LAYER_LUNARG_parameter_validation",
-		"VK_LAYER_LUNARG_core_validation"
-	};
-
 	const VkInstanceCreateInfo INSTANCE_CREATE_INFO =
 	{
 		VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,                   //sType
 		NULL,                                                     //pNext
 		0,                                                        //flags - must be 0 as per current spec (2016/08/21)
 		&APPLICATION_INFO,                                        //pApplicationInfo
-		(uint32_t) sizeof INSTANCE_LAYERS / sizeof(const char*),  //enabledLayerCount
-		INSTANCE_LAYERS,                                          //ppEnabledLayerNames
-		(uint32_t)N_EXTENSIONS,                                  //enabledExtensionCount
-		EXTENSIONS                                                //ppEnabledExtensionNames
+		0,														  //enabledLayerCount
+		nullptr,												  //ppEnabledLayerNames
+		0,														  //enabledExtensionCount
+		nullptr													  //ppEnabledExtensionNames
 	};
 
 	const char * DEVICE_EXTENSIONS[] =
 	{
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-	};
-
-	const char * DEVICE_FEATURES[] =
-	{
-		"ASD"
 	};
 
 	const VkPhysicalDeviceFeatures EMPTY_FEATURES;
@@ -232,10 +214,6 @@ namespace
 	}
 }
 
-VulkanRenderAPI::VulkanRenderAPI() :
-	instance(VulkanInstance()),
-	bufmemIndex(new VulkanBufferMemoryIndex()) {}
-
 VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 	VkDebugReportFlagsEXT       flags,
 	VkDebugReportObjectTypeEXT  objectType,
@@ -268,34 +246,49 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debug(
 VkDebugReportCallbackEXT callback;
 
 void VulkanRenderAPI::onInit(const Preferences &prefs) {
+
+	if (!VULKAN_LOADED) DevaFramework::Vulkan::LoadVulkan();
+
 	auto layers = prefs.getPreference("vklayers");
-	std::vector<char*> layerList;
+	std::vector<const char*> layerPointers;
+	std::vector<std::string> layerStrings;
 	if (layers.has_value() && layers.type() == typeid(std::vector<std::string>)) {
-		auto val = std::any_cast<std::vector<std::string>>(layers);
-		for (auto &l : val) {
-			layerList.push_back(&l[0]);
+		layerStrings = std::any_cast<std::vector<std::string>>(layers);
+		for (auto i = 0;i < layerStrings.size();i++) {
+			layerPointers.push_back(layerStrings[i].c_str());
 		}
 	}
 
-	if (!VULKAN_LOADED) LoadVulkan();
+	auto extensions = prefs.getPreference("vkextensions");
+	std::vector<const char*> extensionPointers;
+	std::vector<std::string> extensionStrings;
+	if (extensions.has_value() && extensions.type() == typeid(std::vector<std::string>)) {
+		extensionStrings = std::any_cast<std::vector<std::string>>(extensions);
+		for (auto i = 0;i < extensionStrings.size();i++) {
+			if (DevaFramework::Vulkan::instanceExtensionAvailable(extensionStrings[i])) {
+				extensionPointers.push_back(extensionStrings[i].c_str());
+			}
+		}
+	}
 
 	VkInstanceCreateInfo instanceInfo(INSTANCE_CREATE_INFO);
-	instanceInfo.enabledLayerCount = layerList.size();
-	instanceInfo.ppEnabledLayerNames = layerList.data();
+	instanceInfo.enabledLayerCount = layerPointers.size();
+	instanceInfo.ppEnabledLayerNames = layerPointers.data();
+	instanceInfo.enabledExtensionCount = extensionPointers.size();
+	instanceInfo.ppEnabledExtensionNames = extensionPointers.data();
 	this->instance = DevaFramework::Vulkan::createInstance(instanceInfo);
 
 	auto &vk = instance.vk;
 
-	/* Setup callback creation information */
 	VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
 	callbackCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
 	callbackCreateInfo.pNext = nullptr;
 	callbackCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
 	callbackCreateInfo.pfnCallback = &debug;
 	callbackCreateInfo.pUserData = nullptr;
+	vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
 
-	/* Register the callback */
-	VkResult result = vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
+	bufmemIndex = std::make_unique<VulkanBufferMemoryIndex>();
 }
 
 void VulkanRenderAPI::onSetupRenderTargetWindow(const Window &wnd) {
@@ -602,7 +595,7 @@ Uuid VulkanRenderAPI::loadImage(const Image &img) {
 
 	VkSubmitInfo submitInfo = {};
 	VulkanCommandBuffer buffer = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-	
+
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 	auto barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
@@ -629,7 +622,7 @@ Uuid VulkanRenderAPI::loadImage(const Image &img) {
 	barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
-	
+
 	vk.vkEndCommandBuffer(buffer.handle);
 
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -704,21 +697,7 @@ void VulkanRenderAPI::drawScene() {
 	DevaFramework::Vulkan::present(main_device, renderQueue.handle, { renderFinishedSemaphore }, { swapchain.handle }, { imageIndex });
 }
 
-VulkanRenderAPI::VulkanRenderAPI(VulkanRenderAPI &&renderer) :
-	instance(std::move(renderer.instance)),
-	main_device(std::move(renderer.main_device)),
-	swapchain(std::move(renderer.swapchain)),
-	surface(std::move(renderer.surface)),
-	colorFormat(renderer.colorFormat),
-	colorSpace(renderer.colorSpace),
-	commandPool(std::move(renderer.commandPool)),
-	pipeline(std::move(renderer.pipeline)) {}
-
-VulkanRenderAPI::~VulkanRenderAPI() {
-	destroy();
-}
-
-void VulkanRenderAPI::destroy() {
+void VulkanRenderAPI::onDestroy() {
 	auto inst = this->instance.handle;
 	auto &vki = this->instance.vk;
 

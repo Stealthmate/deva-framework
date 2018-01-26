@@ -1,6 +1,8 @@
 #include "ImplDefaultVulkanDeviceFunctionSet.hpp"
 
 using namespace DevaFramework;
+using Vulkan::LOG_VULKAN;
+
 void DevaFramework::internal::impldef_vkVoidFunction(void)
 {
 	LOG_VULKAN.e("Called vkVoidFunction without proper driver PFN");

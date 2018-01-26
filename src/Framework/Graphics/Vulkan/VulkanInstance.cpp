@@ -1,7 +1,7 @@
 #include "VulkanInstance.hpp"
 
 using namespace DevaFramework;
-
+using Vulkan::LOG_VULKAN;
 
 #define ERRCHK if( result != VK_SUCCESS ) throw DevaException("DevaFramework::VulkanInstance failed because of Vulkan. Check logs for more info.");
 
@@ -77,10 +77,10 @@ VulkanInstance Vulkan::createInstance(const VkInstanceCreateInfo &info)
 		throw DevaProgrammerErrorException("Vulkan not initialized (did you call DevaFramework::loadVulkan()?)");
 
 	std::vector<std::string> extensions;
-	for (uint32_t i = 0;i <= info.enabledExtensionCount - 1;i++)
+	for (uint32_t i = 0;i < info.enabledExtensionCount;i++)
 	{
 		extensions.push_back(*(info.ppEnabledExtensionNames + i));
-		if (!vulkanInstanceExtensionAvailable(extensions[i]))
+		if (!Vulkan::instanceExtensionAvailable(extensions[i]))
 			throw DevaExternalFailureException("Vulkan", "Could not create VkInstance - extension " + extensions[i] + " not supported by system.");
 	}
 

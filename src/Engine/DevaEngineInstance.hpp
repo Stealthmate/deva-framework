@@ -3,7 +3,6 @@
 
 #include "Config.hpp"
 
-#include "Graphics\Vulkan\VulkanRenderer.hpp"
 #include "Input/InputListener.hpp"
 
 #include <DevaFramework\Include\Core.hpp>
@@ -14,6 +13,7 @@
 namespace DevaEngine
 {
 	class Renderer;
+	class RenderAPI;
 
 	struct DevaEngineInstanceCreateInfo
 	{

@@ -4,6 +4,7 @@
 #include "VulkanInstance.hpp"
 
 using namespace DevaFramework;
+using Vulkan::LOG_VULKAN;
 
 #define LOAD(PFNNAME) \
 LOG_VULKAN.v("Getting Device PFN_" #PFNNAME "..."); \

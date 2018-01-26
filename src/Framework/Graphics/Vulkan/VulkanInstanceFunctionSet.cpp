@@ -3,6 +3,7 @@
 #include "ImplDefaultVulkanDeviceFunctionSet.hpp"
 
 using namespace DevaFramework;
+using Vulkan::LOG_VULKAN;
 
 #define LOAD(PFNNAME) \
 LOG_VULKAN.v("Getting Instance PFN_" #PFNNAME "..."); \

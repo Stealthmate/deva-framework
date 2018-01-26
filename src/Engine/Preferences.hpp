@@ -16,6 +16,9 @@ namespace DevaEngine {
 			return i->second;
 		}
 
+		DEVA_ENGINE_API void setPreference(const std::string &key, const std::any &value) {
+			prefs.insert_or_assign(key, value);
+		}
 	private:
 		std::unordered_map<std::string, std::any> prefs;
 	};

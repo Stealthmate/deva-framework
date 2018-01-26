@@ -3,6 +3,7 @@
 #include <vector>
 
 using namespace DevaFramework;
+using Vulkan::LOG_VULKAN;
 
 PFN_vkGetInstanceProcAddr                           DevaFramework::internal::vkGetInstanceProcAddr = nullptr;
 
@@ -10,7 +11,7 @@ PFN_vkCreateInstance                                DevaFramework::internal::vkC
 PFN_vkEnumerateInstanceLayerProperties              DevaFramework::internal::vkEnumerateInstanceLayerProperties = nullptr;
 PFN_vkEnumerateInstanceExtensionProperties          DevaFramework::internal::vkEnumerateInstanceExtensionProperties = nullptr;
 
-DevaLogger DevaFramework::LOG_VULKAN = DevaLogger("[Vulkan]: ");
+DevaLogger Vulkan::LOG_VULKAN = DevaLogger("[Vulkan]: ");
 
 namespace
 {
@@ -39,7 +40,7 @@ void internal::getVulkanGlobalFunctions()
 
 #undef LOADPFN
 
-void DevaFramework::LoadVulkan(const std::string &dllpath)
+void Vulkan::LoadVulkan(const std::string &dllpath)
 {
 	internal::loadVulkanOS(dllpath);
 	internal::getVulkanGlobalFunctions();
@@ -52,7 +53,7 @@ void DevaFramework::LoadVulkan(const std::string &dllpath)
 	LOG_VULKAN.v("Successfully enumerated extensions");
 }
 
-bool DevaFramework::vulkanInstanceExtensionAvailable(const std::string & extensionName)
+bool Vulkan::instanceExtensionAvailable(const std::string & extensionName)
 {
 	LOG_VULKAN.v("Querying instance extension " + extensionName + "...", false);
 	for (auto &i : EXTENSIONS_AVAILABLE)

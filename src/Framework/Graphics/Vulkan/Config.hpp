@@ -28,13 +28,12 @@ namespace DevaFramework
 		void getVulkanGlobalFunctions();
 	}
 
-	namespace Log {
-
+	namespace Vulkan {
+		DEVA_FRAMEWORK_API extern DevaLogger LOG_VULKAN;
+		DEVA_FRAMEWORK_API void LoadVulkan(const std::string &dllpath = "");
+		DEVA_FRAMEWORK_API bool instanceExtensionAvailable(const std::string & extensionName);
 	}
 
-	DEVA_FRAMEWORK_API extern DevaLogger LOG_VULKAN;
-	DEVA_FRAMEWORK_API void LoadVulkan(const std::string &dllpath = "");
-	DEVA_FRAMEWORK_API bool vulkanInstanceExtensionAvailable(const std::string & extensionName);
 }
 
 #endif //DEVA_FRAMEWORK_GRAPHICS_VULKAN_CONFIG_HPP

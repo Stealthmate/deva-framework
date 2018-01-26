@@ -77,19 +77,14 @@ namespace DevaEngine
 	{
 	public:
 
-		DEVA_ENGINE_API VulkanRenderAPI();
-		DEVA_ENGINE_API VulkanRenderAPI(VulkanRenderAPI &&renderer);
-		DEVA_ENGINE_API virtual ~VulkanRenderAPI();
-
-		DEVA_ENGINE_API virtual void createPipeline();
-
-		DEVA_ENGINE_API void destroy();
-
 		DEVA_ENGINE_API virtual void onInit(const Preferences &prefs);
 		DEVA_ENGINE_API virtual void onSetupRenderTargetWindow(const DevaFramework::Window &wnd);
 		DEVA_ENGINE_API virtual void onSetupRenderTargetImage(const DevaFramework::Image &img);
-		DEVA_ENGINE_API virtual ImageID loadImage(const DevaFramework::Image &img);
+		DEVA_ENGINE_API virtual void onDestroy();
+
 		DEVA_ENGINE_API virtual void drawScene();
+
+		DEVA_ENGINE_API virtual ImageID loadImage(const DevaFramework::Image &img);
 
 		DEVA_ENGINE_API virtual void loadObject(const RenderObjectID &id, const RenderObject &ro);
 		DEVA_ENGINE_API virtual void updateObjectMVP(const RenderObjectID &roid, const DevaFramework::mat4 &mvp);
@@ -132,6 +127,7 @@ namespace DevaEngine
 		VkSemaphore renderFinishedSemaphore;
 		DevaFramework::VulkanRenderPass renderPass;
 
+		void createPipeline();
 		void createRenderPass();
 		void attachToWindow(const DevaFramework::Window &wnd);
 	};

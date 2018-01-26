@@ -10,8 +10,11 @@
 #include <DevaEngine\Graphics\Scene.hpp>
 #include <DevaEngine\Graphics\Renderer.hpp>
 
+#include <DevaEngine\Preferences.hpp>
+
 using namespace DevaEngine;
 using namespace DevaFramework;
+using DevaFramework::Vulkan::LOG_VULKAN;
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -38,6 +41,17 @@ int main()
 	info.window_height = 600;
 	info.window_width = 800;
 	info.window_name = "Vulkan Test";
+	std::vector<std::string> layers;
+	layers.push_back("VK_LAYER_LUNARG_standard_validation");
+	layers.push_back("VK_LAYER_LUNARG_parameter_validation");
+	//layers.push_back("VK_LAYER_LUANRG_object_tracker");
+	layers.push_back("VK_LAYER_LUNARG_core_validation");
+	info.prefs.setPreference("vklayers", layers);
+	std::vector<std::string> extensions;
+	extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+	extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+	extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+	info.prefs.setPreference("vkextensions", extensions);
 
 	LOG_VULKAN.setPrio(DevaLogger::LogLevel::ERR);
 	LOG.setPrio(DevaLogger::LogLevel::UNSPECIFIED);
@@ -85,7 +99,7 @@ int main()
 	d = mvp * c;
 	LOG << strf(normalize(d)) << LOG.endl;*/
 
-	
+
 	try {
 		auto model = std::make_shared<DrawableObject>(std::move(bmb.build()));
 

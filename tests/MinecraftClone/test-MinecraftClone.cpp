@@ -11,6 +11,7 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 using namespace std;
+using DevaFramework::Vulkan::LOG_VULKAN;
 
 void printpack(Pack<float, float, float, float, float, float, float> p) {
 	LOG << std::get<0>(p) << " ";

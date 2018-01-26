@@ -1,6 +1,8 @@
 #include "ImplDefaultVulkanInstanceFunctionSet.hpp"
 
 using namespace DevaFramework;
+using Vulkan::LOG_VULKAN;
+
 void DevaFramework::internal::impldef_vkDestroyInstance(VkInstance instance, const VkAllocationCallbacks* pAllocator)
 {
 	LOG_VULKAN.e("Called vkDestroyInstance without proper driver PFN");

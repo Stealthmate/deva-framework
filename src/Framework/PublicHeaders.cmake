@@ -68,34 +68,28 @@ set(
 	${CURDIR}/Graphics/Vulkan/ImplDefaultVulkanInstanceFunctionSet.cpp
 	${CURDIR}/Graphics/Vulkan/ImplDefaultVulkanInstanceFunctionSet.hpp
 	${CURDIR}/Graphics/Vulkan/VertexInputBinding.cpp
-	${CURDIR}/Graphics/Vulkan/VulkanAPI.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanBuffer.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanBuffer.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanDeviceBuilder.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceFunctionSet.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceFunctionSet.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceQueue.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanException.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanHandle.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanImage.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanImage.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstance.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstanceFunctionSet.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanInstanceFunctionSet.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanLogicalDevice.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanMemory.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanMemory.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanObject.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPhysicalDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPhysicalDevice.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanPipeline.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderPass.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanShader.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanSurface.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanVertexInputBinding.hpp
 	${CURDIR}/Graphics/Vulkan/win32_LoadVulkan.cpp
 	${CURDIR}/Include/Core.hpp

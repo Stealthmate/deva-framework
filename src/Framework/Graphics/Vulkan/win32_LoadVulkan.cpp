@@ -1,5 +1,8 @@
 #include "Config.hpp"
 
+using namespace DevaFramework;
+using Vulkan::LOG_VULKAN;
+
 #ifdef DEVA_OS_WIN32
 
 namespace
@@ -9,7 +12,7 @@ namespace
 
 }
 
-void DevaFramework::internal::loadVulkanOS(const std::string & path)
+void internal::loadVulkanOS(const std::string & path)
 {
 	std::string dllpath = path + VULKAN_DLL;
 	VULKAN = LoadLibrary(dllpath.c_str());

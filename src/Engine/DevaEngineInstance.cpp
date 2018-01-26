@@ -4,6 +4,8 @@
 #include "Graphics\Renderer.hpp"
 #include "Graphics\ScreenRenderer.hpp"
 
+#include "Graphics\Vulkan\VulkanRenderAPI.hpp"
+
 #include <vector>
 
 using namespace DevaEngine;
@@ -53,7 +55,7 @@ DevaEngineInstance::DevaEngineInstance()
 DevaEngineInstance::DevaEngineInstance(const DevaEngineInstanceCreateInfo &info, uint64_t id)
 	: wnd(std::move(Window::openWindow(info.window_width, info.window_height, info.window_name))), inputlstnr(new InputListener()), mID(id)
 {
-	renderer = std::unique_ptr<ScreenRenderer>(new ScreenRenderer(Preferences(), std::unique_ptr<RenderAPI>(new VulkanRenderAPI()), *wnd));
+	renderer = std::unique_ptr<ScreenRenderer>(new ScreenRenderer(info.prefs, std::unique_ptr<RenderAPI>(new VulkanRenderAPI()), *wnd));
 	wnd->getEventObserver().attachListener(
 		std::static_pointer_cast<WindowEventListener, impl_WindowListener>(
 			std::shared_ptr<impl_WindowListener>(new impl_WindowListener())));
