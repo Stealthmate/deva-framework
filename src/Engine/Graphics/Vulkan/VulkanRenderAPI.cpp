@@ -279,15 +279,7 @@ void VulkanRenderAPI::onInit(const Preferences &prefs) {
 	this->instance = DevaFramework::Vulkan::createInstance(instanceInfo);
 
 	auto &vk = instance.vk;
-
-	VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
-	callbackCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
-	callbackCreateInfo.pNext = nullptr;
-	callbackCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
-	callbackCreateInfo.pfnCallback = &debug;
-	callbackCreateInfo.pUserData = nullptr;
-	vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &callback);
-
+	callback = DevaFramework::Vulkan::attachDebugCallback(instance, &debug, VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT);
 	bufmemIndex = std::make_unique<VulkanBufferMemoryIndex>();
 }
 

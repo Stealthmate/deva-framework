@@ -15,6 +15,24 @@ namespace {
 
 }
 
+VkDebugReportCallbackEXT Vulkan::attachDebugCallback(
+	const VulkanInstance &instance,
+	VulkanDebugCallback callback,
+	VkDebugReportFlagsEXT flags,
+	void * userData
+) {
+	VkDebugReportCallbackEXT handle;
+	VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
+	callbackCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
+	callbackCreateInfo.pNext = nullptr;
+	callbackCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
+	callbackCreateInfo.pfnCallback = callback;
+	callbackCreateInfo.pUserData = nullptr;
+	instance.vk.vkCreateDebugReportCallbackEXT(instance.handle, &callbackCreateInfo, nullptr, &handle);
+
+	return handle;
+}
+
 VulkanHandle<VkShaderModule> Vulkan::loadShaderFromFile(const VulkanDevice &dev, const char *filepath)
 {
 	auto src = readBinaryFile(filepath);

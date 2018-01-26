@@ -6,6 +6,7 @@
 #include "VulkanHandle.hpp"
 
 #include <vector>
+#include <functional>
 
 namespace DevaFramework {
 
@@ -19,6 +20,21 @@ namespace DevaFramework {
 
 	namespace Vulkan
 	{
+		typedef VkBool32(VKAPI_CALL * VulkanDebugCallback)(
+			VkDebugReportFlagsEXT,
+			VkDebugReportObjectTypeEXT,
+			uint64_t, size_t,
+			int32_t,
+			const char*,
+			const char*,
+			void*);
+
+		DEVA_FRAMEWORK_API VkDebugReportCallbackEXT attachDebugCallback(
+			const VulkanInstance &instance, 
+			VulkanDebugCallback callback,
+			VkDebugReportFlagsEXT flags, 
+			void * userData = nullptr);
+
 		DEVA_FRAMEWORK_API VulkanHandle<VkShaderModule> loadShaderFromFile(const VulkanDevice &dev, const char *filepath);
 		DEVA_FRAMEWORK_API VulkanHandle<VkSurfaceKHR> createSurfaceForWindow(const VulkanInstance &vkInstance, const Window &wnd);
 		DEVA_FRAMEWORK_API std::vector<uint32_t> deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice pdev, VkSurfaceKHR surface);
