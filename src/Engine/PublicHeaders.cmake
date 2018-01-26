@@ -18,8 +18,6 @@ set(
 	${CURDIR}/Graphics/Vulkan/Config.hpp
 	${CURDIR}/Graphics/Vulkan/DescriptorPoolManager.cpp
 	${CURDIR}/Graphics/Vulkan/DescriptorPoolManager.hpp
-	${CURDIR}/Graphics/Vulkan/Subrenderer.cpp
-	${CURDIR}/Graphics/Vulkan/Subrenderer.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanGraphicsPipeline.cpp
