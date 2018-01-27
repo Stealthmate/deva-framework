@@ -13,7 +13,7 @@ namespace DevaFramework
 
 	/**
 	------------------------------------------------------------------------------------------
-	Model object format specification.
+	Mesh object format specification.
 
 	Size in bytes - description
 
@@ -76,13 +76,13 @@ namespace DevaFramework
 	If the number type is floating-point, then size checks are ignored and size is assumed to be 32bits.
 	*/
 
-	class Model {
+	class Mesh {
 
 	public:
 
-		DEVA_FRAMEWORK_API static Model fromFile(const std::string &filename);
+		DEVA_FRAMEWORK_API static Mesh fromFile(const std::string &filename);
 		/**TODO: NOT FULLY IMPLEMENTED!!!!!!*/
-		DEVA_FRAMEWORK_API static std::vector<byte_t> exportBinary(const Model &model);
+		DEVA_FRAMEWORK_API static std::vector<byte_t> exportBinary(const Mesh &model);
 
 	private:
 		
@@ -91,8 +91,8 @@ namespace DevaFramework
 		std::vector<byte_t> indices;
 
 	public:
-		DEVA_FRAMEWORK_API Model();
-		DEVA_FRAMEWORK_API Model(const VBO &vbo, gl::GLenum index_type, const std::vector<byte_t> &index_arr);
+		DEVA_FRAMEWORK_API Mesh();
+		DEVA_FRAMEWORK_API Mesh(const VBO &vbo, gl::GLenum index_type, const std::vector<byte_t> &index_arr);
 
 		DEVA_FRAMEWORK_API const VBO& getVBO() const;
 		DEVA_FRAMEWORK_API gl::GLenum getIndexType() const;

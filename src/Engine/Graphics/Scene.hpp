@@ -46,7 +46,6 @@ namespace DevaEngine
 		DEVA_ENGINE_API const DevaFramework::mat4& getObjectTransform(const SceneObjectID &id) const;
 		DEVA_ENGINE_API void setObjectTransform(const SceneObjectID &id, const DevaFramework::mat4 &transform);
 
-		DEVA_ENGINE_API SceneObjectID findObjectID(const DrawableObject &object) const;
 		DEVA_ENGINE_API ObjectPtr removeObject(const SceneObjectID &id);
 
 	private:
@@ -56,7 +55,7 @@ namespace DevaEngine
 		std::shared_ptr<DrawableObject::DrawableObjectUpdateObserver> objectObserver;
 	};
 
-	
+
 }
 
 

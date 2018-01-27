@@ -25,15 +25,28 @@ namespace DevaFramework
 		std::vector<size_t> componentBitsizes;
 	};
 
-	class Model : public DataHolder<ByteBuffer> {
+	struct Mesh1 {
+		DEVA_FRAMEWORK_API Mesh1(
+			const std::vector<byte_t> &vertexData,
+			size_t vertexCount,
+			const std::vector<VertexDataElementDescription> &vertexElementDescriptions);
+
+		const std::vector<byte_t> vertexData;
+		const size_t vertexCount;
+		const std::vector<VertexDataElementDescription> vertexElementDescriptions;
+		const size_t faceDataOffset;
+		const size_t faceCount;
+	};
+
+	class Mesh {
 	public:
 
-		DEVA_FRAMEWORK_API Model(
+		DEVA_FRAMEWORK_API Mesh(
 			std::vector<byte_t> vertexData,
 			size_t vertexCount,
 			const std::vector<VertexDataElementDescription> &vertexElementDescriptions,
 			const std::vector<uint32_t> &faceIndices);
-		DEVA_FRAMEWORK_API Model(
+		DEVA_FRAMEWORK_API Mesh(
 			ByteBuffer vertexData,
 			size_t vertexCount,
 			const std::vector<VertexDataElementDescription> &vertexElementDescriptions,
@@ -44,10 +57,6 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API const std::vector<VertexDataElementDescription>& elements() const { return mVertexElementDescriptions; }
 		DEVA_FRAMEWORK_API size_t vertexSize() const;
 		DEVA_FRAMEWORK_API const std::vector<uint32_t>& faceIndices() const { return mFaceIndices; }
-
-	protected:
-
-		DEVA_FRAMEWORK_API virtual ByteBuffer onRelease() override;
 
 	private:
 		ByteBuffer mVertexData;

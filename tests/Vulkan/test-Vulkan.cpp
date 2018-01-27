@@ -101,10 +101,10 @@ int main()
 
 
 	try {
-		auto model = std::make_shared<DrawableObject>(std::move(bmb.build()));
+		auto model = std::make_unique<DrawableObject>(std::move(bmb.build()));
 
 		std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-		Uuid id = scene->addObject(model);
+		Uuid id = scene->addObject(std::move(model));
 		Uuid id1;
 		auto &mobj = scene->getObject(id);
 

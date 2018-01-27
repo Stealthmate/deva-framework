@@ -15,7 +15,7 @@ namespace {
 	}
 }
 
-Model::Model(
+Mesh::Mesh(
 	std::vector<byte_t> vertexData,
 	size_t vertexCount,
 	const std::vector<VertexDataElementDescription> &vertexElementDescriptions,
@@ -25,7 +25,7 @@ Model::Model(
 	mVertexElementDescriptions(vertexElementDescriptions),
 	mFaceIndices(faceIndices) {}
 
-Model::Model(
+Mesh::Mesh(
 	ByteBuffer vertexData,
 	size_t vertexCount,
 	const std::vector<VertexDataElementDescription> &vertexElementDescriptions,
@@ -35,11 +35,11 @@ Model::Model(
 	mVertexElementDescriptions(vertexElementDescriptions),
 	mFaceIndices(faceIndices) {}
 
-size_t Model::vertexSize() const 
+size_t Mesh::vertexSize() const 
 {
 	return sumComponentSizes(mVertexElementDescriptions);
 }
-
-ByteBuffer Model::onRelease() {
+/*
+ByteBuffer Mesh::onRelease() {
 	return std::move(mVertexData.release());
-}
+}*/

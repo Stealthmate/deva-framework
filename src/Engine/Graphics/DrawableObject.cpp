@@ -1,5 +1,7 @@
 #include "DrawableObject.hpp"
 
+#include <DevaFramework\Graphics\Model.hpp>
+
 using namespace DevaFramework;
 using namespace DevaEngine;
 
@@ -30,4 +32,4 @@ void Observers::DrawableObjectObserver::onNotify(Observable<DrawableObjectObserv
 	}
 }
 
-DrawableObject::DrawableObject(Model model) : model(std::move(model)) {}
+DrawableObject::DrawableObject(DevaFramework::Mesh model) : model(std::move(model)) {}

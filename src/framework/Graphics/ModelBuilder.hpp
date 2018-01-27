@@ -15,7 +15,7 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API BasicModelBuilder& addVertex(const vec4 &vertex);
 		DEVA_FRAMEWORK_API BasicModelBuilder& addFace(const FaceIndexTriplet &face);
 
-		DEVA_FRAMEWORK_API Model build() const;
+		DEVA_FRAMEWORK_API Mesh build() const;
 
 	protected:
 		std::vector<uint32_t> faces;
@@ -28,7 +28,7 @@ namespace DevaFramework {
 		DEVA_FRAMEWORK_API TexturedModelBuilder& addVertex(const vec4 &vertex, const vec3 &texCoords);
 		DEVA_FRAMEWORK_API TexturedModelBuilder& addFace(const FaceIndexTriplet &face);
 
-		DEVA_FRAMEWORK_API Model build();
+		DEVA_FRAMEWORK_API Mesh build();
 
 	private:
 		PackedVector<float, float, float, float, float, float, float> vertexTexCoords;

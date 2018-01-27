@@ -28,11 +28,12 @@ namespace DevaEngine {
 	public:
 		typedef Observers::DrawableObjectObserver DrawableObjectUpdateObserver;
 
-		DEVA_ENGINE_API DrawableObject(DevaFramework::Model model);
-		DrawableObject(const DrawableObject &obj) = delete;
+		DEVA_ENGINE_API DrawableObject(DevaFramework::Mesh model);
+		DrawableObject& operator=(const DrawableObject &obj) = delete;
+		DrawableObject& operator=(DrawableObject &&obj) = delete;
 
 	//private:
-		DevaFramework::Model model;
+		DevaFramework::Mesh model;
 		DevaFramework::vec4 frontVector;
 
 	};

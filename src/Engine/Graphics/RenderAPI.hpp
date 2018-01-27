@@ -8,7 +8,7 @@
 namespace DevaFramework {
 	class Window;
 	struct Image;
-	class Model;
+	class Mesh;
 	class Uuid;
 }
 
@@ -17,7 +17,7 @@ namespace DevaEngine {
 	class Preferences;
 
 	struct RenderObject {
-		const DevaFramework::Model *model;
+		const DevaFramework::Mesh *model;
 		DevaFramework::vec4 frontVector;
 	};
 	typedef DevaFramework::Uuid RenderObjectID;

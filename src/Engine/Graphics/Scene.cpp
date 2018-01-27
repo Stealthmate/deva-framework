@@ -42,7 +42,7 @@ namespace {
 
 		};
 		virtual void onVerticesChanged(const DrawableObject &object) override {
-			scene.notifyObservers(SceneEvent(SceneEventType::OBJECT_UPDATED, scene, scene.findObjectID(object), object));
+			scene.notifyObservers(SceneEvent(SceneEventType::OBJECT_UPDATED, scene, Uuid(), object));
 		};
 	};
 }
@@ -100,13 +100,13 @@ const DrawableObject& Scene::getObject(const SceneObjectID &id) const {
 	return *i->second;
 }
 
-SceneObjectID Scene::findObjectID(const DrawableObject &obj) const {
+/*SceneObjectID Scene::findObjectID(const DrawableObject &obj) const {
 	for (auto i : objects) {
 		if (i.second.get() == &obj) return i.first;
 	}
 
 	throw DevaInvalidArgumentException("Object is not part of Scene");
-}
+}*/
 
 Scene::ObjectPtr Scene::removeObject(const SceneObjectID &id) {
 	ensureHasObject(id, objects);

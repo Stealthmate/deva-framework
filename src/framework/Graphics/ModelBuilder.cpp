@@ -28,7 +28,7 @@ BasicModelBuilder& BasicModelBuilder::addFace(const FaceIndexTriplet &face)
 	return *this;
 }
 
-Model BasicModelBuilder::build() const
+Mesh BasicModelBuilder::build() const
 {
 	std::vector<byte_t> vertexData;
 	for (auto &v : vertices) {
@@ -45,7 +45,7 @@ Model BasicModelBuilder::build() const
 	eld.size = 4 * sizeof(float);
 	eld.type = VertexComponentType::FLOAT;
 	
-	return Model(vertexData, vertices.size(), { eld }, faces);
+	return Mesh(vertexData, vertices.size(), { eld }, faces);
 }
 
 TexturedModelBuilder& TexturedModelBuilder::addVertex(const vec4 &vertex, const vec3 &texCoords) {
@@ -61,7 +61,7 @@ TexturedModelBuilder&::TexturedModelBuilder::addFace(const FaceIndexTriplet &fac
 	return *this;
 }
 
-Model TexturedModelBuilder::build()
+Mesh TexturedModelBuilder::build()
 {
 	VertexDataElementDescription eld;
 	size_t bitsize = sizeof(float) * 8;
@@ -74,5 +74,5 @@ Model TexturedModelBuilder::build()
 	eldtex.size = 3 * sizeof(float);
 	eldtex.type = VertexComponentType::FLOAT;
 
-	return Model(std::move(vertexTexCoords.release()), vertexTexCoords.size(), { eld, eldtex }, faces);
+	return Mesh(std::move(vertexTexCoords.release()), vertexTexCoords.size(), { eld, eldtex }, faces);
 }

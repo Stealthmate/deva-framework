@@ -3,7 +3,7 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 
-SceneBuilder& SceneBuilder::addObject(const SceneObjectID &objectID, std::unique_ptr<Model> model) {
+SceneBuilder& SceneBuilder::addObject(const SceneObjectID &objectID, std::unique_ptr<Mesh> model) {
 
 	if (objects.find(objectID) != objects.end()) {
 		throw DevaProgrammerErrorException(strformat("Object with ID {} already exists!", (std::string)objectID));
