@@ -35,8 +35,22 @@ public:
  	}
 };
 
+class Renderer::ImplSceneObjectObserver : public Observers::SceneObjectObserver {
+public:
+	Renderer & renderer;
+
+	ImplSceneObjectObserver(Renderer& renderer) : renderer(renderer) {}
+
+	virtual void onModelChanged(const SceneObject &object, const Model &model) {
+		//TODO
+	}
+	virtual void onMVPChanged(const SceneObject &object, const DevaFramework::mat4 &mvp) {
+		renderer.api->setMeshMVP(renderer.meshMap.find(object.model().mesh)->second.first, mvp);
+	}
+};
+
 Renderer::Renderer(const Preferences &prefs, std::unique_ptr<RenderAPI> renderAPI)
-	: api(std::move(renderAPI)), sceneListener(new ImplSceneObserver(*this)), texMap()
+	: api(std::move(renderAPI)), sceneListener(new ImplSceneObserver(*this)), sceneObjectObserver(new ImplSceneObjectObserver(*this)), texMap()
 {
 	api->onInit(prefs);
 }
@@ -65,6 +79,8 @@ void Renderer::loadSceneObject(std::shared_ptr<SceneObject> obj) {
 		texid = api->loadTexture(*obj->model().texture);
 		texMap.insert({ obj->model().texture,{ texid, 1 } });
 	}
+
+	::registerObserver(*obj, *sceneObjectObserver);
 
 	modelHandles.insert({ obj, {meshid, texid} });
 }
