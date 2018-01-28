@@ -1,81 +1,96 @@
 #include "Image.hpp"
 
-#include "ImageReaders.hpp"
-
-#include <string>
+#include<libpng\png.h>
 
 using namespace DevaFramework;
 
-Image Image::loadImageFromFile(const std::string &filename, ImageFormat format)
-{
-	RawImage raw;
+namespace {
 
-	switch (format)
+	static void readData(png_structp pngPtr, png_bytep data, png_size_t length)
 	{
-	case PNG:
-	{
-		raw = readPNG(filename);
-	}
-	break;
+		png_voidp a = png_get_io_ptr(pngPtr);
+		((std::istream*)a)->read((char*)data, length);
 	}
 
-	if (raw.error)
-	{
-		LOG.e("Could not load image. Error code: " + strf(raw.error));
-		return Image();
-	}
-
-	Image img;
-	img.width = raw.width;
-	img.height = raw.height;
-
-	if (raw.color_type == COLOR_TYPE_RGBA && raw.bitdepth == 8)
-	{
-		img.data = std::move(raw.data);
-		return img;
-	}
-	else if (raw.bitdepth == 8)
-	{
-		std::vector<byte_t> new_data(raw.width*raw.height*DEVA_IMAGE_BITS_PER_PIXEL);
-		for (unsigned int i = 0;i <= raw.height - 1;i++)
-		{
-			for (unsigned int j = 0;j < raw.width - 1;j++)
-			{
-				new_data[(4 * i*raw.width) + (4 * j) + 0] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 0];
-				new_data[(4 * i*raw.width) + (4 * j) + 1] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 1];
-				new_data[(4 * i*raw.width) + (4 * j) + 2] = raw.data[(raw.channels*i*raw.width) + (raw.channels*j) + 2];
-				new_data[(4 * i*raw.width) + (4 * j) + 3] = (byte_t) 0xFF;
-
-			}
+	ImageFormat chooseFormat(png_uint_32 colorType) {
+		switch (colorType) {
+		case PNG_COLOR_TYPE_GRAY: 
+			return ImageFormat::R8_UNORM;
+		case PNG_COLOR_TYPE_GA: 
+			return ImageFormat::R8G8_UNORM;
+		case PNG_COLOR_TYPE_PALETTE:
+		case PNG_COLOR_TYPE_RGB:
+			return ImageFormat::R8G8B8_UNORM;
+		case PNG_COLOR_TYPE_RGBA:
+			return ImageFormat::R8G8B8A8_UNORM;
 		}
-
-		img.data = std::move(new_data);
-
-		return img;
 	}
-	else return Image();
 }
 
-Image::Image()
-{
-	this->width = 0;
-	this->height = 0;
+Image DevaFramework::readImagePNG(std::istream &source) {
+
+	png_byte png_signature[8];
+	int is_not_png = 0;
+	source.read((char*)png_signature, 8);
+
+	is_not_png = png_sig_cmp(png_signature, 0, 8);
+	if (is_not_png)
+	{
+		throw DevaInvalidInputException("readPNG: Image is not PNG.");
+
+	}
+
+	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (!pngPtr)
+	{
+		throw DevaInvalidInputException("readPNG: libPNG failed. (Could not create read_struct)");
+	}
+
+	png_infop infoPtr = png_create_info_struct(pngPtr);
+
+	if (!infoPtr)
+	{
+		png_destroy_read_struct(&pngPtr, (png_infopp)0, (png_infopp)0);
+		throw DevaInvalidInputException("readPNG: libPNG failed. (Could not create info_struct)");
+	}
+
+	png_bytep* rowPtrs = NULL;
+	std::vector<byte_t> data;
+	png_set_read_fn(pngPtr, (png_voidp)&source, readData);
+	png_set_sig_bytes(pngPtr, 8);
+	png_read_info(pngPtr, infoPtr);
+
+	png_uint_32 imgWidth = png_get_image_width(pngPtr, infoPtr);
+	png_uint_32 imgHeight = png_get_image_height(pngPtr, infoPtr);
+	png_uint_32 bitdepth = png_get_bit_depth(pngPtr, infoPtr);
+	png_uint_32 channels = png_get_channels(pngPtr, infoPtr);
+	png_uint_32 color_type = png_get_color_type(pngPtr, infoPtr);
+
+	rowPtrs = new png_bytep[imgHeight];
+
+	size_t data_size = imgWidth * imgHeight * bitdepth * channels / 8;
+	data = std::vector<byte_t>(data_size);
+	data.resize(data_size);
+
+	size_t stride = data_size / imgHeight;
+
+	for (size_t i = 0; i < imgHeight; i++)
+	{
+		png_uint_32 q = (png_uint_32)((imgHeight - i - 1) * stride);
+		rowPtrs[i] = (png_bytep)data.data() + q;
+	}
+	
+	png_set_expand(pngPtr);
+	if(bitdepth > 8) png_set_strip_16(pngPtr);
+
+	png_read_image(pngPtr, rowPtrs);
+
+	delete[] rowPtrs;
+	png_destroy_read_struct(&pngPtr, &infoPtr, (png_infopp)0);
+
+	return Image(data, imgWidth, imgHeight, chooseFormat(color_type));
 }
 
-Image::Image(const Image &img) = default;
 
-Image::Image(Image &&img) = default;
-
-Image& Image::operator=(const Image& img) = default;
-
-Image& Image::operator=(Image &&img) = default;
-
-const std::vector<byte_t>& Image::getData() const {
-	return this->data;
-}
-
-std::vector<byte_t> Image::onRelease() {
-	return std::move(data);
-}
-
-Image::~Image() = default;
+Image::Image(std::vector<byte_t> data, size_t width, size_t height, ImageFormat format)
+	: data(std::move(data)), width(width), height(height), format(format) {}
