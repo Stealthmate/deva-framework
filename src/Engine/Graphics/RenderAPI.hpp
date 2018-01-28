@@ -8,16 +8,17 @@
 namespace DevaFramework {
 	class Window;
 	struct Image;
-	class Mesh;
+	struct Mesh;
 	class Uuid;
 }
 
 namespace DevaEngine {
 
 	class Preferences;
+	struct Model;
 
 	struct RenderObject {
-		const DevaFramework::Mesh *model;
+		std::shared_ptr<DevaFramework::Mesh> model;
 		DevaFramework::vec4 frontVector;
 	};
 	typedef DevaFramework::Uuid RenderObjectID;
@@ -31,10 +32,15 @@ namespace DevaEngine {
 		virtual void onSetupRenderTargetImage(const DevaFramework::Image &img) = 0;
 		virtual void onDestroy() = 0;
 
-		virtual void loadObject(const RenderObjectID &id, const RenderObject &ro) = 0;
-		virtual void updateObjectMVP(const RenderObjectID &roid, const DevaFramework::mat4 &mvp) = 0;
-		virtual void unloadObject(const RenderObjectID &roid) = 0;
-		virtual ImageID loadImage(const DevaFramework::Image &img) = 0;
+		virtual RenderObjectID loadMesh(const DevaFramework::Mesh &mesh) = 0;
+		virtual void unloadMesh(const RenderObjectID &id) = 0;
+		virtual void setMeshMVP(const RenderObjectID &id, const DevaFramework::mat4 &mvp) = 0;
+
+		virtual RenderObjectID loadTexture(const DevaFramework::Image &tex) = 0;
+		virtual void unloadTexture(const RenderObjectID &id) = 0;
+
+		virtual void bindMeshTexture(const RenderObjectID &meshid, const RenderObjectID &texid) = 0;
+		virtual void unbindMeshTexture(const RenderObjectID &meshid, const RenderObjectID &texid) = 0;
 
 		virtual void drawScene() = 0;
 	};

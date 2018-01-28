@@ -1,4 +1,5 @@
 #include "VertexBuffer.hpp"
+#include "Mesh.hpp"
 
 #include <numeric>
 

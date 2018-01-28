@@ -4,12 +4,11 @@
 #include "Config.hpp"
 #include "../Core/DataHolder.hpp"
 
-#include "Model.hpp"
-
 #include <vector>
 
 namespace DevaFramework
 {
+	struct VertexDataElementDescription;
 
 	enum VertexBufferLayout {
 		INTERLEAVED,

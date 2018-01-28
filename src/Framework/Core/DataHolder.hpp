@@ -15,7 +15,7 @@ namespace DevaFramework {
 		}
 
 		
-		explicit DataHolder(const DataHolder<DataType> &holder) = default;
+		DataHolder(const DataHolder<DataType> &holder) = default;
 		DataHolder<DataType>& operator=(const DataHolder<DataType> &holder) = default;
 
 		DataHolder(DataHolder<DataType> &&holder) = default;

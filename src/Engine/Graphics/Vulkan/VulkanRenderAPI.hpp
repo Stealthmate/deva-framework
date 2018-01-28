@@ -67,7 +67,7 @@ namespace DevaEngine
 
 	};
 
-	struct VulkanRenderObjectResources {
+	struct VulkanMeshResources {
 		std::vector<DevaFramework::Vulkan::VulkanBufferID> vertexBuffers;
 		DevaFramework::Vulkan::VulkanBufferID indexBuffer;
 		DevaFramework::Vulkan::VulkanBufferID mvpBuffer;
@@ -109,18 +109,24 @@ namespace DevaEngine
 	{
 	public:
 
-		DEVA_ENGINE_API virtual void onInit(const Preferences &prefs);
-		DEVA_ENGINE_API virtual void onSetupRenderTargetWindow(const DevaFramework::Window &wnd);
-		DEVA_ENGINE_API virtual void onSetupRenderTargetImage(const DevaFramework::Image &img);
-		DEVA_ENGINE_API virtual void onDestroy();
+		DEVA_ENGINE_API virtual void onInit(const Preferences &prefs) override;
+		DEVA_ENGINE_API virtual void onSetupRenderTargetWindow(const DevaFramework::Window &wnd) override;
+		DEVA_ENGINE_API virtual void onSetupRenderTargetImage(const DevaFramework::Image &img) override;
+		DEVA_ENGINE_API virtual void onDestroy() override;
 
-		DEVA_ENGINE_API virtual void drawScene();
+		DEVA_ENGINE_API virtual void drawScene() override;
 
 		DEVA_ENGINE_API virtual ImageID loadImage(const DevaFramework::Image &img);
 
-		DEVA_ENGINE_API virtual void loadObject(const RenderObjectID &id, const RenderObject &ro);
-		DEVA_ENGINE_API virtual void updateObjectMVP(const RenderObjectID &roid, const DevaFramework::mat4 &mvp);
-		DEVA_ENGINE_API virtual void unloadObject(const RenderObjectID &roid);
+		DEVA_ENGINE_API virtual RenderObjectID loadMesh(const DevaFramework::Mesh &mesh) override;
+		DEVA_ENGINE_API virtual void unloadMesh(const RenderObjectID &id) override;
+		DEVA_ENGINE_API virtual void setMeshMVP(const RenderObjectID &id, const DevaFramework::mat4 &mvp) override;
+
+		DEVA_ENGINE_API virtual RenderObjectID loadTexture(const DevaFramework::Image &tex) override;
+		DEVA_ENGINE_API virtual void unloadTexture(const RenderObjectID &id) override;
+
+		DEVA_ENGINE_API virtual void bindMeshTexture(const RenderObjectID &meshid, const RenderObjectID &texid) override;
+		DEVA_ENGINE_API virtual void unbindMeshTexture(const RenderObjectID &meshid, const RenderObjectID &texid) override;
 
 	private:
 		std::unique_ptr<VulkanBufferMemoryIndex> bufmemIndex;
@@ -146,7 +152,8 @@ namespace DevaEngine
 		DevaFramework::VulkanCommandPool commandPool;
 		std::vector<DevaFramework::VulkanCommandBuffer> commandBuffers;
 
-		std::unordered_map<DevaFramework::Uuid, std::pair<VulkanRenderObject, VulkanRenderObjectResources>> renderObjects;
+		std::unordered_map<RenderObjectID, std::pair<VulkanMesh, VulkanMeshResources>> meshMap;
+		std::unordered_map<RenderObjectID, std::pair<VulkanTexture, VulkanTextureResrouces>> texMap;
 		std::vector<VkSemaphore> objectUpdateSemaphores;
 
 		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel>> dsLayouts;

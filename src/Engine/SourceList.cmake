@@ -5,14 +5,18 @@ set(
 	${CURDIR}/Graphics/DrawableObject.cpp
 	${CURDIR}/Graphics/DrawableObject.hpp
 	${CURDIR}/Graphics/DrawableObjectBuilder.hpp
+	${CURDIR}/Graphics/Model.hpp
 	${CURDIR}/Graphics/RenderAPI.hpp
 	${CURDIR}/Graphics/Renderer.cpp
 	${CURDIR}/Graphics/Renderer.hpp
 	${CURDIR}/Graphics/RenderSurface.hpp
+	${CURDIR}/Graphics/ResourceCache.hpp
 	${CURDIR}/Graphics/Scene.cpp
 	${CURDIR}/Graphics/Scene.hpp
 	${CURDIR}/Graphics/SceneBuilder.cpp
 	${CURDIR}/Graphics/SceneBuilder.hpp
+	${CURDIR}/Graphics/SceneObject.cpp
+	${CURDIR}/Graphics/SceneObject.hpp
 	${CURDIR}/Graphics/ScreenRenderer.hpp
 	${CURDIR}/Graphics/GUI/Component.hpp
 	${CURDIR}/Graphics/Vulkan/Config.hpp

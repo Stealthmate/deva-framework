@@ -18,9 +18,9 @@ namespace DevaFramework {
 			VkPresentInfoKHR info = {};
 			info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-			info.waitSemaphoreCount = waitSemaphores.size();
+			info.waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size());
 			info.pWaitSemaphores = waitSemaphores.data();
-			info.swapchainCount = swapchains.size();
+			info.swapchainCount = static_cast<uint32_t>(swapchains.size());
 			info.pSwapchains = swapchains.data();
 			info.pImageIndices = imageIndices.data();
 			info.pResults = nullptr; // Optional

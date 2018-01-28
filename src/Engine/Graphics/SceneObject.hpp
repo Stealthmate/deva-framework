@@ -6,17 +6,17 @@
 #include <DevaFramework\Math\Matrix.hpp>
 
 namespace DevaFramework {
-	class Mesh;
-	class Image;
+	struct Mesh;
+	struct Image;
 }
 
 namespace DevaEngine {
 
-	class Model;
+	struct Model;
 
 	class SceneObject;
 	namespace Observers {
-		class SceneObjectObservedMessage;
+		struct SceneObjectObservedMessage;
 		class SceneObjectObserver : public DevaFramework::Observer<SceneObjectObservedMessage> {
 		public:
 
@@ -61,58 +61,21 @@ namespace DevaEngine {
 
 		DEVA_ENGINE_API SceneObjectUpdate update();
 
+		DEVA_ENGINE_API SceneObject(std::shared_ptr<Model> model);
+
 		DEVA_ENGINE_API const Model& model() const;
 		DEVA_ENGINE_API const DevaFramework::mat4& mvp() const;
 
 	private:
+
+		SceneObject& operator=(const SceneObject&obj);
+		SceneObject& operator=(SceneObject &&obj);
 
 		friend class SceneObjectUpdate;
 
 		std::shared_ptr<Model> mModel;
 		DevaFramework::mat4 mMVP;
 	};
-
-	class Scene1;
-	namespace Observers {
-		class Scene1ObservedMessage;
-		class Scene1Observer : public DevaFramework::Observer<Scene1ObservedMessage> {
-		public:
-
-			DEVA_ENGINE_API virtual void onNotify(ObservedObject &obj, const ObservedMessage &message) override final;
-
-			virtual void onObjectsAdded(const Scene1 &scene, const std::unordered_set<std::shared_ptr<SceneObject>> &objects) = 0;
-			virtual void onObjectRemoved(const Scene1 &scene, const std::unordered_set<std::shared_ptr<SceneObject>> &objects) = 0;
-		};
-	}
-
-	class Scene1 : public DevaFramework::Observable<Observers::Scene1ObservedMessage> {
-	public:
-		class SceneUpdate {
-
-			DEVA_ENGINE_API SceneUpdate(Scene1 &scene);
-
-			DEVA_ENGINE_API SceneUpdate& addObjects(const std::unordered_set<std::shared_ptr<SceneObject>> &objs);
-			DEVA_ENGINE_API SceneUpdate& removeObjects(const std::unordered_set<std::shared_ptr<SceneObject>> &objs);
-
-			DEVA_ENGINE_API void commit();
-
-		private:
-			Scene1 & scene;
-			std::unordered_set<std::shared_ptr<SceneObject>> newObjs;
-			std::unordered_set<std::shared_ptr<SceneObject>> delObjs;
-			friend class Scene1;
-		};
-
-		DEVA_ENGINE_API SceneUpdate update();
-		DEVA_ENGINE_API const std::unordered_set<std::shared_ptr<SceneObject>>& getAllObjects() const;
-
-	private:
-
-		friend class SceneUpdate;
-
-		std::unordered_set<std::shared_ptr<SceneObject>> objects;
-	};
-
 }
 
 #endif //DEVA_ENGINE_GRAPHICS_SCENE_OBJECT_HPP

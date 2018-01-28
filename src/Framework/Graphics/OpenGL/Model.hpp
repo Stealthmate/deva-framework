@@ -76,12 +76,12 @@ namespace DevaFramework
 	If the number type is floating-point, then size checks are ignored and size is assumed to be 32bits.
 	*/
 
-	class Mesh {
+	/*class Mesh {
 
 	public:
 
 		DEVA_FRAMEWORK_API static Mesh fromFile(const std::string &filename);
-		/**TODO: NOT FULLY IMPLEMENTED!!!!!!*/
+		///TODO: NOT FULLY IMPLEMENTED!!!!!!
 		DEVA_FRAMEWORK_API static std::vector<byte_t> exportBinary(const Mesh &model);
 
 	private:
@@ -99,7 +99,7 @@ namespace DevaFramework
 		DEVA_FRAMEWORK_API const std::vector<byte_t>& getIndexArray() const;
 
 		DEVA_FRAMEWORK_API std::string str();
-	};
+	};*/
 }
 
 

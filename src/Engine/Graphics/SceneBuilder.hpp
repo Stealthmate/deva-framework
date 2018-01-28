@@ -3,23 +3,24 @@
 
 #include "Config.hpp"
 
-#include "Scene.hpp"
-
 namespace DevaFramework {
-	class Mesh;
+	struct Mesh;
 }
 
 namespace DevaEngine {
 
+	class Scene;
+	class SceneObject;
+
 	class SceneBuilder {
 	public:
 
-		DEVA_ENGINE_API SceneBuilder& addObject(const SceneObjectID& id, std::unique_ptr<DevaFramework::Mesh> object);
+		DEVA_ENGINE_API SceneBuilder& addObject(std::shared_ptr<SceneObject> obj, std::unique_ptr<DevaFramework::Mesh> object);
 
 		DEVA_ENGINE_API Scene build();
 
 	private:
-		std::unordered_map<SceneObjectID, std::unique_ptr<DevaFramework::Mesh>> objects;
+		std::unordered_map<std::shared_ptr<SceneObject>, std::unique_ptr<DevaFramework::Mesh>> objects;
 
 	};
 

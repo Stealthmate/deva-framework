@@ -2,6 +2,8 @@
 #include <DevaFramework\Util\ByteBufferStream.hpp>
 #include <gtest\gtest.h>
 
+#include <DevaFramework\Graphics\Mesh.hpp>
+
 using namespace DevaFramework;
 using namespace std;
 

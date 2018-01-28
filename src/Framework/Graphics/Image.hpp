@@ -3,6 +3,8 @@
 
 #include "Config.hpp"
 
+#include <memory>
+#include <unordered_map>
 namespace DevaFramework
 {
 

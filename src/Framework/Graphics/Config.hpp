@@ -23,9 +23,11 @@ namespace DevaFramework
 
 
 	///A collection of supported ImageFormats
-	enum ImageFormat
-	{
-		PNG = 0x00
+	enum ImageFormat {
+		R8_UNORM,
+		R8G8_UNORM,
+		R8G8B8_UNORM,
+		R8G8B8A8_UNORM
 	};
 
 }

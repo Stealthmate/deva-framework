@@ -3,128 +3,62 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 
-class DevaEngine::Observers::SceneObservedMessage {
-public:
-	enum Event {
-		NEW_OBJECT,
-		OBJECT_UPDATED,
-		OBJECT_REMOVED
+using SceneUpdate = Scene::SceneUpdate;
+using SceneEvent = Observers::SceneObservedMessage;
+
+
+struct Observers::SceneObservedMessage {
+	enum Type {
+		OBJECTS_ADDED = 0, OBJECTS_REMOVED = 1
 	};
 
-	SceneObservedMessage(Event evt, const Scene &scene, const SceneObjectID &id, const DrawableObject &object)
-		: evt(evt), scene(scene), id(id), object(object) {}
-
-	const Event evt;
-	const Scene& scene;
-	const SceneObjectID& id;
-	const DrawableObject& object;
+	Type type;
+	Scene& scene;
+	std::unordered_set<std::shared_ptr<SceneObject>> objs;
 };
 
-using DevaEngine::Observers::SceneObserver;
-using SceneEvent = DevaEngine::Observers::SceneObservedMessage;
-using SceneEventType = SceneEvent::Event;
-
-namespace {
-
-	void ensureHasObject(const SceneObjectID &id, const std::unordered_map<SceneObjectID, Scene::ObjectPtr> &map) {
-		if (map.find(id) == map.end()) {
-			throw DevaProgrammerErrorException(strformat("Scene does not contain object with id: {}", (std::string)id));
-		}
+void Observers::SceneObserver::onNotify(ObservedObject &obj, const ObservedMessage &msg) {
+	switch (msg.type) {
+	case SceneEvent::Type::OBJECTS_ADDED: {
+		onObjectsAdded(msg.scene, msg.objs);
+	}break;
+	case SceneEvent::Type::OBJECTS_REMOVED: {
+		onObjectRemoved(msg.scene, msg.objs);
+	} break;
+	default: {
+		throw DevaException("Invalid SceneObjectObservedMessage type");
 	}
-
-	class SceneObjectUpdateObserver : public DrawableObject::DrawableObjectUpdateObserver {
-		Scene& scene;
-	public:
-
-		SceneObjectUpdateObserver(Scene& scene) : scene(scene) {}
-
-		virtual void onObjectUpdated(const DrawableObject &object) override {
-
-		};
-		virtual void onVerticesChanged(const DrawableObject &object) override {
-			scene.notifyObservers(SceneEvent(SceneEventType::OBJECT_UPDATED, scene, Uuid(), object));
-		};
-	};
-}
-
-void SceneObserver::onNotify(ObservedObject &obj, const ObservedMessage &msg) {
-	switch (msg.evt) {
-	case SceneEventType::NEW_OBJECT:
-		onNewObject(msg.scene, msg.id, msg.object);
-		break;
-	case SceneEventType::OBJECT_REMOVED:
-		onObjectRemoved(msg.scene, msg.id, msg.object);
-		break;
-	case SceneEventType::OBJECT_UPDATED:
-		onObjectUpdated(msg.scene, msg.id, msg.object);
-		break;
-	default:
-		throw DevaException("Received invalid message");
 	}
 }
 
-Scene::Scene() : objectObserver(std::make_shared<SceneObjectUpdateObserver>(*this)) {}
+SceneUpdate::SceneUpdate(Scene &scene) : scene(scene) {}
 
-SceneObjectID Scene::addObject(Scene::ObjectPtr object) {
-	SceneObjectID id;
-	::registerObserver(*object, *objectObserver);
-	objects.insert({ id, std::move(object) });
-	objectTransforms.insert({ id, mat4() });
-	notifyObservers(SceneEvent(SceneEventType::NEW_OBJECT, *this, id, *objects.find(id)->second));
-	return id;
+SceneUpdate& SceneUpdate::addObjects(const std::unordered_set<std::shared_ptr<SceneObject>> &objs) {
+	newObjs.insert(objs.begin(), objs.end());
+	return *this;
 }
 
-
-std::unordered_set<SceneObjectID> Scene::getAllObjectIDs() const {
-	std::unordered_set<SceneObjectID> ids;
-	for (auto kv : objects)
-		ids.insert(kv.first);
-	return ids;
+SceneUpdate& SceneUpdate::removeObjects(const std::unordered_set<std::shared_ptr<SceneObject>> &objs) {
+	delObjs.insert(objs.begin(), objs.end());
+	return *this;
 }
 
-DrawableObject& Scene::getObject(const SceneObjectID &id) {
-	auto i = objects.find(id);
-	if (i == objects.end()) {
-		throw DevaInvalidArgumentException(strformat("ObjectID {} does not exist in scene", id.str()));
+void SceneUpdate::commit() {
+	scene.objects.insert(newObjs.begin(), newObjs.end());
+	scene.notifyObservers({ SceneEvent::OBJECTS_ADDED, scene, newObjs });
+	for (auto o : delObjs) {
+		auto i = scene.objects.find(o);
+		if (i != scene.objects.end()) scene.objects.erase(i);
 	}
-
-	return *i->second;
+	scene.notifyObservers({ SceneEvent::OBJECTS_REMOVED, scene, delObjs });
 }
 
-const DrawableObject& Scene::getObject(const SceneObjectID &id) const {
-	auto i = objects.find(id);
-	if (i == objects.end()) {
-		throw DevaInvalidArgumentException(strformat("ObjectID {} does not exist in scene", id.str()));
-	}
+Scene::Scene() {}
 
-	return *i->second;
+SceneUpdate Scene::update() {
+	return SceneUpdate(*this);
 }
 
-/*SceneObjectID Scene::findObjectID(const DrawableObject &obj) const {
-	for (auto i : objects) {
-		if (i.second.get() == &obj) return i.first;
-	}
-
-	throw DevaInvalidArgumentException("Object is not part of Scene");
-}*/
-
-Scene::ObjectPtr Scene::removeObject(const SceneObjectID &id) {
-	ensureHasObject(id, objects);
-	Scene::ObjectPtr obj = std::move(objects.find(id)->second);
-	objects.erase(id);
-	notifyObservers(SceneEvent(SceneEventType::OBJECT_REMOVED, *this, id, *obj));
-	return obj;
-}
-
-const mat4& Scene::getObjectTransform(const SceneObjectID &id) const {
-	auto &result = objectTransforms.find(id);
-	if (result == objectTransforms.end())
-		throw DevaInvalidArgumentException("Scene does not contain object with id " + strm(id.str()));
-	
-	return result->second;
-}
-
-void Scene::setObjectTransform(const SceneObjectID &id, const mat4 &transform) {
-	objectTransforms.insert_or_assign(id, transform);
-	notifyObservers(SceneEvent(SceneEventType::OBJECT_UPDATED, *this, id, *objects.find(id)->second));
+const std::unordered_set<std::shared_ptr<SceneObject>>& Scene::getAllObjects() const {
+	return objects;
 }

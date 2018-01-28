@@ -56,6 +56,9 @@ void SceneObjectUpdate::commit() {
 	}
 }
 
+SceneObject::SceneObject(std::shared_ptr<Model> model) : mModel(model) {
+	
+}
 
 SceneObjectUpdate SceneObject::update() {
 	return SceneObjectUpdate(*this);
@@ -67,68 +70,4 @@ const Model& SceneObject::model() const {
 
 const mat4& SceneObject::mvp() const {
 	return mMVP;
-}
-
-
-
-//
-
-
-
-using SceneUpdate = Scene1::SceneUpdate;
-using SceneEvent = Observers::Scene1ObservedMessage;
-
-
-struct Observers::Scene1ObservedMessage {
-	enum Type {
-		OBJECTS_ADDED = 0, OBJECTS_REMOVED = 1
-	};
-
-	Type type;
-	Scene1& scene;
-	std::unordered_set<std::shared_ptr<SceneObject>> objs;
-};
-
-void Observers::Scene1Observer::onNotify(ObservedObject &obj, const ObservedMessage &msg) {
-	switch (msg.type) {
-	case SceneEvent::Type::OBJECTS_ADDED: {
-		onObjectsAdded(msg.scene, msg.objs);
-	}break;
-	case SceneEvent::Type::OBJECTS_REMOVED: {
-		onObjectRemoved(msg.scene, msg.objs);
-	} break;
-	default: {
-		throw DevaException("Invalid SceneObjectObservedMessage type");
-	}
-	}
-}
-
-SceneUpdate::SceneUpdate(Scene1 &scene) : scene(scene) {}
-
-SceneUpdate& SceneUpdate::addObjects(const std::unordered_set<std::shared_ptr<SceneObject>> &objs) {
-	newObjs.insert(objs.begin(), objs.end());
-	return *this;
-}
-
-SceneUpdate& SceneUpdate::removeObjects(const std::unordered_set<std::shared_ptr<SceneObject>> &objs) {
-	delObjs.insert(objs.begin(), objs.end());
-	return *this;
-}
-
-void SceneUpdate::commit() {
-	scene.objects.insert(newObjs.begin(), newObjs.end());
-	scene.notifyObservers({ SceneEvent::OBJECTS_ADDED, scene, newObjs });
-	for (auto o : delObjs) {
-		auto i = scene.objects.find(o);
-		if (i != scene.objects.end()) scene.objects.erase(i);
-	}
-	scene.notifyObservers({ SceneEvent::OBJECTS_REMOVED, scene, delObjs });
-}
-
-SceneUpdate Scene1::update() {
-	return SceneUpdate(*this);
-}
-
-const std::unordered_set<std::shared_ptr<SceneObject>>& Scene1::getAllObjects() const {
-	return objects;
 }

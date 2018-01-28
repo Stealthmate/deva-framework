@@ -5,7 +5,7 @@
 
 namespace DevaEngine {
 
-	struct VulkanRenderObject {
+	struct VulkanMesh {
 		std::vector<VkBuffer> vertexBuffers;
 		std::vector<VkDeviceSize> vertexOffsets;
 		VkBuffer indexBuffer;
@@ -24,6 +24,13 @@ namespace DevaEngine {
 		uint32_t firstInstance;
 	};
 
+	struct VulkanTextureResrouces {
+
+	};
+	struct VulkanTexture {
+
+	};
+
 	struct VulkanRenderPassRecord {
 
 		VkFramebuffer framebuffer;
@@ -31,7 +38,7 @@ namespace DevaEngine {
 		VkExtent2D renderArea;
 		std::vector<VkClearValue> clearVals;
 		VkPipeline pipeline;
-		std::vector<VulkanRenderObject> objs;
+		std::vector<VulkanMesh> objs;
 	};
 
 	namespace Vulkan {

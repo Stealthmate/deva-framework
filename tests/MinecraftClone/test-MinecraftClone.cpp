@@ -3,7 +3,9 @@
 #include <DevaFramework\Graphics\Vulkan\Config.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanHandle.hpp>
 #include <DevaFramework\Math\Vector.hpp>
-#include <DevaFramework\Graphics\ModelBuilder.hpp>
+#include <DevaFramework\Graphics\MeshBuilder.hpp>
+#include <DevaFramework\Graphics\Mesh.hpp>
+#include <DevaFramework\Util\MultiTypeVector.hpp>
 
 #include <DevaEngine\Graphics\Scene.hpp>
 #include <DevaEngine\Graphics\Renderer.hpp>
@@ -25,7 +27,7 @@ void printpack(Pack<float, float, float, float, float, float, float> p) {
 }
 
 int main() {
-	DevaEngineInstanceCreateInfo info;
+	/*DevaEngineInstanceCreateInfo info;
 	info.window_height = 600;
 	info.window_width = 800;
 	info.window_name = "Vulkan Test";
@@ -42,7 +44,7 @@ int main() {
 		.build());
 
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	Uuid id = scene->addObject(model);
+	//Uuid id = scene->addObjects({ model });
 
 	auto engine = DevaEngineInstance::createInstance(info);
 	auto &renderer = engine->getRenderer();
@@ -53,5 +55,5 @@ int main() {
 	}
 	LOG.i("Over");
 
-	engine->destroy();
+	engine->destroy();*/
 }

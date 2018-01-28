@@ -2,12 +2,14 @@
 #include <DevaFramework\Graphics\Vulkan\Config.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanHandle.hpp>
 #include <DevaFramework\Math\Vector.hpp>
-#include <DevaFramework\Graphics\ModelBuilder.hpp>
+#include <DevaFramework\Graphics\Mesh.hpp>
+#include <DevaFramework\Graphics\MeshBuilder.hpp>
 #include <DevaFramework\Math\MatrixFactory.hpp>
 #include <DevaFramework\Math\Common.hpp>
 #include <DevaFramework\Core\Uuid.hpp>
 
 #include <DevaEngine\Graphics\Scene.hpp>
+#include <DevaEngine\Graphics\SceneObject.hpp>
 #include <DevaEngine\Graphics\Renderer.hpp>
 
 #include <DevaEngine\Preferences.hpp>
@@ -77,7 +79,7 @@ int main()
 	}
 	ostr >> n;
 	for (int i = 0;i < n;i++) {
-		int a, b, c;
+		uint32_t a, b, c;
 		ostr >> a >> b >> c;
 		bmb.addFace({ a, b, c });
 	}
@@ -101,32 +103,34 @@ int main()
 
 
 	try {
-		auto model = std::make_unique<DrawableObject>(std::move(bmb.build()));
+		auto model = std::make_shared<Model>(Model(std::make_shared<Mesh>(bmb.build()), nullptr, { 0.0, 0.0, 1.0, 0.0 }));
+		auto scobj = std::make_shared<SceneObject>(model);
 
 		std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-		Uuid id = scene->addObject(std::move(model));
-		Uuid id1;
-		auto &mobj = scene->getObject(id);
 
 		auto engine = DevaEngineInstance::createInstance(info);
 		LOG.i("SUCCESS!");
 		auto &renderer = engine->getRenderer();
+
+		scobj->update().setMVP(mvp).commit();
+		scene->update().addObjects({ scobj }).commit();
+
 		renderer.prepareScene(scene);
 
 		int deg = 0;
 		int dm = 3;
 		float c = 0;
 		float dc = 0.00001f;
-		scene->setObjectTransform(id, mvp);
+		
 		while (engine->update()) {
 			if (c + dc > 2) {
 				c = 0;
-				//if (scene->getAllObjectIDs().size() == 1) id1 = scene->addObject(std::move(model));
-				//else model = scene->removeObject(id1);
+				//if (scene->getAllObjectIDs().size() == 1) id1 = scene->addObject(std::move(scobj));
+				//else scobj = scene->removeObject(id1);
 			}
 			c += dc;
 			mvp = mvp * Math::rotateZ(M_PI * c);
-			scene->setObjectTransform(id, mvp);
+			scobj->update().setMVP(mvp).commit();
 		}
 		LOG.i("Over");
 
