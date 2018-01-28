@@ -38,8 +38,11 @@ namespace DevaEngine
 		std::unique_ptr<RenderAPI> api;
 
 	private:
+
 		std::shared_ptr<Scene> currentScene;
 		
+		std::pair<MeshID, TextureID> loadModel(const Model &model);
+		void unloadModel(const Model &model);
 
 		class ImplSceneObjectObserver;
 		friend class ImplSceneObjectObserver;
@@ -48,7 +51,7 @@ namespace DevaEngine
 		std::shared_ptr<ImplSceneObserver> sceneListener;
 		std::shared_ptr<ImplSceneObjectObserver> sceneObjectObserver;
 
-		std::unordered_map<std::shared_ptr<SceneObject>, std::pair<MeshID, TextureID>> modelHandles;
+		std::unordered_map<const SceneObject*, std::pair<MeshID, TextureID>> modelHandles;
 		std::unordered_map<std::shared_ptr<const DevaFramework::Mesh>, std::pair<MeshID, uint32_t>> meshMap;
 		std::unordered_map<std::shared_ptr<const DevaFramework::Image>, std::pair<TextureID, uint32_t>> texMap;
 

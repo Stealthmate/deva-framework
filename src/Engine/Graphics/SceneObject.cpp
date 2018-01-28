@@ -1,5 +1,5 @@
 #include "SceneObject.hpp"
-
+#include <variant>
 using namespace DevaFramework;
 using namespace DevaEngine;
 
@@ -12,6 +12,7 @@ struct Observers::SceneObjectObservedMessage {
 
 	Type type;
 	SceneObject &obj;
+	std::variant<std::shared_ptr<Model>, mat4> old;
 };
 
 using Event = Observers::SceneObjectObservedMessage;
@@ -19,10 +20,10 @@ using Event = Observers::SceneObjectObservedMessage;
 void Observers::SceneObjectObserver::onNotify(ObservedObject &obj, const ObservedMessage &msg) {
 	switch (msg.type) {
 	case Event::Type::MODEL_CHANGED: {
-		onModelChanged(msg.obj, msg.obj.model());
+		onModelChanged(msg.obj, std::get<std::shared_ptr<Model>>(msg.old), msg.obj.model());
 	}break;
 	case Event::Type::MVP_CHANGED: {
-		onMVPChanged(msg.obj, msg.obj.mvp());
+		onMVPChanged(msg.obj, std::get<mat4>(msg.old), msg.obj.mvp());
 	} break;
 	default: {
 		throw DevaException("Invalid SceneObjectObservedMessage type");
@@ -47,12 +48,14 @@ SceneObjectUpdate& SceneObjectUpdate::setMVP(const mat4 &mvp) {
 
 void SceneObjectUpdate::commit() {
 	if (newModel.first) {
+		auto old = object.mModel;
 		object.mModel = newModel.second;
-		object.notifyObservers({ Event::MODEL_CHANGED, object });
+		object.notifyObservers({ Event::MODEL_CHANGED, object, old });
 	}
 	if (newMVP.first) {
+		auto old = object.mMVP;
 		object.mMVP = newMVP.second;
-		object.notifyObservers({ Event::MVP_CHANGED, object });
+		object.notifyObservers({ Event::MVP_CHANGED, object, old });
 	}
 }
 

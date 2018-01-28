@@ -32,7 +32,7 @@ public:
 		for (auto o : objects) {
 			renderer.unloadSceneObject(o);
 		}
- 	}
+	}
 };
 
 class Renderer::ImplSceneObjectObserver : public Observers::SceneObjectObserver {
@@ -41,11 +41,13 @@ public:
 
 	ImplSceneObjectObserver(Renderer& renderer) : renderer(renderer) {}
 
-	virtual void onModelChanged(const SceneObject &object, const Model &model) {
-		//TODO
+	virtual void onModelChanged(const SceneObject &object, std::shared_ptr<Model> oldModel, const Model &newModel) {
+		auto ids = renderer.loadModel(newModel);
+		renderer.modelHandles.insert_or_assign(&object, ids);
+		renderer.unloadModel(*oldModel);
 	}
-	virtual void onMVPChanged(const SceneObject &object, const DevaFramework::mat4 &mvp) {
-		renderer.api->setMeshMVP(renderer.meshMap.find(object.model().mesh)->second.first, mvp);
+	virtual void onMVPChanged(const SceneObject &object, const DevaFramework::mat4 &oldMVP, const DevaFramework::mat4 &newMVP) {
+		renderer.api->setMeshMVP(renderer.modelHandles.find(&object)->second.first, newMVP);
 	}
 };
 
@@ -55,42 +57,69 @@ Renderer::Renderer(const Preferences &prefs, std::unique_ptr<RenderAPI> renderAP
 	api->onInit(prefs);
 }
 
-void Renderer::loadSceneObject(std::shared_ptr<SceneObject> obj) {
-
+std::pair<MeshID, TextureID> Renderer::loadModel(const Model &model) {
 	RenderObjectID meshid;
-	auto mi = meshMap.find(obj->model().mesh);
+	auto mi = meshMap.find(model.mesh);
 	if (mi != meshMap.end()) {
 		meshid = mi->second.first;
 		mi->second.second++;
 	}
 	else {
-		meshid = api->loadMesh(*obj->model().mesh);
-		meshMap.insert({ obj->model().mesh, {meshid, 1} });
+		meshid = api->loadMesh(*model.mesh);
+		meshMap.insert({ model.mesh,{ meshid, 1 } });
 	}
-	api->setMeshMVP(meshid, obj->mvp());
 
 	RenderObjectID texid;
-	auto ti = texMap.find(obj->model().texture);
+	auto ti = texMap.find(model.texture);
 	if (ti != texMap.end()) {
 		texid = ti->second.first;
 		ti->second.second++;
 	}
 	else {
-		texid = api->loadTexture(*obj->model().texture);
-		texMap.insert({ obj->model().texture,{ texid, 1 } });
+		texid = api->loadTexture(*model.texture);
+		texMap.insert({ model.texture,{ texid, 1 } });
 	}
+
+	api->bindMeshTexture(meshid, texid);
+
+	return { meshid, texid };
+}
+
+void Renderer::unloadModel(const Model &model) {
+
+	auto mi = meshMap.find(model.mesh);
+	auto ti = texMap.find(model.texture);
+
+	api->unbindMeshTexture(mi->second.first, ti->second.first);
+
+	if (mi->second.second == 1) {
+		api->unloadMesh(mi->second.first);
+		meshMap.erase(mi);
+	}
+
+	if (ti->second.second == 1) {
+		api->unloadTexture(ti->second.first);
+		texMap.erase(ti);
+	}
+}
+
+void Renderer::loadSceneObject(std::shared_ptr<SceneObject> obj) {
+
+	auto ids = loadModel(obj->model());
+	api->setMeshMVP(ids.first, obj->mvp());
 
 	::registerObserver(*obj, *sceneObjectObserver);
 
-	modelHandles.insert({ obj, {meshid, texid} });
+	modelHandles.insert({ obj.get(), {ids.first, ids.second} });
 }
 
 void Renderer::unloadSceneObject(std::shared_ptr<SceneObject> obj) {
-	auto i = modelHandles.find(obj);
+	auto i = modelHandles.find(obj.get());
 	if (i == modelHandles.end()) return;
-	//TODO
-	api->unloadMesh(i->second.first);
-	api->unloadTexture(i->second.second);
+
+	::unregisterObserver(*obj, *sceneObjectObserver);
+
+	unloadModel(obj->model());
 
 	modelHandles.erase(i);
 }

@@ -22,8 +22,8 @@ namespace DevaEngine {
 
 			DEVA_ENGINE_API virtual void onNotify(ObservedObject &obj, const ObservedMessage &message) override final;
 
-			virtual void onModelChanged(const SceneObject &object, const Model &model) = 0;
-			virtual void onMVPChanged(const SceneObject &object, const DevaFramework::mat4 &mvp) = 0;
+			virtual void onModelChanged(const SceneObject &object, std::shared_ptr<Model> oldModel, const Model &newModel) = 0;
+			virtual void onMVPChanged(const SceneObject &object, const DevaFramework::mat4 &oldMVP, const DevaFramework::mat4 &newMVP) = 0;
 		};
 	}
 

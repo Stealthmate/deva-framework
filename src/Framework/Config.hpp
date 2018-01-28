@@ -1,8 +1,6 @@
 #ifndef DEVA_FRAMEWORK_CONFIG_H
 #define DEVA_FRAMEWORK_CONFIG_H
 
-#define GLFW_DLL
-
 #include <stdint.h>
 #include <string>
 
@@ -34,9 +32,6 @@
 ///Encloses the whole Deva Framework and the functionality it provides
 namespace DevaFramework
 {
-	typedef uint32_t ShaderID;
-	typedef uint32_t TextureID;
-
 	typedef unsigned char byte_t;
 
 	const uint32_t DEVA_VERSION_MAJOR = DEVA_VERSION_MACRO_MAJOR;
