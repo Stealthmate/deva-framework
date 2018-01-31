@@ -37,6 +37,27 @@ vec4 normalize(vec4 v) {
 	return result;
 }
 
+std::shared_ptr<Mesh> loadMesh(std::string filename) {
+	std::istringstream ostr(readTextFile(filename.c_str()));
+	TexturedModelBuilder bmb;
+	size_t n = 0;
+	ostr >> n;
+	for (int i = 0;i < n;i++) {
+		vec4 v1;
+		vec3 v2;
+		ostr >> v1[0] >> v1[1] >> v1[2] >> v1[3] >> v2[0] >> v2[1] >> v2[2];
+		bmb.addVertex(v1, v2);
+	}
+	ostr >> n;
+	for (int i = 0;i < n;i++) {
+		uint32_t a, b, c;
+		ostr >> a >> b >> c;
+		bmb.addFace({ a, b, c });
+	}
+
+	return std::make_shared<Mesh>(bmb.build());
+}
+
 int main()
 {
 	DevaEngineInstanceCreateInfo info;
@@ -58,53 +79,18 @@ int main()
 	LOG_VULKAN.setPrio(DevaLogger::LogLevel::ERR);
 	LOG.setPrio(DevaLogger::LogLevel::UNSPECIFIED);
 
-	auto data = readTextFile("./resources/mesh3.txt");
-	std::istringstream ostr(data);
-
+	std::shared_ptr<Model> models [] = { 
+		std::make_shared<Model>(loadMesh("./resources/mesh3.txt"), nullptr, vec4()),
+		std::make_shared<Model>(loadMesh("./resources/mesh.txt"), nullptr, vec4()) 
+	};
+	
 	mat4 mvp;
 	//mvp = mvp * Math::projection(M_PI / 3, 4.0 / 3.0, 0.1f, 100.f);
 	//mvp = mvp * Math::translate({ 0.f, 0.f, 0.f });
 	mvp = mvp * Math::rotateZ(M_PI / 2.0);
-	TexturedModelBuilder bmb;
-	size_t n = 0;
-	ostr >> n;
-	LOG << n << LOG.endl;
-	for (int i = 0;i < n;i++) {
-		vec4 v1;
-		vec3 v2;
-		ostr >> v1[0] >> v1[1] >> v1[2] >> v1[3] >> v2[0] >> v2[1] >> v2[2];
-		vec4 v3 = mvp * v1;
-		v3 = v3 / v3[3];
-		bmb.addVertex(v1, v2);
-	}
-	ostr >> n;
-	for (int i = 0;i < n;i++) {
-		uint32_t a, b, c;
-		ostr >> a >> b >> c;
-		bmb.addFace({ a, b, c });
-	}
-
-	/*vec4 a{ +0.5f, -0.5f, -0.5f, 1.f };
-	vec4 b{ -0.5f, -0.5f, -0.5f, 1.f };
-	vec4 c{ -0.5f, -0.5f, +0.5f, 1.f };
-	mat4 mvp;
-	mvp = mvp * Math::projection(M_PI / 3, 4.0 / 3.0, 0.1f, 100.f);
-	mvp = mvp * Math::translate({ 0.f, 0.f, -5.f });
-	//mvp = mvp * Math::scale({ 1.f, 2.f, 1.f });
-	//mvp = Math::scale({1.f, 1.f, 10.f});
-	LOG << strf(mvp) << LOG.endl;
-	LOG << strf(a) << LOG.endl << strf(b) << LOG.endl << strf(c) << LOG.endl;
-	vec4 d = mvp * a;
-	LOG << strf(normalize(d)) << LOG.endl;
-	d = mvp * b;
-	LOG << strf(normalize(d)) << LOG.endl;
-	d = mvp * c;
-	LOG << strf(normalize(d)) << LOG.endl;*/
-
 
 	try {
-		auto model = std::make_shared<Model>(Model(std::make_shared<Mesh>(bmb.build()), nullptr, { 0.0, 0.0, 1.0, 0.0 }));
-		auto scobj = std::make_shared<SceneObject>(model);
+		auto scobj = std::make_shared<SceneObject>(models[0]);
 
 		std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
@@ -120,16 +106,19 @@ int main()
 		int deg = 0;
 		int dm = 3;
 		float c = 0;
-		float dc = 0.00001f;
+		float dc = 0.001f;
+		int i = 0;
 		
 		while (engine->update()) {
 			if (c + dc > 2) {
 				c = 0;
+				scobj->update().setModel(models[1 - i]).commit();
+				i = 1 - i;
 				//if (scene->getAllObjectIDs().size() == 1) id1 = scene->addObject(std::move(scobj));
 				//else scobj = scene->removeObject(id1);
 			}
 			c += dc;
-			mvp = mvp * Math::rotateZ(M_PI * c);
+			//mvp = mvp * Math::rotateZ(M_PI * c);
 			scobj->update().setMVP(mvp).commit();
 		}
 		LOG.i("Over");

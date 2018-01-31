@@ -63,7 +63,7 @@ namespace DevaEngine {
 		VkDescriptorPoolCreateInfo cinfo;
 		cinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		cinfo.pNext = nullptr;
-		cinfo.flags = 0;
+		cinfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 		cinfo.poolSizeCount = static_cast<uint32_t>(sizes.size());
 		cinfo.pPoolSizes = sizes.data();
 		cinfo.maxSets = maxSets;
@@ -93,6 +93,7 @@ namespace DevaEngine {
 
 	void VulkanDescriptorPool::relinquishDescriptorSet(VkDescriptorSet dset)
 	{
+		VkResult res = device.vk.vkFreeDescriptorSets(device.handle, poolHandle, 1, &dset);
 	}
 }
 
@@ -479,7 +480,7 @@ void VulkanRenderAPI::createPipeline()
 	plb.addDescriptorSetLayout(dslayout.first, &setn);
 	dsLayoutPipelineMap.insert({ id, setn });
 
-	dpoolManager = std::make_unique<VulkanDescriptorPool>(VulkanDescriptorPool(main_device, { dslayout.second }, { 2 }));
+	dpoolManager = std::make_unique<VulkanDescriptorPool>(VulkanDescriptorPool(main_device, { dslayout.second }, 100));
 
 	this->pipeline = plb.build(this->main_device);
 
@@ -851,6 +852,8 @@ void VulkanRenderAPI::unloadMesh(const RenderObjectID &id) {
 	auto dev = main_device.handle;
 	auto &vk = main_device.vk;
 
+	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100000);
+
 	auto i = meshMap.find(id);
 	if (i == meshMap.end()) {
 		throw DevaInvalidArgumentException(strformat("MeshID {} does not exist in renderer", (std::string)id));
@@ -865,6 +868,11 @@ void VulkanRenderAPI::unloadMesh(const RenderObjectID &id) {
 	bufids.insert(vrm.vertexBuffers.begin(), vrm.vertexBuffers.end());
 	for (auto &i : bufids) {
 		bufmemIndex->removeBuffer(i, false);
+	}
+
+	for (auto i : mesh.descriptorSets) {
+		//causes bugs
+		dpoolManager->relinquishDescriptorSet(i);
 	}
 
 	auto irp = renderPassRecord.objs.begin();
