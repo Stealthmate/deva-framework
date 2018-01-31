@@ -14,6 +14,7 @@ namespace DevaEngine
 {
 	class Scene;
 	class SceneObject;
+	class GraphicObject;
 	struct Model;
 	class RenderAPI;
 
@@ -30,8 +31,8 @@ namespace DevaEngine
 		DEVA_ENGINE_API void prepareScene(std::shared_ptr<Scene> scene);
 		DEVA_ENGINE_API void render();
 
-		DEVA_ENGINE_API void loadSceneObject(std::shared_ptr<SceneObject> obj);
-		DEVA_ENGINE_API void unloadSceneObject(std::shared_ptr<SceneObject> obj);
+		DEVA_ENGINE_API void loadGraphicObject(std::shared_ptr<GraphicObject> obj);
+		DEVA_ENGINE_API void unloadGraphicObject(std::shared_ptr<GraphicObject> obj);
 
 	protected:
 
@@ -44,14 +45,14 @@ namespace DevaEngine
 		std::pair<MeshID, TextureID> loadModel(const Model &model);
 		void unloadModel(const Model &model);
 
-		class ImplSceneObjectObserver;
-		friend class ImplSceneObjectObserver;
+		class ImplGraphicObjectObserver;
+		friend class ImplGraphicObjectObserver;
 		class ImplSceneObserver;
 		friend class ImplSceneObserver;
 		std::shared_ptr<ImplSceneObserver> sceneListener;
-		std::shared_ptr<ImplSceneObjectObserver> sceneObjectObserver;
+		std::shared_ptr<ImplGraphicObjectObserver> graphicObjectObserver;
 
-		std::unordered_map<const SceneObject*, std::pair<MeshID, TextureID>> modelHandles;
+		std::unordered_map<const GraphicObject*, std::pair<MeshID, TextureID>> modelHandles;
 		std::unordered_map<std::shared_ptr<const DevaFramework::Mesh>, std::pair<MeshID, uint32_t>> meshMap;
 		std::unordered_map<std::shared_ptr<const DevaFramework::Image>, std::pair<TextureID, uint32_t>> texMap;
 

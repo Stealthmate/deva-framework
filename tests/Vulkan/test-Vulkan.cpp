@@ -90,7 +90,7 @@ int main()
 	mvp = mvp * Math::rotateZ(M_PI / 2.0);
 
 	try {
-		auto scobj = std::make_shared<SceneObject>(models[0]);
+		auto scobj = std::make_shared<SceneObject>(std::make_shared<GraphicObject>(models[0]));
 
 		std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
@@ -98,7 +98,7 @@ int main()
 		LOG.i("SUCCESS!");
 		auto &renderer = engine->getRenderer();
 
-		scobj->update().setMVP(mvp).commit();
+		scobj->graphicPart()->mvp(mvp);
 		scene->update().addObjects({ scobj }).commit();
 
 		renderer.prepareScene(scene);
@@ -112,14 +112,14 @@ int main()
 		while (engine->update()) {
 			if (c + dc > 2) {
 				c = 0;
-				scobj->update().setModel(models[1 - i]).commit();
+				scobj->graphicPart()->model(models[1 - i]);
 				i = 1 - i;
 				//if (scene->getAllObjectIDs().size() == 1) id1 = scene->addObject(std::move(scobj));
 				//else scobj = scene->removeObject(id1);
 			}
 			c += dc;
 			//mvp = mvp * Math::rotateZ(M_PI * c);
-			scobj->update().setMVP(mvp).commit();
+			scobj->graphicPart()->mvp(mvp);
 		}
 		LOG.i("Over");
 

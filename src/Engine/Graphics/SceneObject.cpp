@@ -3,7 +3,7 @@
 using namespace DevaFramework;
 using namespace DevaEngine;
 
-using SceneObjectUpdate = SceneObject::SceneObjectUpdate;
+/*using SceneObjectUpdate = SceneObject::SceneObjectUpdate;
 
 struct Observers::SceneObjectObservedMessage {
 	enum Type {
@@ -30,47 +30,12 @@ void Observers::SceneObjectObserver::onNotify(ObservedObject &obj, const Observe
 	}
 	}
 }
+*/
 
-SceneObjectUpdate::SceneObjectUpdate(SceneObject &target)
-	: object(target),
-	newModel({ false, nullptr }),
-	newMVP({ false, mat4() }) {}
-
-SceneObjectUpdate& SceneObjectUpdate::setModel(std::shared_ptr<Model> model) {
-	newModel = { true, model };
-	return *this;
-}
-
-SceneObjectUpdate& SceneObjectUpdate::setMVP(const mat4 &mvp) {
-	newMVP = { true, mvp };
-	return *this;
-}
-
-void SceneObjectUpdate::commit() {
-	if (newModel.first) {
-		auto old = object.mModel;
-		object.mModel = newModel.second;
-		object.notifyObservers({ Event::MODEL_CHANGED, object, old });
-	}
-	if (newMVP.first) {
-		auto old = object.mMVP;
-		object.mMVP = newMVP.second;
-		object.notifyObservers({ Event::MVP_CHANGED, object, old });
-	}
-}
-
-SceneObject::SceneObject(std::shared_ptr<Model> model) : mModel(model) {
+SceneObject::SceneObject(std::shared_ptr<GraphicObject> model) : graphic(model) {
 	
 }
 
-SceneObjectUpdate SceneObject::update() {
-	return SceneObjectUpdate(*this);
-}
-
-const Model& SceneObject::model() const {
-	return *mModel;
-}
-
-const mat4& SceneObject::mvp() const {
-	return mMVP;
+std::shared_ptr<GraphicObject> SceneObject::graphicPart() const {
+	return graphic;
 }

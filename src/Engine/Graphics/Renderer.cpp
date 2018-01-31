@@ -4,6 +4,7 @@
 #include <DevaFramework\Graphics\Image.hpp>
 
 #include "Scene.hpp"
+#include "GraphicObject.hpp"
 #include "SceneObject.hpp"
 #include "RenderAPI.hpp"
 
@@ -25,34 +26,34 @@ public:
 
 	virtual void onObjectsAdded(const Scene &scene, const std::unordered_set<std::shared_ptr<SceneObject>> &objects) {
 		for (auto o : objects) {
-			renderer.loadSceneObject(o);
+			renderer.loadGraphicObject(o->graphicPart());
 		}
 	}
 	virtual void onObjectRemoved(const Scene &scene, const std::unordered_set<std::shared_ptr<SceneObject>> &objects) {
 		for (auto o : objects) {
-			renderer.unloadSceneObject(o);
+			renderer.unloadGraphicObject(o->graphicPart());
 		}
 	}
 };
 
-class Renderer::ImplSceneObjectObserver : public Observers::SceneObjectObserver {
+class Renderer::ImplGraphicObjectObserver : public Observers::GraphicObjectObserver {
 public:
 	Renderer & renderer;
 
-	ImplSceneObjectObserver(Renderer& renderer) : renderer(renderer) {}
+	ImplGraphicObjectObserver(Renderer& renderer) : renderer(renderer) {}
 
-	virtual void onModelChanged(const SceneObject &object, std::shared_ptr<Model> oldModel, const Model &newModel) {
+	virtual void onModelChanged(const GraphicObject &object, std::shared_ptr<Model> oldModel, const Model &newModel) {
 		auto ids = renderer.loadModel(newModel);
 		renderer.modelHandles.insert_or_assign(&object, ids);
 		renderer.unloadModel(*oldModel);
 	}
-	virtual void onMVPChanged(const SceneObject &object, const DevaFramework::mat4 &oldMVP, const DevaFramework::mat4 &newMVP) {
+	virtual void onMVPChanged(const GraphicObject &object, const DevaFramework::mat4 &oldMVP, const DevaFramework::mat4 &newMVP) {
 		renderer.api->setMeshMVP(renderer.modelHandles.find(&object)->second.first, newMVP);
 	}
 };
 
 Renderer::Renderer(const Preferences &prefs, std::unique_ptr<RenderAPI> renderAPI)
-	: api(std::move(renderAPI)), sceneListener(new ImplSceneObserver(*this)), sceneObjectObserver(new ImplSceneObjectObserver(*this)), texMap()
+	: api(std::move(renderAPI)), sceneListener(new ImplSceneObserver(*this)), graphicObjectObserver(new ImplGraphicObjectObserver(*this)), texMap()
 {
 	api->onInit(prefs);
 }
@@ -103,23 +104,23 @@ void Renderer::unloadModel(const Model &model) {
 	}
 }
 
-void Renderer::loadSceneObject(std::shared_ptr<SceneObject> obj) {
+void Renderer::loadGraphicObject(std::shared_ptr<GraphicObject> obj) {
 
-	auto ids = loadModel(obj->model());
+	auto ids = loadModel(*obj->model());
 	api->setMeshMVP(ids.first, obj->mvp());
 
-	::registerObserver(*obj, *sceneObjectObserver);
+	::registerObserver(*obj, *graphicObjectObserver);
 
 	modelHandles.insert({ obj.get(), {ids.first, ids.second} });
 }
 
-void Renderer::unloadSceneObject(std::shared_ptr<SceneObject> obj) {
+void Renderer::unloadGraphicObject(std::shared_ptr<GraphicObject> obj) {
 	auto i = modelHandles.find(obj.get());
 	if (i == modelHandles.end()) return;
 
-	::unregisterObserver(*obj, *sceneObjectObserver);
+	::unregisterObserver(*obj, *graphicObjectObserver);
 
-	unloadModel(obj->model());
+	unloadModel(*obj->model());
 
 	modelHandles.erase(i);
 }
@@ -150,7 +151,7 @@ void Renderer::prepareScene(std::shared_ptr<Scene> scene) {
 	auto &objs = scene->getAllObjects();
 	GuidGenerator ggen;
 	for (auto &object : objs) {
-		loadSceneObject(object);
+		loadGraphicObject(object->graphicPart());
 	}
 }
 
