@@ -16,3 +16,4 @@ clang/**
 *.dir
 x64/**
 *.dir/**
+uml/**
