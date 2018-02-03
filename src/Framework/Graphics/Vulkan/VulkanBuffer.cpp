@@ -26,24 +26,18 @@ VulkanBuffer Vulkan::createBuffer(
 	auto dev = device.handle;
 	auto vk = device.vk;
 
-	VulkanBuffer buffer;
+	VkBuffer handle;
 
-	VkResult result = vk.vkCreateBuffer(dev, &cinfo, nullptr, &buffer.handle);
+	VkResult result = vk.vkCreateBuffer(dev, &cinfo, nullptr, &handle);
 	if (result != VK_SUCCESS) {
 		throw DevaExternalFailureException("Vulkan", "Could not create buffer");
 	}
+	VkMemoryRequirements memreq;
+	vk.vkGetBufferMemoryRequirements(dev, handle, &memreq);
 
-
-	buffer.usage = usage;
-	buffer.sharingMode = sharingMode;
-	buffer.size = size;
-
-	vk.vkGetBufferMemoryRequirements(dev, buffer.handle, &buffer.memoryRequirements);
-
-	return buffer;
+	return VulkanBuffer{ handle, size, usage, sharingMode, memreq };
 }
 
 void DevaFramework::Vulkan::destroyObject(const VulkanDevice &dev, VulkanBuffer &buf) {
 	dev.vk.vkDestroyBuffer(dev.handle, buf.handle, nullptr);
-	buf.handle = VK_NULL_HANDLE;
 }
