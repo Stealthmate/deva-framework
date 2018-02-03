@@ -70,15 +70,17 @@ std::pair<MeshID, TextureID> Renderer::loadModel(const Model &model) {
 		meshMap.insert({ model.mesh,{ meshid, 1 } });
 	}
 
-	RenderObjectID texid;
-	auto ti = texMap.find(model.texture);
-	if (ti != texMap.end()) {
-		texid = ti->second.first;
-		ti->second.second++;
-	}
-	else {
-		texid = api->loadTexture(*model.texture);
-		texMap.insert({ model.texture,{ texid, 1 } });
+	RenderObjectID texid = Uuid::NULL_ID;
+	if (model.texture) {
+		auto ti = texMap.find(model.texture);
+		if (ti != texMap.end()) {
+			texid = ti->second.first;
+			ti->second.second++;
+		}
+		else {
+			texid = api->loadTexture(*model.texture);
+			texMap.insert({ model.texture,{ texid, 1 } });
+		}
 	}
 
 	api->bindMeshTexture(meshid, texid);
