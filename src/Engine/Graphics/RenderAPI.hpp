@@ -22,7 +22,7 @@ namespace DevaEngine {
 		DevaFramework::vec4 frontVector;
 	};
 	typedef DevaFramework::Uuid RenderObjectID;
-	typedef DevaFramework::Uuid ImageID;
+	typedef DevaFramework::Uuid ShaderID;
 
 	class RenderAPI {
 	public:
@@ -31,6 +31,9 @@ namespace DevaEngine {
 		virtual void onSetupRenderTargetWindow(const DevaFramework::Window &wnd) = 0;
 		virtual void onSetupRenderTargetImage(const DevaFramework::Image &img) = 0;
 		virtual void onDestroy() = 0;
+
+		//virtual ShaderID loadShader() = 0;
+		//virtual void unloadShader(const ShaderID &id);
 
 		virtual RenderObjectID loadMesh(const DevaFramework::Mesh &mesh) = 0;
 		virtual void unloadMesh(const RenderObjectID &id) = 0;

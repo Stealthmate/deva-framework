@@ -117,8 +117,6 @@ namespace DevaEngine
 
 		DEVA_ENGINE_API virtual void drawScene() override;
 
-		DEVA_ENGINE_API virtual ImageID loadImage(const DevaFramework::Image &img);
-
 		DEVA_ENGINE_API virtual RenderObjectID loadMesh(const DevaFramework::Mesh &mesh) override;
 		DEVA_ENGINE_API virtual void unloadMesh(const RenderObjectID &id) override;
 		DEVA_ENGINE_API virtual void setMeshMVP(const RenderObjectID &id, const DevaFramework::mat4 &mvp) override;
@@ -130,23 +128,34 @@ namespace DevaEngine
 		DEVA_ENGINE_API virtual void unbindMeshTexture(const RenderObjectID &meshid, const RenderObjectID &texid) override;
 
 	private:
+
+		DevaFramework::VulkanInstance instance;
+		DevaFramework::VulkanDevice main_device;
+		std::unique_ptr<VulkanPresenter> presenter;
+		DevaFramework::VulkanQueue renderQueue;
+
+		std::vector<VkFramebuffer> framebuffers;
+
+		VulkanGraphicsPipeline pipeline;
+
+		VulkanQueueSubmitBuffer queueBuffer;
+		DevaFramework::VulkanRenderPass renderPass;
+		VulkanRenderPassRecord renderPassRecord;
+
+		DevaFramework::VulkanCommandPool commandPool;
+		std::vector<DevaFramework::VulkanCommandBuffer> commandBuffers;
+
+		VkSemaphore imageAvailableSemaphore;
+		VkSemaphore renderFinishedSemaphore;
+
 		std::unique_ptr<VulkanBufferMemoryIndex> bufmemIndex;
 
 		std::unique_ptr<VulkanDescriptorPool> dpoolManager;
 
-		DevaFramework::VulkanInstance instance;
-		DevaFramework::VulkanDevice main_device;
 		VkFence fence;
-
-		std::vector<VkFramebuffer> framebuffers;
-
-		DevaFramework::VulkanQueue renderQueue;
-		VulkanGraphicsPipeline pipeline;
 
 		DevaFramework::Vulkan::VulkanBufferID prebuffer;
 
-		DevaFramework::VulkanCommandPool commandPool;
-		std::vector<DevaFramework::VulkanCommandBuffer> commandBuffers;
 
 		std::unordered_map<RenderObjectID, std::pair<VulkanMesh, VulkanMeshResources>> meshMap;
 		std::unordered_map<RenderObjectID, std::pair<VulkanTexture, VulkanTextureResrouces>> texMap;
@@ -156,15 +165,6 @@ namespace DevaEngine
 		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;
 
 		std::unordered_map<DevaFramework::Uuid, DevaFramework::VulkanImage> mImages;
-
-		VulkanQueueSubmitBuffer queueBuffer;
-
-		VulkanRenderPassRecord renderPassRecord;
-
-		VkSemaphore imageAvailableSemaphore;
-		VkSemaphore renderFinishedSemaphore;
-		DevaFramework::VulkanRenderPass renderPass;
-		std::unique_ptr<VulkanPresenter> presenter;
 
 		void createPipeline();
 		void createRenderPass();

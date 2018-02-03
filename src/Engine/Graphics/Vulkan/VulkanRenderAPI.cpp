@@ -19,6 +19,7 @@
 #include <DevaFramework\Util\Time.hpp>
 
 
+#include"VulkanPresenter.hpp"
 
 #include <limits>
 #include <unordered_set>
@@ -123,70 +124,9 @@ namespace
 		nullptr													  //ppEnabledExtensionNames
 	};
 
-	const char * DEVICE_EXTENSIONS[] =
-	{
-		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-	};
-
 	const VkPhysicalDeviceFeatures EMPTY_FEATURES;
 
 	const bool VULKAN_LOADED = false;
-
-	bool pickGPU(const VulkanInstance &instance, VkSurfaceKHR surface, VulkanPhysicalDevice * gpu, uint32_t * queueIndex)
-	{
-		auto vk = instance.vk;
-		auto pdevs = instance.physicalDevices;
-		for (auto &pdev : pdevs) {
-			if (pdev.properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) continue;
-			auto& supportedQueues = DevaFramework::Vulkan::deviceQueueFamiliesSupportSurface(instance, pdev.handle, surface);
-			for (int i = 0;i < supportedQueues.size();i++)
-			{
-				auto& q = pdev.queueFamilyProperties[supportedQueues[i]];
-				if ((q.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) continue;
-
-				VkBool32 supportsPresent = DevaFramework::Vulkan::doesDeviceQueueSupportSurface(instance, pdev, supportedQueues[i], surface);
-				if (supportsPresent) {
-					*queueIndex = supportedQueues[i];
-					*gpu = pdev;
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	VulkanDevice createLogicalDevice(const VulkanInstance& instance, const VulkanPhysicalDevice &pdev, uint32_t queueIndex)
-	{
-		std::vector<float> priorities = { 1.0f };
-		VkDeviceQueueCreateInfo q_cinfo;
-		q_cinfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		q_cinfo.pNext = nullptr;
-		q_cinfo.queueCount = 1;
-		q_cinfo.queueFamilyIndex = queueIndex;
-		q_cinfo.pQueuePriorities = priorities.data();
-		q_cinfo.flags = 0;
-		for (auto ext : DEVICE_EXTENSIONS)
-		{
-			if (!DevaFramework::Vulkan::doesDeviceSupportExtension(pdev, ext))
-				throw DevaException("Cannot create VulkanDevice: Unsupported extension " + std::string(ext));
-		}
-
-		VkDeviceCreateInfo dev_cinfo;
-		dev_cinfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		dev_cinfo.pNext = nullptr;
-		dev_cinfo.flags = 0;
-		dev_cinfo.queueCreateInfoCount = 1;
-		dev_cinfo.pQueueCreateInfos = &q_cinfo;
-		dev_cinfo.enabledLayerCount = 0;
-		dev_cinfo.ppEnabledLayerNames = nullptr;
-		dev_cinfo.enabledExtensionCount = sizeof DEVICE_EXTENSIONS / sizeof(const char*);
-		dev_cinfo.ppEnabledExtensionNames = DEVICE_EXTENSIONS;
-		VkPhysicalDeviceFeatures features = EMPTY_FEATURES;
-		features.fillModeNonSolid = VK_TRUE;
-		if (pdev.features.fillModeNonSolid) dev_cinfo.pEnabledFeatures = &features;
-
-		return DevaFramework::Vulkan::createDevice(instance, pdev, dev_cinfo);
-	}
 
 	std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel> createLayout(
 		const VulkanDevice &device,
@@ -261,9 +201,7 @@ void VulkanRenderAPI::onInit(const Preferences &prefs) {
 	std::vector<std::string> layerStrings;
 	if (layers.has_value() && layers.type() == typeid(std::vector<std::string>)) {
 		layerStrings = std::any_cast<std::vector<std::string>>(layers);
-		for (auto i = 0;i < layerStrings.size();i++) {
-			layerPointers.push_back(layerStrings[i].c_str());
-		}
+		layerPointers = DevaFramework::convertStringArrToPtrArr(layerStrings);
 	}
 
 	auto extensions = prefs.getPreference("vkextensions");
@@ -271,11 +209,7 @@ void VulkanRenderAPI::onInit(const Preferences &prefs) {
 	std::vector<std::string> extensionStrings;
 	if (extensions.has_value() && extensions.type() == typeid(std::vector<std::string>)) {
 		extensionStrings = std::any_cast<std::vector<std::string>>(extensions);
-		for (auto i = 0;i < extensionStrings.size();i++) {
-			if (DevaFramework::Vulkan::instanceExtensionAvailable(extensionStrings[i])) {
-				extensionPointers.push_back(extensionStrings[i].c_str());
-			}
-		}
+		extensionPointers = DevaFramework::convertStringArrToPtrArr(extensionStrings);
 	}
 
 	VkInstanceCreateInfo instanceInfo(INSTANCE_CREATE_INFO);
@@ -297,15 +231,12 @@ void VulkanRenderAPI::onSetupRenderTargetWindow(const Window &wnd) {
 	renderQueue = presenter->queue();
 	queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
 
-
 	createRenderPass();
 	createFramebuffers();
 
-	{
-		fence = DevaFramework::Vulkan::createFence(main_device, VK_FENCE_CREATE_SIGNALED_BIT);
-		imageAvailableSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
-		renderFinishedSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
-	}
+	fence = DevaFramework::Vulkan::createFence(main_device, VK_FENCE_CREATE_SIGNALED_BIT);
+	imageAvailableSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
+	renderFinishedSemaphore = DevaFramework::Vulkan::createSemaphore(main_device);
 
 	createPipeline();
 }
@@ -401,6 +332,8 @@ void VulkanRenderAPI::createPipeline()
 	vib.addAttribute(DevaFramework::Vulkan::makeVAD(1, 0, VK_FORMAT_R32G32B32_SFLOAT, 16));
 	plb.addVertexInputBinding(vib);
 
+
+
 	VkDescriptorSetLayoutBinding binding;
 	binding.binding = 0;
 	binding.descriptorCount = 1;
@@ -416,6 +349,8 @@ void VulkanRenderAPI::createPipeline()
 	dsLayoutPipelineMap.insert({ id, setn });
 
 	dpoolManager = std::make_unique<VulkanDescriptorPool>(VulkanDescriptorPool(main_device, { dslayout.second }, 100));
+
+
 
 	this->pipeline = plb.build(this->main_device);
 
@@ -468,110 +403,6 @@ std::tuple<VkImageMemoryBarrier, VkPipelineStageFlags, VkPipelineStageFlags> tra
 
 	return { barrier, sourceStage, destinationStage };
 }
-
-Uuid VulkanRenderAPI::loadImage(const Image &img) {
-	auto dev = this->main_device.handle;
-	auto vk = this->main_device.vk;
-
-	size_t imageSize = img.data.size();
-	Uuid bufid = bufmemIndex->addBuffer(DevaFramework::Vulkan::createBuffer(
-		this->main_device,
-		0,
-		imageSize,
-		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-		VK_SHARING_MODE_EXCLUSIVE));
-	Uuid memid = bufmemIndex->addMemory(DevaFramework::Vulkan::allocateMemoryForBuffer(
-		this->main_device,
-		bufmemIndex->getBuffer(bufid),
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
-	bufmemIndex->bindBufferMemory(bufid, memid, main_device, 0);
-
-	void* mem = nullptr;
-	vk.vkMapMemory(dev, bufmemIndex->getMemory(memid).handle, 0, imageSize, 0, &mem);
-	memcpy(mem, img.data.data(), imageSize);
-	vk.vkUnmapMemory(dev, bufmemIndex->getMemory(memid).handle);
-
-	VulkanImage image;
-
-	VkImageCreateInfo imageInfo = {};
-	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	imageInfo.imageType = VK_IMAGE_TYPE_2D;
-	imageInfo.extent.width = static_cast<uint32_t>(img.width);
-	imageInfo.extent.height = static_cast<uint32_t>(img.height);
-	imageInfo.extent.depth = 1;
-	imageInfo.mipLevels = 1;
-	imageInfo.arrayLayers = 1;
-	imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-	imageInfo.flags = 0; // Optional
-
-	VkResult res;
-	res = vk.vkCreateImage(dev, &imageInfo, nullptr, &image.handle);
-	if (res != VK_SUCCESS) {
-		throw DevaException("Could not create image");
-	}
-
-	VulkanMemory imgmem = DevaFramework::Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	image.sharingMode = imageInfo.sharingMode;
-	image.size = imgmem.size;
-	image.usage = imageInfo.usage;
-
-	Uuid id = Uuid();
-	mImages.insert({ id, image });
-
-	vk.vkBindImageMemory(dev, image.handle, imgmem.handle, 0);
-
-	VkSubmitInfo submitInfo = {};
-	VulkanCommandBuffer buffer = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-
-	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-	auto barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
-
-	VkBufferImageCopy region = {};
-	region.bufferOffset = 0;
-	region.bufferRowLength = 0;
-	region.bufferImageHeight = 0;
-
-	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	region.imageSubresource.mipLevel = 0;
-	region.imageSubresource.baseArrayLayer = 0;
-	region.imageSubresource.layerCount = 1;
-
-	region.imageOffset = { 0, 0, 0 };
-	region.imageExtent = {
-		img.width,
-		img.height,
-		1
-	};
-
-	vk.vkCmdCopyBufferToImage(buffer.handle, bufmemIndex->getBuffer(bufid).handle, image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-
-	barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
-
-	vk.vkEndCommandBuffer(buffer.handle);
-
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &buffer.handle;
-
-	vk.vkResetFences(dev, 1, &fence);
-	vk.vkQueueSubmit(renderQueue.handle, 1, &submitInfo, fence);
-	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100000000);
-
-	vk.vkFreeCommandBuffers(dev, this->commandPool.handle, 1, &buffer.handle);
-	bufmemIndex->removeBuffer(bufid, true);
-
-	return Uuid();
-}
-
-#include"VulkanPresenter.hpp"
 
 void VulkanRenderAPI::drawScene() {
 	auto &vk = main_device.vk;
