@@ -8,11 +8,11 @@ namespace DevaFramework {
 	struct VulkanDevice;
 
 	struct VulkanBuffer {
-		const VkBuffer              handle;
-		const VkDeviceSize          size;
-		const VkBufferUsageFlags    usage;
-		const VkSharingMode         sharingMode;
-		const VkMemoryRequirements  memoryRequirements;
+		VkBuffer              handle;
+		VkDeviceSize          size;
+		VkBufferUsageFlags    usage;
+		VkSharingMode         sharingMode;
+		VkMemoryRequirements  memoryRequirements;
 	};
 
 	namespace Vulkan {
@@ -23,7 +23,7 @@ namespace DevaFramework {
 			VkBufferUsageFlags usage,
 			VkSharingMode sharingMode,
 			const std::vector<uint32_t> &queues = std::vector<uint32_t>());
-
+		
 		DEVA_FRAMEWORK_API void destroyObject(const VulkanDevice& dev, VulkanBuffer &obj);
 	}
 }
