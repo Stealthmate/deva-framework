@@ -291,8 +291,9 @@ void VulkanRenderAPI::onInit(const Preferences &prefs) {
 }
 
 void VulkanRenderAPI::onSetupRenderTargetWindow(const Window &wnd) {
-	surface = DevaFramework::Vulkan::createSurfaceForWindow(instance, wnd);
-
+	presenter = std::make_unique<VulkanPresenter>(instance, wnd);
+	/*surface = DevaFramework::Vulkan::createSurfaceForWindow(instance, wnd);
+	
 	VulkanPhysicalDevice gpu;
 	uint32_t queueIndex = 0;
 	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
@@ -301,8 +302,9 @@ void VulkanRenderAPI::onSetupRenderTargetWindow(const Window &wnd) {
 
 	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queueIndex, 0);
 	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
-
-	attachToWindow(wnd);
+	*/
+	//attachToWindow(wnd);
+	main_device = presenter->device();
 	createRenderPass();
 
 	{
@@ -650,10 +652,6 @@ void VulkanRenderAPI::drawScene() {
 	commandBuffers[0] = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-	/*for (auto& object : meshMap) {
-		renderPassRecord.objs.push_back(object.second.first);
-	}*/
-
 	uint32_t imageIndex;
 	vk.vkAcquireNextImageKHR(device, swapchain.handle, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
@@ -673,7 +671,7 @@ void VulkanRenderAPI::drawScene() {
 
 	queueBuffer.flush(main_device, fence);
 
-	DevaFramework::Vulkan::present(main_device, renderQueue.handle, { renderFinishedSemaphore }, { swapchain.handle }, { imageIndex });
+	DevaEngine::Vulkan::present(main_device, renderQueue.handle, { renderFinishedSemaphore }, { swapchain.handle }, { imageIndex });
 }
 
 void VulkanRenderAPI::onDestroy() {
@@ -844,7 +842,104 @@ RenderObjectID VulkanRenderAPI::loadMesh(const Mesh &mesh) {
 }
 
 RenderObjectID VulkanRenderAPI::loadTexture(const Image &tex) {
-	//TODO
+	auto dev = this->main_device.handle;
+	auto vk = this->main_device.vk;
+
+	size_t imageSize = tex.data.size();
+	Uuid bufid = bufmemIndex->addBuffer(DevaFramework::Vulkan::createBuffer(
+		this->main_device,
+		0,
+		imageSize,
+		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+		VK_SHARING_MODE_EXCLUSIVE));
+	Uuid memid = bufmemIndex->addMemory(DevaFramework::Vulkan::allocateMemoryForBuffer(
+		this->main_device,
+		bufmemIndex->getBuffer(bufid),
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+	bufmemIndex->bindBufferMemory(bufid, memid, main_device, 0);
+
+	void* mem = nullptr;
+	vk.vkMapMemory(dev, bufmemIndex->getMemory(memid).handle, 0, imageSize, 0, &mem);
+	memcpy(mem, tex.data.data(), imageSize);
+	vk.vkUnmapMemory(dev, bufmemIndex->getMemory(memid).handle);
+
+	VulkanImage image;
+
+	VkImageCreateInfo imageInfo = {};
+	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageInfo.imageType = VK_IMAGE_TYPE_2D;
+	imageInfo.extent.width = static_cast<uint32_t>(tex.width);
+	imageInfo.extent.height = static_cast<uint32_t>(tex.height);
+	imageInfo.extent.depth = 1;
+	imageInfo.mipLevels = 1;
+	imageInfo.arrayLayers = 1;
+	imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageInfo.flags = 0; // Optional
+
+	VkResult res;
+	res = vk.vkCreateImage(dev, &imageInfo, nullptr, &image.handle);
+	if (res != VK_SUCCESS) {
+		throw DevaException("Could not create image");
+	}
+
+	VulkanMemory imgmem = DevaFramework::Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	image.sharingMode = imageInfo.sharingMode;
+	image.size = imgmem.size;
+	image.usage = imageInfo.usage;
+
+	Uuid id = Uuid();
+	mImages.insert({ id, image });
+
+	vk.vkBindImageMemory(dev, image.handle, imgmem.handle, 0);
+
+	VkSubmitInfo submitInfo = {};
+	VulkanCommandBuffer buffer = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+	DevaFramework::Vulkan::beginCommandBuffer(main_device, buffer.handle, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+	auto barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
+
+	VkBufferImageCopy region = {};
+	region.bufferOffset = 0;
+	region.bufferRowLength = 0;
+	region.bufferImageHeight = 0;
+
+	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	region.imageSubresource.mipLevel = 0;
+	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.layerCount = 1;
+
+	region.imageOffset = { 0, 0, 0 };
+	region.imageExtent = {
+		tex.width,
+		tex.height,
+		1
+	};
+
+	vk.vkCmdCopyBufferToImage(buffer.handle, bufmemIndex->getBuffer(bufid).handle, image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+
+	barrier = transitionImageLayout(image.handle, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	vk.vkCmdPipelineBarrier(buffer.handle, std::get<1>(barrier), std::get<2>(barrier), 0, 0, nullptr, 0, nullptr, 1, &std::get<0>(barrier));
+
+	vk.vkEndCommandBuffer(buffer.handle);
+
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &buffer.handle;
+
+	vk.vkResetFences(dev, 1, &fence);
+	vk.vkQueueSubmit(renderQueue.handle, 1, &submitInfo, fence);
+	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100000000);
+
+	vk.vkFreeCommandBuffers(dev, this->commandPool.handle, 1, &buffer.handle);
+	bufmemIndex->removeBuffer(bufid, true);
+
 	return Uuid();
 }
 

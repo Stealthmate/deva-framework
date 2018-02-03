@@ -15,6 +15,7 @@
 #include "VulkanSwapchain.hpp"
 #include "VulkanPipeline.hpp"
 #include "VulkanQueueSubmitBuffer.hpp"
+#include "VulkanPresenter.hpp"
 
 namespace DevaEngine
 {
@@ -168,6 +169,7 @@ namespace DevaEngine
 		VkSemaphore imageAvailableSemaphore;
 		VkSemaphore renderFinishedSemaphore;
 		DevaFramework::VulkanRenderPass renderPass;
+		std::unique_ptr<VulkanPresenter> presenter;
 
 		void createPipeline();
 		void createRenderPass();
