@@ -169,7 +169,6 @@ namespace DevaEngine
 		void createPipeline();
 		void createRenderPass();
 		void createFramebuffers();
-		void attachToWindow(const DevaFramework::Window &wnd);
 	};
 }
 

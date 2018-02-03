@@ -292,18 +292,6 @@ void VulkanRenderAPI::onInit(const Preferences &prefs) {
 
 void VulkanRenderAPI::onSetupRenderTargetWindow(const Window &wnd) {
 	presenter = std::make_unique<VulkanPresenter>(instance, wnd);
-	/*surface = DevaFramework::Vulkan::createSurfaceForWindow(instance, wnd);
-	
-	VulkanPhysicalDevice gpu;
-	uint32_t queueIndex = 0;
-	if (!::pickGPU(instance, surface, &gpu, &queueIndex)) throw DevaException("Could not find suitable GPU and/or queue");
-	this->main_device = ::createLogicalDevice(instance, gpu, queueIndex);
-	ENGINE_LOG.v(strformat("Using GPU: {}", gpu.properties.deviceName));
-
-	this->renderQueue = DevaFramework::Vulkan::getDeviceQueue(main_device, queueIndex, 0);
-	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
-	*/
-	//attachToWindow(wnd);
 
 	main_device = presenter->device();
 	renderQueue = presenter->queue();
@@ -354,7 +342,7 @@ void VulkanRenderAPI::onSetupRenderTargetImage(const Image &img) {
 	throw DevaUnsupportedOperationException("Image rendering not supported yet");
 }
 
-void VulkanRenderAPI::createRenderPass() {
+void VulkanRenderAPI::createRenderPass()	 {
 	VkAttachmentDescription colorAttachment = {};
 	colorAttachment.format = presenter->swapchain().format;
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
