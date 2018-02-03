@@ -137,15 +137,10 @@ namespace DevaEngine
 		DevaFramework::VulkanInstance instance;
 		DevaFramework::VulkanDevice main_device;
 		VkFence fence;
-		VkColorSpaceKHR colorSpace;
-		VkFormat colorFormat;
 
 		std::vector<VkFramebuffer> framebuffers;
 
 		DevaFramework::VulkanQueue renderQueue;
-
-		DevaFramework::VulkanHandle<VkSurfaceKHR> surface;
-		VulkanSwapchain swapchain;
 		VulkanGraphicsPipeline pipeline;
 
 		DevaFramework::Vulkan::VulkanBufferID prebuffer;
@@ -173,6 +168,7 @@ namespace DevaEngine
 
 		void createPipeline();
 		void createRenderPass();
+		void createFramebuffers();
 		void attachToWindow(const DevaFramework::Window &wnd);
 	};
 }

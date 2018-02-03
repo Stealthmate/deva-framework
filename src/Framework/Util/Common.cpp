@@ -18,7 +18,7 @@ std::string DevaFramework::readTextFile(const char* filepath)
 		input.close();
 	}
 	else {
-		
+
 		throw DevaInvalidArgumentException(strformat("Cannot open file {}", filepath));
 	}
 	return text;
@@ -40,4 +40,12 @@ ByteBuffer DevaFramework::readBinaryFile(const char* filepath)
 		throw DevaInvalidArgumentException("Cannot open file " + std::string(filepath));
 	}
 	return buffer;
+}
+
+std::vector<const char*> DevaFramework::convertStringArrToPtrArr(const std::vector<std::string> &strings) {
+	std::vector<const char*> ptrs;
+	for (auto i = 0;i < strings.size();i++) {
+		ptrs.push_back(strings[i].c_str());
+	}
+	return ptrs;
 }

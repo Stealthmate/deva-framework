@@ -304,8 +304,14 @@ void VulkanRenderAPI::onSetupRenderTargetWindow(const Window &wnd) {
 	this->queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
 	*/
 	//attachToWindow(wnd);
+
 	main_device = presenter->device();
+	renderQueue = presenter->queue();
+	queueBuffer = VulkanQueueSubmitBuffer(renderQueue);
+
+
 	createRenderPass();
+	createFramebuffers();
 
 	{
 		fence = DevaFramework::Vulkan::createFence(main_device, VK_FENCE_CREATE_SIGNALED_BIT);
@@ -316,83 +322,41 @@ void VulkanRenderAPI::onSetupRenderTargetWindow(const Window &wnd) {
 	createPipeline();
 }
 
+void VulkanRenderAPI::createFramebuffers() {
+
+	auto dev = main_device.handle;
+	auto &vk = main_device.vk;
+
+	auto swapchain = presenter->swapchain();
+	framebuffers.resize(swapchain.imageViews.size());
+	for (size_t i = 0; i < swapchain.imageViews.size(); i++) {
+		VkImageView attachments[] = {
+			swapchain.imageViews[i]
+		};
+
+		VkFramebufferCreateInfo framebufferInfo = {};
+		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.renderPass = renderPass.handle;
+		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.pAttachments = attachments;
+		framebufferInfo.width = swapchain.extent.width;
+		framebufferInfo.height = swapchain.extent.height;
+		framebufferInfo.layers = 1;
+
+		if (vk.vkCreateFramebuffer(dev, &framebufferInfo, nullptr, &framebuffers[i]) != VK_SUCCESS) {
+			throw DevaException("failed to create framebuffer!");
+		}
+	}
+}
+
+
 void VulkanRenderAPI::onSetupRenderTargetImage(const Image &img) {
 	throw DevaUnsupportedOperationException("Image rendering not supported yet");
 }
 
-void VulkanRenderAPI::attachToWindow(const Window &wnd)
-{
-	auto dev = instance.physicalDevices[0];
-	auto vk = instance.vk;
-
-	auto surfaceprops = DevaFramework::Vulkan::getSurfaceProperties(instance, dev, surface);
-
-	uint32_t formatCount = static_cast<uint32_t>(surfaceprops.formats.size());
-	if (formatCount == 1 && surfaceprops.formats[0].format == VK_FORMAT_UNDEFINED)
-		this->colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
-	else {
-		if (formatCount == 0)
-			throw DevaExternalFailureException("Vulkan", "Device has no surface formats!");
-		this->colorFormat = surfaceprops.formats[0].format;
-	}
-	this->colorSpace = surfaceprops.formats[0].colorSpace;
-
-	DevaExternalFailureException e = DevaExternalFailureException("Vulkan", "Vulkan error");
-
-	VkExtent2D swapchainExtent = {};
-
-	if (surfaceprops.capabilities.currentExtent.width == -1 || surfaceprops.capabilities.currentExtent.height == -1) {
-		swapchainExtent.width = wnd.getWidth() / 2;
-		swapchainExtent.height = wnd.getHeight() / 2;
-	}
-	else {
-		swapchainExtent = surfaceprops.capabilities.currentExtent;
-	}
-
-	VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
-
-	for (uint32_t i = 0; i < surfaceprops.presentModes.size(); i++) {
-		if (surfaceprops.presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
-			presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
-			break;
-		}
-
-		if (surfaceprops.presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR)
-			presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
-	}
-
-	if (surfaceprops.capabilities.maxImageCount < 1) throw e;
-
-	uint32_t imageCount = surfaceprops.capabilities.minImageCount + 1;
-	if (imageCount > surfaceprops.capabilities.maxImageCount) imageCount = surfaceprops.capabilities.maxImageCount;
-
-	uint32_t indices = {
-		renderQueue.familyIndex
-	};
-
-	VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
-	swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	swapchainCreateInfo.surface = surface;
-	swapchainCreateInfo.minImageCount = imageCount;
-	swapchainCreateInfo.imageFormat = colorFormat;
-	swapchainCreateInfo.imageColorSpace = colorSpace;
-	swapchainCreateInfo.imageExtent = swapchainExtent;
-	swapchainCreateInfo.imageArrayLayers = 1;
-	swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-	swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	swapchainCreateInfo.queueFamilyIndexCount = 1;
-	swapchainCreateInfo.pQueueFamilyIndices = &indices;
-	swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-	swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	swapchainCreateInfo.presentMode = presentMode;
-	swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
-
-	this->swapchain = DevaEngine::Vulkan::createSwapchain(this->main_device, swapchainCreateInfo);
-}
-
 void VulkanRenderAPI::createRenderPass() {
 	VkAttachmentDescription colorAttachment = {};
-	colorAttachment.format = swapchain.format;
+	colorAttachment.format = presenter->swapchain().format;
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -436,29 +400,10 @@ void VulkanRenderAPI::createPipeline()
 	VulkanGraphicsPipelineBuilder plb;
 	plb.attachShader(vert, VK_SHADER_STAGE_VERTEX_BIT, "main")
 		.attachShader(frag, VK_SHADER_STAGE_FRAGMENT_BIT, "main")
-		.outputExtent(swapchain.extent);
+		.outputExtent(presenter->swapchain().extent);
 
 	auto &vk = main_device.vk;
 	auto device = main_device.handle;
-
-	for (size_t i = 0; i < swapchain.imageViews.size(); i++) {
-		VkImageView attachments[] = {
-			swapchain.imageViews[i]
-		};
-
-		VkFramebufferCreateInfo framebufferInfo = {};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderPass.handle;
-		framebufferInfo.attachmentCount = 1;
-		framebufferInfo.pAttachments = attachments;
-		framebufferInfo.width = swapchain.extent.width;
-		framebufferInfo.height = swapchain.extent.height;
-		framebufferInfo.layers = 1;
-
-		if (vk.vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapchain.framebuffers[i]) != VK_SUCCESS) {
-			throw DevaException("failed to create framebuffer!");
-		}
-	}
 
 	plb.setTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.setRenderPass(renderPass.handle, 0);
@@ -487,7 +432,7 @@ void VulkanRenderAPI::createPipeline()
 	this->pipeline = plb.build(this->main_device);
 
 	renderPassRecord.pipeline = pipeline.getHandle();
-	renderPassRecord.renderArea = swapchain.extent;
+	renderPassRecord.renderArea = presenter->swapchain().extent;
 	renderPassRecord.clearVals = { { 0.0f, 0.0f, 0.0f, 0.0f } };
 	renderPassRecord.renderPass = renderPass.handle;
 
@@ -652,10 +597,10 @@ void VulkanRenderAPI::drawScene() {
 	commandBuffers[0] = DevaFramework::Vulkan::allocateCommandBuffer(main_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-	uint32_t imageIndex;
-	vk.vkAcquireNextImageKHR(device, swapchain.handle, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+	uint32_t imageIndex = presenter->nextImageIndex(std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE);
+	//vk.vkAcquireNextImageKHR(device, swapchain.handle, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
-	renderPassRecord.framebuffer = swapchain.framebuffers[imageIndex];
+	renderPassRecord.framebuffer = framebuffers[imageIndex];
 
 	Vulkan::recordRenderPass(main_device, commandBuffers[0].handle, renderPassRecord);
 
@@ -671,7 +616,8 @@ void VulkanRenderAPI::drawScene() {
 
 	queueBuffer.flush(main_device, fence);
 
-	DevaEngine::Vulkan::present(main_device, renderQueue.handle, { renderFinishedSemaphore }, { swapchain.handle }, { imageIndex });
+	presenter->present(renderQueue.handle, { renderFinishedSemaphore }, imageIndex);
+	//DevaEngine::Vulkan::present(main_device, renderQueue.handle, { renderFinishedSemaphore }, { swapchain.handle }, { imageIndex });
 }
 
 void VulkanRenderAPI::onDestroy() {
@@ -687,14 +633,15 @@ void VulkanRenderAPI::onDestroy() {
 		vkd.vkDestroySemaphore(dev, imageAvailableSemaphore, nullptr);
 		vkd.vkDestroySemaphore(dev, renderFinishedSemaphore, nullptr);
 		vkd.vkDestroyFence(dev, fence, nullptr);
+		auto swapchain = presenter->swapchain();
 		for (auto i : swapchain.imageViews) {
 			vkd.vkDestroyImageView(dev, i, nullptr);
 		}
-		for (auto i : swapchain.framebuffers) {
+		for (auto i : framebuffers) {
 			vkd.vkDestroyFramebuffer(dev, i, nullptr);
 		}
-		vkd.vkDestroySwapchainKHR(dev, this->swapchain.handle, nullptr);
-		this->surface.replace();
+		vkd.vkDestroySwapchainKHR(dev, swapchain.handle, nullptr);
+		//this->surface.replace();
 
 		for (auto &i : dsLayouts) {
 			vkd.vkDestroyDescriptorSetLayout(dev, i.second.first, nullptr);

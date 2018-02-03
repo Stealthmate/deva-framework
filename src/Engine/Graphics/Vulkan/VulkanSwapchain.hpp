@@ -9,13 +9,11 @@
 
 namespace DevaEngine {
 	struct VulkanSwapchain {
-
 		VkSwapchainKHR handle;
 		std::vector<VkImage> images;
 		std::vector<VkImageView> imageViews;
 		VkExtent2D extent;
 		VkFormat format;
-		std::vector<VkFramebuffer> framebuffers;
 	};
 
 	namespace Vulkan {

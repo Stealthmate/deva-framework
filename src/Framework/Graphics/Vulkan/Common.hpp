@@ -36,7 +36,7 @@ namespace DevaFramework {
 			void * userData = nullptr);
 
 		DEVA_FRAMEWORK_API VulkanHandle<VkShaderModule> loadShaderFromFile(const VulkanDevice &dev, const char *filepath);
-		DEVA_FRAMEWORK_API VulkanHandle<VkSurfaceKHR> createSurfaceForWindow(const VulkanInstance &vkInstance, const Window &wnd);
+		DEVA_FRAMEWORK_API VkSurfaceKHR createSurfaceForWindow(const VulkanInstance &vkInstance, const Window &wnd);
 		DEVA_FRAMEWORK_API std::vector<uint32_t> deviceQueueFamiliesSupportSurface(const VulkanInstance &vkInstance, VkPhysicalDevice pdev, VkSurfaceKHR surface);
 		DEVA_FRAMEWORK_API std::vector<VkVertexInputAttributeDescription> getAttributeDescriptionsForVertexBuffer(
 			const VertexBuffer &vb,

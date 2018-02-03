@@ -53,10 +53,9 @@ VulkanHandle<VkShaderModule> Vulkan::loadShaderFromFile(const VulkanDevice &dev,
 
 	return shaderModule;
 }
-
-VulkanHandle<VkSurfaceKHR> Vulkan::createSurfaceForWindow(const VulkanInstance &vkInstance, const Window &wnd)
+VkSurfaceKHR Vulkan::createSurfaceForWindow(const VulkanInstance &vkInstance, const Window &wnd)
 {
-	VulkanHandle<VkSurfaceKHR> surface(vkInstance.handle, vkInstance.vk.vkDestroySurfaceKHR);
+	VkSurfaceKHR surface;
 	auto os = wnd.getOSHandles();
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 	VkWin32SurfaceCreateInfoKHR surface_cinfo =
@@ -67,7 +66,7 @@ VulkanHandle<VkSurfaceKHR> Vulkan::createSurfaceForWindow(const VulkanInstance &
 		(HINSTANCE)os->win32_hinstance(),
 		(HWND)os->win32_hwnd()
 	};
-	vkInstance.vk.vkCreateWin32SurfaceKHR(vkInstance.handle, &surface_cinfo, nullptr, surface.replace());
+	vkInstance.vk.vkCreateWin32SurfaceKHR(vkInstance.handle, &surface_cinfo, nullptr, &surface);
 #endif
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
 #error WAYLAND NOT IMPLEMENTED!

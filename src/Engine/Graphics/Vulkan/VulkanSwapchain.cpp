@@ -44,7 +44,5 @@ VulkanSwapchain DevaEngine::Vulkan::createSwapchain(const VulkanDevice &dev, con
 		}
 	}
 
-	swapchain.framebuffers.resize(swapchain.imageViews.size());
-
 	return swapchain;
 }
