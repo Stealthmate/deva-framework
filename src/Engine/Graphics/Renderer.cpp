@@ -106,7 +106,7 @@ void Renderer::unloadModel(const Model &model) {
 	}
 }
 
-void Renderer::loadGraphicObject(std::shared_ptr<GraphicObject> obj) {
+void Renderer::loadGraphicObject(const std::shared_ptr<GraphicObject>& obj) {
 
 	auto ids = loadModel(*obj->model());
 	api->setMeshMVP(ids.first, obj->mvp());
@@ -116,7 +116,7 @@ void Renderer::loadGraphicObject(std::shared_ptr<GraphicObject> obj) {
 	modelHandles.insert({ obj.get(), {ids.first, ids.second} });
 }
 
-void Renderer::unloadGraphicObject(std::shared_ptr<GraphicObject> obj) {
+void Renderer::unloadGraphicObject(const std::shared_ptr<GraphicObject>& obj) {
 	auto i = modelHandles.find(obj.get());
 	if (i == modelHandles.end()) return;
 
@@ -145,7 +145,7 @@ std::shared_ptr<Scene> Renderer::unloadCurrentScene() {
 	return std::move(currentScene);
 }
 
-void Renderer::prepareScene(std::shared_ptr<Scene> scene) {
+void Renderer::prepareScene(const std::shared_ptr<Scene> &scene) {
 	unloadCurrentScene();
 
 	::registerObserver(*scene, *sceneListener);

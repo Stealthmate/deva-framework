@@ -28,11 +28,11 @@ namespace DevaEngine
 		DEVA_ENGINE_API Renderer(const Preferences &prefs, std::unique_ptr<RenderAPI> renderAPI);
 
 		DEVA_ENGINE_API std::shared_ptr<Scene> unloadCurrentScene();
-		DEVA_ENGINE_API void prepareScene(std::shared_ptr<Scene> scene);
+		DEVA_ENGINE_API void prepareScene(const std::shared_ptr<Scene> &scene);
 		DEVA_ENGINE_API void render();
 
-		DEVA_ENGINE_API void loadGraphicObject(std::shared_ptr<GraphicObject> obj);
-		DEVA_ENGINE_API void unloadGraphicObject(std::shared_ptr<GraphicObject> obj);
+		DEVA_ENGINE_API void loadGraphicObject(const std::shared_ptr<GraphicObject> &obj);
+		DEVA_ENGINE_API void unloadGraphicObject(const std::shared_ptr<GraphicObject> &obj);
 
 	protected:
 
@@ -55,7 +55,6 @@ namespace DevaEngine
 		std::unordered_map<const GraphicObject*, std::pair<MeshID, TextureID>> modelHandles;
 		std::unordered_map<std::shared_ptr<const DevaFramework::Mesh>, std::pair<MeshID, uint32_t>> meshMap;
 		std::unordered_map<std::shared_ptr<const DevaFramework::Image>, std::pair<TextureID, uint32_t>> texMap;
-
 	};
 }
 
