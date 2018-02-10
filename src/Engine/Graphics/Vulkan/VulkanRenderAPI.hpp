@@ -10,6 +10,7 @@
 #include <DevaFramework/Graphics/Vulkan/VulkanBuffer.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanImage.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanRenderPass.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanDescriptorSetLayout.hpp>
 #include "VulkanRenderObject.hpp"
 #include "VulkanBufferMemoryIndex.hpp"
 #include "VulkanSwapchain.hpp"
@@ -19,7 +20,7 @@
 
 namespace DevaEngine
 {
-
+	/*
 	class VulkanDescriptorSetLayout {
 	public:
 		struct LayoutModel {
@@ -47,13 +48,13 @@ namespace DevaEngine
 		DevaFramework::VulkanHandle<VkDescriptorSetLayout> mHandle;
 		std::vector<VkDescriptorSetLayoutBinding> mBindings;
 	};
-
+	*/
 	class VulkanDescriptorPool {
 	public:
 
-		VulkanDescriptorPool(const DevaFramework::VulkanDevice &dev, const std::vector<VulkanDescriptorSetLayout::LayoutModel> &layouts, uint32_t maxSets);
+		VulkanDescriptorPool(const DevaFramework::VulkanDevice &dev, const std::vector<DevaFramework::VulkanDescriptorSetLayout> &layouts, uint32_t maxSets);
 
-		bool supportsLayout(const VulkanDescriptorSetLayout::LayoutModel &layout);
+		bool supportsLayout(const DevaFramework::VulkanDescriptorSetLayout &layout);
 
 		std::vector<VkDescriptorSet> allocateDescriptorSets(const std::vector<VkDescriptorSetLayout> &layout, size_t count);
 		void relinquishDescriptorSet(VkDescriptorSet dset);
@@ -62,8 +63,8 @@ namespace DevaEngine
 
 	private:
 
-		const DevaFramework::VulkanDevice& device;
-		std::vector<VulkanDescriptorSetLayout::LayoutModel> supportedLayouts;
+		DevaFramework::VulkanDevice device;
+		std::vector<DevaFramework::VulkanDescriptorSetLayout> supportedLayouts;
 		VkDescriptorPool poolHandle;
 
 	};
@@ -161,7 +162,7 @@ namespace DevaEngine
 		std::unordered_map<RenderObjectID, std::pair<VulkanTexture, VulkanTextureResrouces>> texMap;
 		std::vector<VkSemaphore> objectUpdateSemaphores;
 
-		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel>> dsLayouts;
+		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, DevaFramework::VulkanDescriptorSetLayout>> dsLayouts;
 		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;
 
 		std::unordered_map<DevaFramework::Uuid, DevaFramework::VulkanImage> mImages;

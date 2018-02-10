@@ -36,7 +36,7 @@ namespace DevaEngine {
 
 	VulkanDescriptorPool::VulkanDescriptorPool(
 		const DevaFramework::VulkanDevice &dev,
-		const std::vector<VulkanDescriptorSetLayout::LayoutModel> &layouts,
+		const std::vector<VulkanDescriptorSetLayout> &layouts,
 		uint32_t maxSets)
 		: device(dev), supportedLayouts(layouts)
 	{
@@ -128,7 +128,7 @@ namespace
 
 	const bool VULKAN_LOADED = false;
 
-	std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout::LayoutModel> createLayout(
+	std::pair<VkDescriptorSetLayout, VulkanDescriptorSetLayout> createLayout(
 		const VulkanDevice &device,
 		const std::vector<VkDescriptorSetLayoutBinding> &bindings,
 		VkDescriptorSetLayoutCreateFlags flags = 0) {
@@ -149,9 +149,9 @@ namespace
 			throw DevaException("Could not create descriptor set layout");
 		}
 
-		VulkanDescriptorSetLayout::LayoutModel layoutinfo;
+		VulkanDescriptorSetLayout layoutinfo;
 		for (auto i : bindings) {
-			VulkanDescriptorSetLayout::LayoutModel::Binding binfo;
+			VulkanDescriptorSetLayout::Binding binfo;
 			binfo.descriptorType = i.descriptorType;
 			binfo.descriptorCount = i.descriptorCount;
 			layoutinfo.bindings.insert({ i.binding, binfo });
