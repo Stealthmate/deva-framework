@@ -10,7 +10,7 @@
 #include <DevaFramework/Graphics/Vulkan/VulkanBuffer.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanImage.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanRenderPass.hpp>
-#include <DevaFramework\Graphics\Vulkan\VulkanDescriptorSetLayout.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanDescriptorSet.hpp>
 #include "VulkanRenderObject.hpp"
 #include "VulkanBufferMemoryIndex.hpp"
 #include "VulkanSwapchain.hpp"
@@ -20,59 +20,11 @@
 
 namespace DevaEngine
 {
-	/*
-	class VulkanDescriptorSetLayout {
-	public:
-		struct LayoutModel {
-			struct Binding {
-				VkDescriptorType descriptorType;
-				uint32_t descriptorCount;
-			};
-			std::unordered_map<uint32_t, Binding> bindings;
-		};
-
-		DEVA_ENGINE_API static VulkanDescriptorSetLayout create(
-			const DevaFramework::VulkanDevice &device,
-			const std::vector<VkDescriptorSetLayoutBinding> &bindings,
-			VkDescriptorSetLayoutCreateFlags flags = 0);
-
-		DEVA_ENGINE_API VkDescriptorSetLayout getHandle() const;
-		DEVA_ENGINE_API const std::vector<VkDescriptorSetLayoutBinding>& getBindings() const;
-
-		DEVA_ENGINE_API LayoutModel getLayoutModel() const;
-
-	private:
-
-		VulkanDescriptorSetLayout(VkDescriptorSetLayout handle);
-
-		DevaFramework::VulkanHandle<VkDescriptorSetLayout> mHandle;
-		std::vector<VkDescriptorSetLayoutBinding> mBindings;
-	};
-	*/
-	class VulkanDescriptorPool {
-	public:
-
-		VulkanDescriptorPool(const DevaFramework::VulkanDevice &dev, const std::vector<DevaFramework::VulkanDescriptorSetLayout> &layouts, uint32_t maxSets);
-
-		bool supportsLayout(const DevaFramework::VulkanDescriptorSetLayout &layout);
-
-		std::vector<VkDescriptorSet> allocateDescriptorSets(const std::vector<VkDescriptorSetLayout> &layout, size_t count);
-		void relinquishDescriptorSet(VkDescriptorSet dset);
-
-		DEVA_ENGINE_API VkDescriptorPool getHandle() const;
-
-	private:
-
-		DevaFramework::VulkanDevice device;
-		std::vector<DevaFramework::VulkanDescriptorSetLayout> supportedLayouts;
-		VkDescriptorPool poolHandle;
-
-	};
-
 	struct VulkanMeshResources {
 		std::vector<DevaFramework::Vulkan::VulkanBufferID> vertexBuffers;
 		DevaFramework::Vulkan::VulkanBufferID indexBuffer;
 		DevaFramework::Vulkan::VulkanBufferID mvpBuffer;
+		std::vector<DevaFramework::VulkanDescriptorSet> descSets;
 		size_t index;
 	};
 
@@ -151,7 +103,7 @@ namespace DevaEngine
 
 		std::unique_ptr<VulkanBufferMemoryIndex> bufmemIndex;
 
-		std::unique_ptr<VulkanDescriptorPool> dpoolManager;
+		DevaFramework::VulkanDescriptorPool descPool;
 
 		VkFence fence;
 

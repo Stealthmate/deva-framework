@@ -30,75 +30,6 @@ using namespace DevaEngine;
 
 using DevaFramework::Vulkan::LOG_VULKAN;
 
-namespace DevaEngine {
-
-
-
-	VulkanDescriptorPool::VulkanDescriptorPool(
-		const DevaFramework::VulkanDevice &dev,
-		const std::vector<VulkanDescriptorSetLayout> &layouts,
-		uint32_t maxSets)
-		: device(dev), supportedLayouts(layouts)
-	{
-		auto device = dev.handle;
-		auto &vk = dev.vk;
-
-
-		std::unordered_map<VkDescriptorType, uint32_t> poolSizes;
-		for (auto i = 0;i < layouts.size();i++) {
-			for (auto j : layouts[i].bindings) {
-				auto &result = poolSizes.find(j.second.descriptorType);
-				if (result == poolSizes.end()) poolSizes.insert({ j.second.descriptorType, j.second.descriptorCount });
-				else if (result->second < j.second.descriptorCount) result->second = j.second.descriptorCount;
-			}
-		}
-
-		std::vector<VkDescriptorPoolSize> sizes;
-		for (auto i : poolSizes) {
-			VkDescriptorPoolSize psize;
-			psize.type = i.first;
-			psize.descriptorCount = i.second;
-			sizes.push_back(psize);
-		}
-
-		VkDescriptorPoolCreateInfo cinfo;
-		cinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		cinfo.pNext = nullptr;
-		cinfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-		cinfo.poolSizeCount = static_cast<uint32_t>(sizes.size());
-		cinfo.pPoolSizes = sizes.data();
-		cinfo.maxSets = maxSets;
-
-		if (vk.vkCreateDescriptorPool(device, &cinfo, nullptr, &poolHandle) != VK_SUCCESS)
-			throw DevaException("Could not create descriptor pool");
-	}
-
-	VkDescriptorPool VulkanDescriptorPool::getHandle() const {
-		return poolHandle;
-	}
-
-	std::vector<VkDescriptorSet> VulkanDescriptorPool::allocateDescriptorSets(const std::vector<VkDescriptorSetLayout> &layouts, size_t count) {
-		VkDescriptorSetAllocateInfo info;
-		info.descriptorPool = poolHandle;
-		info.descriptorSetCount = static_cast<uint32_t>(count);
-		info.pNext = nullptr;
-		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		info.pSetLayouts = layouts.data();
-
-		std::vector<VkDescriptorSet> sets(count);
-		if (device.vk.vkAllocateDescriptorSets(device.handle, &info, sets.data()) != VK_SUCCESS)
-			throw DevaException("Could not allocated descriptor sets");
-
-		return sets;
-	}
-
-	void VulkanDescriptorPool::relinquishDescriptorSet(VkDescriptorSet dset)
-	{
-		VkResult res = device.vk.vkFreeDescriptorSets(device.handle, poolHandle, 1, &dset);
-	}
-}
-
-
 namespace
 {
 	const VkApplicationInfo APPLICATION_INFO =
@@ -348,9 +279,7 @@ void VulkanRenderAPI::createPipeline()
 	plb.addDescriptorSetLayout(dslayout.first, &setn);
 	dsLayoutPipelineMap.insert({ id, setn });
 
-	dpoolManager = std::make_unique<VulkanDescriptorPool>(VulkanDescriptorPool(main_device, { dslayout.second }, 100));
-
-
+	descPool = DevaFramework::Vulkan::createDescriptorPool(main_device, { dslayout.second }, 10);
 
 	this->pipeline = plb.build(this->main_device);
 
@@ -463,10 +392,10 @@ void VulkanRenderAPI::onDestroy() {
 		//this->surface.replace();
 
 		for (auto &i : dsLayouts) {
-			vkd.vkDestroyDescriptorSetLayout(dev, i.second.first, nullptr);
+			DevaFramework::Vulkan::destroyObject(main_device, i.second.second);
 		}
 
-		vkd.vkDestroyDescriptorPool(dev, dpoolManager->getHandle(), nullptr);
+		DevaFramework::Vulkan::destroyObject(main_device, descPool);
 
 		auto leftover = bufmemIndex->clear();
 		for (auto &i : leftover.first) {
@@ -480,7 +409,7 @@ void VulkanRenderAPI::onDestroy() {
 		}
 		leftover.second.clear();
 		DevaFramework::Vulkan::destroyObject(main_device, commandPool);
-		//this->dpoolManager->clear();
+		//this->descPool->clear();
 		vkd.vkDestroyPipelineLayout(dev, pipeline.getPipelineLayout(), nullptr);
 		vkd.vkDestroyPipeline(dev, pipeline.getHandle(), nullptr);
 
@@ -553,14 +482,14 @@ RenderObjectID VulkanRenderAPI::loadMesh(const Mesh &mesh) {
 	memcpy(memory, mesh.vertexData.data() + mesh.faceDataOffset, isize);
 	vk.vkUnmapMemory(dev, mem.handle);
 
-	VkDescriptorSet dset = dpoolManager->allocateDescriptorSets({ dsLayouts.begin()->second.first }, 1)[0];
+	VulkanDescriptorSet dset = DevaFramework::Vulkan::allocateDescriptorSets(main_device, descPool, { dsLayouts.begin()->second.first }, 1)[0];
 	VkDescriptorBufferInfo dbufinfo;
 	dbufinfo.buffer = buf.handle;
 	dbufinfo.offset = 0;
 	dbufinfo.range = mvpsize;
 	VkWriteDescriptorSet descriptorWrite = {};
 	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	descriptorWrite.dstSet = dset;
+	descriptorWrite.dstSet = dset.handle;
 	descriptorWrite.dstBinding = 0;
 	descriptorWrite.dstArrayElement = 0;
 	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -586,7 +515,7 @@ RenderObjectID VulkanRenderAPI::loadMesh(const Mesh &mesh) {
 
 	vmesh.mvpBuffer = buf.handle;
 	vmesh.mvpOffset = 0;
-	vmesh.descriptorSets = { dset };
+	vmesh.descriptorSets = { dset.handle };
 
 	vmesh.firstInstance = 0;
 	vmesh.instanceCount = 1;
@@ -596,6 +525,7 @@ RenderObjectID VulkanRenderAPI::loadMesh(const Mesh &mesh) {
 	vmr.indexBuffer = bufid;
 	vmr.mvpBuffer = bufid;
 	vmr.vertexBuffers = { bufid };
+	vmr.descSets = { dset };
 
 	renderPassRecord.objs.push_back(vmesh);
 	vmr.index = renderPassRecord.objs.size() - 1;
@@ -731,10 +661,8 @@ void VulkanRenderAPI::unloadMesh(const RenderObjectID &id) {
 		bufmemIndex->removeBuffer(i, false);
 	}
 
-	for (auto i : mesh.descriptorSets) {
-		//causes bugs
-		dpoolManager->relinquishDescriptorSet(i);
-	}
+	//bugged
+	DevaFramework::Vulkan::freeDescriptorSets(main_device, vrm.descSets);
 
 	auto irp = renderPassRecord.objs.begin();
 	std::advance(irp, vrm.index);
