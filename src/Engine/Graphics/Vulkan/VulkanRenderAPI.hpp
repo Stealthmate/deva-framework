@@ -100,24 +100,17 @@ namespace DevaEngine
 
 		VkSemaphore imageAvailableSemaphore;
 		VkSemaphore renderFinishedSemaphore;
+		VkFence fence;
 
 		std::unique_ptr<VulkanBufferMemoryIndex> bufmemIndex;
 
 		DevaFramework::VulkanDescriptorPool descPool;
 
-		VkFence fence;
-
-		DevaFramework::Vulkan::VulkanBufferID prebuffer;
-
-
 		std::unordered_map<RenderObjectID, std::pair<VulkanMesh, VulkanMeshResources>> meshMap;
 		std::unordered_map<RenderObjectID, std::pair<VulkanTexture, VulkanTextureResrouces>> texMap;
-		std::vector<VkSemaphore> objectUpdateSemaphores;
 
 		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, DevaFramework::VulkanDescriptorSetLayout>> dsLayouts;
 		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;
-
-		std::unordered_map<DevaFramework::Uuid, DevaFramework::VulkanImage> mImages;
 
 		void createPipeline();
 		void createRenderPass();

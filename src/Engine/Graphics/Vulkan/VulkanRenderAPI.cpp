@@ -275,9 +275,8 @@ void VulkanRenderAPI::createPipeline()
 	auto dslayout = createLayout(main_device, { binding });
 	auto id = Uuid();
 	dsLayouts.insert({ id, dslayout });
-	uint32_t setn;
-	plb.addDescriptorSetLayout(dslayout.first, &setn);
-	dsLayoutPipelineMap.insert({ id, setn });
+	plb.addDescriptorSetLayout(dslayout.first);
+	descSetIndexMap.insert({ id, 0 });
 
 	descPool = DevaFramework::Vulkan::createDescriptorPool(main_device, { dslayout.second }, 10);
 
@@ -389,7 +388,6 @@ void VulkanRenderAPI::onDestroy() {
 			vkd.vkDestroyFramebuffer(dev, i, nullptr);
 		}
 		vkd.vkDestroySwapchainKHR(dev, swapchain.handle, nullptr);
-		//this->surface.replace();
 
 		for (auto &i : dsLayouts) {
 			DevaFramework::Vulkan::destroyObject(main_device, i.second.second);
@@ -399,17 +397,15 @@ void VulkanRenderAPI::onDestroy() {
 
 		auto leftover = bufmemIndex->clear();
 		for (auto &i : leftover.first) {
-			//vkd.vkDestroyBuffer(dev, i.handle, nullptr);
 			DevaFramework::Vulkan::destroyObject(main_device, i);
 		}
 		leftover.first.clear();
 		for (auto &i : leftover.second) {
-			//vkd.vkFreeMemory(dev, i.handle, nullptr);
 			DevaFramework::Vulkan::destroyObject(main_device, i);
 		}
 		leftover.second.clear();
 		DevaFramework::Vulkan::destroyObject(main_device, commandPool);
-		//this->descPool->clear();
+
 		vkd.vkDestroyPipelineLayout(dev, pipeline.getPipelineLayout(), nullptr);
 		vkd.vkDestroyPipeline(dev, pipeline.getHandle(), nullptr);
 
@@ -587,9 +583,6 @@ RenderObjectID VulkanRenderAPI::loadTexture(const Image &tex) {
 	image.sharingMode = imageInfo.sharingMode;
 	image.size = imgmem.size;
 	image.usage = imageInfo.usage;
-
-	Uuid id = Uuid();
-	mImages.insert({ id, image });
 
 	vk.vkBindImageMemory(dev, image.handle, imgmem.handle, 0);
 
