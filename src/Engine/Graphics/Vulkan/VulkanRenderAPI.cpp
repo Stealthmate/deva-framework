@@ -282,7 +282,7 @@ void VulkanRenderAPI::createPipeline()
 
 	this->pipeline = plb.build(this->main_device);
 
-	renderPassRecord.pipeline = pipeline.getHandle();
+	renderPassRecord.pipeline = pipeline.handle;
 	renderPassRecord.renderArea = presenter->swapchain().extent;
 	renderPassRecord.clearVals = { { 0.0f, 0.0f, 0.0f, 0.0f } };
 	renderPassRecord.renderPass = renderPass.handle;
@@ -406,8 +406,8 @@ void VulkanRenderAPI::onDestroy() {
 		leftover.second.clear();
 		DevaFramework::Vulkan::destroyObject(main_device, commandPool);
 
-		vkd.vkDestroyPipelineLayout(dev, pipeline.getPipelineLayout(), nullptr);
-		vkd.vkDestroyPipeline(dev, pipeline.getHandle(), nullptr);
+		vkd.vkDestroyPipelineLayout(dev, pipeline.layout, nullptr);
+		DevaFramework::Vulkan::destroyObject(main_device, pipeline);
 
 
 		vki.vkDestroyDebugReportCallbackEXT(inst, callback, nullptr);
@@ -506,7 +506,7 @@ RenderObjectID VulkanRenderAPI::loadMesh(const Mesh &mesh) {
 	vmesh.indexType = VK_INDEX_TYPE_UINT32;
 	vmesh.firstIndex = 0;
 
-	vmesh.pipelineLayout = pipeline.getPipelineLayout();
+	vmesh.pipelineLayout = pipeline.layout;
 	vmesh.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
 	vmesh.mvpBuffer = buf.handle;

@@ -5,9 +5,12 @@
 #include <DevaFramework\Util\CStructDeleter.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanHandle.hpp>
 #include "VulkanSwapchain.hpp"
-#include "VulkanPipeline.hpp"
 
 #include <DevaFramework\Graphics\Vulkan\VulkanVertexInputBinding.hpp>
+
+namespace DevaFramework {
+	struct VulkanGraphicsPipeline;
+}
 
 namespace DevaEngine {
 
@@ -26,9 +29,9 @@ namespace DevaEngine {
 
 		VkDescriptorSetLayoutBinding st;
 
-		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& addDescriptorSetLayout(VkDescriptorSetLayout layout, uint32_t *setn = nullptr);
+		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& addDescriptorSetLayout(VkDescriptorSetLayout layout);
 
-		DEVA_ENGINE_API VulkanGraphicsPipeline build(const DevaFramework::VulkanDevice &dev);
+		DEVA_ENGINE_API DevaFramework::VulkanGraphicsPipeline build(const DevaFramework::VulkanDevice &dev);
 
 	private:
 		VkGraphicsPipelineCreateInfo createInfo;

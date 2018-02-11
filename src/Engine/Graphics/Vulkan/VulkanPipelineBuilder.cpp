@@ -1,5 +1,7 @@
 #include "VulkanPipelineBuilder.hpp"
 
+#include <DevaFramework\Graphics\Vulkan\VulkanPipeline.hpp>
+
 using namespace DevaFramework;
 using namespace DevaEngine;
 
@@ -189,13 +191,16 @@ VulkanGraphicsPipeline VulkanGraphicsPipelineBuilder::build(const VulkanDevice &
 	inputState.pVertexAttributeDescriptions = attrDescriptions.data();
 	createInfo.pVertexInputState = &inputState;
 
-	VkPipeline pl;
-	auto result = vk.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &createInfo, nullptr, &pl);
+	VulkanGraphicsPipeline pipeline;
+	auto result = vk.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &createInfo, nullptr, &pipeline.handle);
 	if (result != VK_SUCCESS) {
 		throw DevaException("Failed to create graphics pipeline!");
 	}
 
-	return VulkanGraphicsPipeline(pl, createInfo);
+	pipeline.layout = createInfo.layout;
+	pipeline.descSetLayouts = descriptorSetLayouts;
+
+	return pipeline;
 }
 
 VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding)
@@ -204,8 +209,7 @@ VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addVertexInputBind
 	return *this;
 }
 
-VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addDescriptorSetLayout(VkDescriptorSetLayout layout, uint32_t *setn) {
+VulkanGraphicsPipelineBuilder& VulkanGraphicsPipelineBuilder::addDescriptorSetLayout(VkDescriptorSetLayout layout) {
 	descriptorSetLayouts.push_back(layout);
-	if (setn) *setn = static_cast<uint32_t>(descriptorSetLayouts.size()) - 1;
 	return *this;
 }

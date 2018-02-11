@@ -14,7 +14,7 @@
 #include "VulkanRenderObject.hpp"
 #include "VulkanBufferMemoryIndex.hpp"
 #include "VulkanSwapchain.hpp"
-#include "VulkanPipeline.hpp"
+#include <DevaFramework\Graphics\Vulkan\VulkanPipeline.hpp>
 #include "VulkanQueueSubmitBuffer.hpp"
 #include "VulkanPresenter.hpp"
 
@@ -89,7 +89,7 @@ namespace DevaEngine
 
 		std::vector<VkFramebuffer> framebuffers;
 
-		VulkanGraphicsPipeline pipeline;
+		DevaFramework::VulkanGraphicsPipeline pipeline;
 
 		VulkanQueueSubmitBuffer queueBuffer;
 		DevaFramework::VulkanRenderPass renderPass;
@@ -110,7 +110,7 @@ namespace DevaEngine
 		std::unordered_map<RenderObjectID, std::pair<VulkanTexture, VulkanTextureResrouces>> texMap;
 
 		std::unordered_map<DevaFramework::Uuid, std::pair<VkDescriptorSetLayout, DevaFramework::VulkanDescriptorSetLayout>> dsLayouts;
-		std::unordered_map<DevaFramework::Uuid, uint32_t> dsLayoutPipelineMap;
+		std::unordered_map<DevaFramework::Uuid, uint32_t> descSetIndexMap;
 
 		void createPipeline();
 		void createRenderPass();
