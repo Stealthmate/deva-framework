@@ -32,10 +32,10 @@ set(
 	${CURDIR}/Graphics/Init.cpp
 	${CURDIR}/Graphics/Init.hpp
 	${CURDIR}/Graphics/Master.hpp
-	${CURDIR}/Graphics/Model.cpp
-	${CURDIR}/Graphics/Model.hpp
-	${CURDIR}/Graphics/ModelBuilder.cpp
-	${CURDIR}/Graphics/ModelBuilder.hpp
+	${CURDIR}/Graphics/Mesh.cpp
+	${CURDIR}/Graphics/Mesh.hpp
+	${CURDIR}/Graphics/MeshBuilder.cpp
+	${CURDIR}/Graphics/MeshBuilder.hpp
 	${CURDIR}/Graphics/OpenGL.hpp
 	${CURDIR}/Graphics/VertexBuffer.cpp
 	${CURDIR}/Graphics/VertexBuffer.hpp
@@ -72,6 +72,8 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanBuffer.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanCommandPool.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanDescriptorSet.cpp
+	${CURDIR}/Graphics/Vulkan/VulkanDescriptorSet.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanDevice.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanDeviceFunctionSet.cpp
@@ -89,6 +91,8 @@ set(
 	${CURDIR}/Graphics/Vulkan/VulkanMemory.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPhysicalDevice.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPhysicalDevice.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanPipeline.cpp
+	${CURDIR}/Graphics/Vulkan/VulkanPipeline.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanRenderPass.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanVertexInputBinding.hpp
 	${CURDIR}/Graphics/Vulkan/win32_LoadVulkan.cpp

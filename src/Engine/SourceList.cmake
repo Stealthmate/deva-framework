@@ -2,9 +2,8 @@ set(
 	DEVA_ENGINE_SOURCE_LIST
 	${CURDIR}/Graphics/Camera.hpp
 	${CURDIR}/Graphics/Config.hpp
-	${CURDIR}/Graphics/DrawableObject.cpp
-	${CURDIR}/Graphics/DrawableObject.hpp
-	${CURDIR}/Graphics/DrawableObjectBuilder.hpp
+	${CURDIR}/Graphics/GraphicObject.cpp
+	${CURDIR}/Graphics/GraphicObject.hpp
 	${CURDIR}/Graphics/Model.hpp
 	${CURDIR}/Graphics/RenderAPI.hpp
 	${CURDIR}/Graphics/Renderer.cpp
@@ -17,17 +16,15 @@ set(
 	${CURDIR}/Graphics/SceneBuilder.hpp
 	${CURDIR}/Graphics/SceneObject.cpp
 	${CURDIR}/Graphics/SceneObject.hpp
+	${CURDIR}/Graphics/SceneObjectBuilder.hpp
 	${CURDIR}/Graphics/ScreenRenderer.hpp
 	${CURDIR}/Graphics/GUI/Component.hpp
 	${CURDIR}/Graphics/Vulkan/Config.hpp
-	${CURDIR}/Graphics/Vulkan/DescriptorPoolManager.cpp
-	${CURDIR}/Graphics/Vulkan/DescriptorPoolManager.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.hpp
-	${CURDIR}/Graphics/Vulkan/VulkanGraphicsPipeline.cpp
-	${CURDIR}/Graphics/Vulkan/VulkanPipeline.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipelineBuilder.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipelineBuilder.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanPresenter.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPresenter.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanQueueSubmitBuffer.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanQueueSubmitBuffer.hpp
