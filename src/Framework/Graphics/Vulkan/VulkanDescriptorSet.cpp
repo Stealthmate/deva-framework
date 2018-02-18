@@ -72,7 +72,7 @@ VulkanDescriptorPool Vulkan::createDescriptorPool(
 	for (auto i : poolSizes) {
 		VkDescriptorPoolSize psize;
 		psize.type = i.first;
-		psize.descriptorCount = i.second;
+		psize.descriptorCount = i.second*10;
 		sizes.push_back(psize);
 	}
 

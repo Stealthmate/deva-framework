@@ -7,12 +7,16 @@
 #include <DevaFramework\Math\MatrixFactory.hpp>
 #include <DevaFramework\Math\Common.hpp>
 #include <DevaFramework\Core\Uuid.hpp>
+#include <DevaFramework\Graphics\Image.hpp>
 
 #include <DevaEngine\Graphics\Scene.hpp>
 #include <DevaEngine\Graphics\SceneObject.hpp>
 #include <DevaEngine\Graphics\Renderer.hpp>
 
+
 #include <DevaEngine\Preferences.hpp>
+
+#include<fstream>
 
 using namespace DevaEngine;
 using namespace DevaFramework;
@@ -79,9 +83,11 @@ int main()
 	LOG_VULKAN.setPrio(DevaLogger::LogLevel::ERR);
 	LOG.setPrio(DevaLogger::LogLevel::UNSPECIFIED);
 
+
+	std::shared_ptr<Image> tex = std::make_shared<Image>(readImagePNG(std::ifstream("./resources/SS1.png", std::ios::binary)));
 	std::shared_ptr<Model> models [] = { 
-		std::make_shared<Model>(loadMesh("./resources/mesh3.txt"), nullptr, vec4()),
-		std::make_shared<Model>(loadMesh("./resources/mesh.txt"), nullptr, vec4()) 
+		std::make_shared<Model>(loadMesh("./resources/mesh.txt"), tex, vec4()),
+		std::make_shared<Model>(loadMesh("./resources/mesh.txt"), tex, vec4())
 	};
 	
 	mat4 mvp;

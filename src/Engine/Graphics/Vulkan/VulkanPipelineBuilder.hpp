@@ -14,6 +14,11 @@ namespace DevaFramework {
 
 namespace DevaEngine {
 
+	struct VulkanGraphicsPipelineBase {
+		VkGraphicsPipelineCreateInfo create;
+
+	};
+
 	class VulkanGraphicsPipelineBuilder {
 	public:
 		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder();
@@ -27,8 +32,6 @@ namespace DevaEngine {
 
 		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& addVertexInputBinding(const DevaFramework::Vulkan::VertexInputBinding &binding);
 
-		VkDescriptorSetLayoutBinding st;
-
 		DEVA_ENGINE_API VulkanGraphicsPipelineBuilder& addDescriptorSetLayout(VkDescriptorSetLayout layout);
 
 		DEVA_ENGINE_API DevaFramework::VulkanGraphicsPipeline build(const DevaFramework::VulkanDevice &dev);
@@ -40,7 +43,6 @@ namespace DevaEngine {
 
 		VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo;
 		std::vector<DevaFramework::Vulkan::VertexInputBinding> vertexBindings;
-		std::vector<VkVertexInputBindingDescription> vertexInputBindings;
 		std::vector<VkVertexInputAttributeDescription> vertexInputAttributes;
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyCreateInfo;

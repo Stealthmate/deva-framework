@@ -81,9 +81,10 @@ std::pair<MeshID, TextureID> Renderer::loadModel(const Model &model) {
 			texid = api->loadTexture(*model.texture);
 			texMap.insert({ model.texture,{ texid, 1 } });
 		}
+
+		api->bindMeshTexture(meshid, texid);
 	}
 
-	api->bindMeshTexture(meshid, texid);
 
 	return { meshid, texid };
 }

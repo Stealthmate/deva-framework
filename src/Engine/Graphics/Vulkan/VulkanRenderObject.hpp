@@ -2,8 +2,19 @@
 #define DEVA_ENGINE_GRAPHICS_VULKAN_SUBRENDERER_HPP
 
 #include "Config.hpp"
+#include <DevaFramework/Graphics/Vulkan/VulkanBuffer.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanDescriptorSet.hpp>
+#include <DevaFramework/Graphics/Vulkan/VulkanImage.hpp>
 
 namespace DevaEngine {
+
+	struct VulkanMeshResources {
+		std::vector<DevaFramework::Vulkan::VulkanBufferID> vertexBuffers;
+		DevaFramework::Vulkan::VulkanBufferID indexBuffer;
+		DevaFramework::Vulkan::VulkanBufferID mvpBuffer;
+		std::vector<DevaFramework::VulkanDescriptorSet> descSets;
+		size_t index;
+	};
 
 	struct VulkanMesh {
 		std::vector<VkBuffer> vertexBuffers;
@@ -25,10 +36,13 @@ namespace DevaEngine {
 	};
 
 	struct VulkanTextureResrouces {
-
+		VkDeviceMemory imgMemory;
+		DevaFramework::VulkanImage img;
 	};
 	struct VulkanTexture {
-
+		VkImageLayout layout;
+		VkImageView imgView;
+		VkSampler sampler;
 	};
 
 	struct VulkanRenderPassRecord {

@@ -7,8 +7,6 @@
 #include <DevaFramework/Graphics/Vulkan/VulkanInstance.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanDevice.hpp>
 #include <DevaFramework/Graphics/Vulkan/VulkanCommandPool.hpp>
-#include <DevaFramework/Graphics/Vulkan/VulkanBuffer.hpp>
-#include <DevaFramework/Graphics/Vulkan/VulkanImage.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanRenderPass.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanDescriptorSet.hpp>
 #include "VulkanRenderObject.hpp"
@@ -20,13 +18,6 @@
 
 namespace DevaEngine
 {
-	struct VulkanMeshResources {
-		std::vector<DevaFramework::Vulkan::VulkanBufferID> vertexBuffers;
-		DevaFramework::Vulkan::VulkanBufferID indexBuffer;
-		DevaFramework::Vulkan::VulkanBufferID mvpBuffer;
-		std::vector<DevaFramework::VulkanDescriptorSet> descSets;
-		size_t index;
-	};
 
 	class UpdateStager {
 	public:

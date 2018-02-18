@@ -268,13 +268,23 @@ void VulkanRenderAPI::createPipeline()
 	binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 	binding.pImmutableSamplers = nullptr;
 
+	VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
+	samplerLayoutBinding.binding = 1;
+	samplerLayoutBinding.descriptorCount = 1;
+	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	samplerLayoutBinding.pImmutableSamplers = nullptr;
+	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
 	auto dslayout = createLayout(main_device, { binding });
+	auto dsimglayout = createLayout(main_device, { samplerLayoutBinding });
 	auto id = Uuid();
 	dsLayouts.insert({ id, dslayout });
+	dsLayouts.insert({ Uuid(), dsimglayout });
 	plb.addDescriptorSetLayout(dslayout.first);
+	plb.addDescriptorSetLayout(dsimglayout.first);
 	descSetIndexMap.insert({ id, 0 });
 
-	descPool = DevaFramework::Vulkan::createDescriptorPool(main_device, { dslayout.second }, 10);
+	descPool = DevaFramework::Vulkan::createDescriptorPool(main_device, { dslayout.second, dsimglayout.second }, 10);
 
 	this->pipeline = plb.build(this->main_device);
 
@@ -341,7 +351,6 @@ void VulkanRenderAPI::drawScene() {
 	DevaFramework::Vulkan::beginCommandBuffer(main_device, commandBuffers[0].handle, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 	uint32_t imageIndex = presenter->nextImageIndex(std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE);
-	//vk.vkAcquireNextImageKHR(device, swapchain.handle, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
 	renderPassRecord.framebuffer = framebuffers[imageIndex];
 
@@ -360,7 +369,6 @@ void VulkanRenderAPI::drawScene() {
 	queueBuffer.flush(main_device, fence);
 
 	presenter->present(renderQueue.handle, { renderFinishedSemaphore }, imageIndex);
-	//DevaEngine::Vulkan::present(main_device, renderQueue.handle, { renderFinishedSemaphore }, { swapchain.handle }, { imageIndex });
 }
 
 void VulkanRenderAPI::onDestroy() {
@@ -625,7 +633,53 @@ RenderObjectID VulkanRenderAPI::loadTexture(const Image &tex) {
 	vk.vkFreeCommandBuffers(dev, this->commandPool.handle, 1, &buffer.handle);
 	bufmemIndex->removeBuffer(bufid, true);
 
-	return Uuid();
+	Uuid id;
+	VulkanTexture vtex;
+	vtex.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+	VkImageViewCreateInfo viewInfo = {};
+	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	viewInfo.image = image.handle;
+	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	viewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	viewInfo.subresourceRange.baseMipLevel = 0;
+	viewInfo.subresourceRange.levelCount = 1;
+	viewInfo.subresourceRange.baseArrayLayer = 0;
+	viewInfo.subresourceRange.layerCount = 1;
+	res = vk.vkCreateImageView(dev, &viewInfo, nullptr, &vtex.imgView);
+
+	VkSamplerCreateInfo samplerInfo = {};
+	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	samplerInfo.magFilter = VK_FILTER_LINEAR;
+	samplerInfo.minFilter = VK_FILTER_LINEAR;
+	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.anisotropyEnable = VK_FALSE;//TODO: TRUE
+	samplerInfo.maxAnisotropy = 1;//TODO16
+	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	samplerInfo.unnormalizedCoordinates = VK_FALSE;
+	samplerInfo.compareEnable = VK_FALSE;
+	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+	samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	samplerInfo.mipLodBias = 0.0f;
+	samplerInfo.minLod = 0.0f;
+	samplerInfo.maxLod = 0.0f;
+	res = vk.vkCreateSampler(dev, &samplerInfo, nullptr, &vtex.sampler);
+
+
+	VkDescriptorImageInfo imageDescriptorInfo = {};
+	imageDescriptorInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageDescriptorInfo.imageView = vtex.imgView;
+	imageDescriptorInfo.sampler = vtex.sampler;
+
+	std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
+
+	VulkanTextureResrouces vtr;
+	
+	this->texMap.insert({ id, {vtex, vtr} });
+	return id;
 }
 
 void VulkanRenderAPI::unloadMesh(const RenderObjectID &id) {
@@ -664,7 +718,34 @@ void VulkanRenderAPI::unloadTexture(const RenderObjectID &id) {
 }
 
 void VulkanRenderAPI::bindMeshTexture(const RenderObjectID &meshid, const RenderObjectID &texid) {
-	//TODO
+
+	auto dev = main_device.handle;
+	auto &vk = main_device.vk;
+
+	auto descriptorSet = DevaFramework::Vulkan::allocateDescriptorSets(main_device, descPool, { (++dsLayouts.begin())->second.first }, 1)[0];
+	auto& mesh = meshMap.find(meshid)->second;
+	VulkanTexture tex = texMap.find(texid)->second.first;
+
+	VkDescriptorImageInfo imageInfo;
+	imageInfo.imageLayout = tex.layout;
+	imageInfo.imageView = tex.imgView;
+	imageInfo.sampler = tex.sampler;
+
+	VkWriteDescriptorSet descriptorWrite;
+	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrite.dstSet = descriptorSet.handle;
+	descriptorWrite.dstBinding = 1;
+	descriptorWrite.dstArrayElement = 0;
+	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	descriptorWrite.descriptorCount = 1;
+	descriptorWrite.pImageInfo = &imageInfo;
+	descriptorWrite.pNext = nullptr;
+
+	vk.vkWaitForFences(dev, 1, &fence, VK_TRUE, 100000);
+	vk.vkUpdateDescriptorSets(dev, 1, &descriptorWrite, 0, nullptr);
+
+	mesh.first.descriptorSets.push_back(descriptorSet.handle);
+	renderPassRecord.objs[mesh.second.index].descriptorSets.push_back(descriptorSet.handle);
 }
 
 void VulkanRenderAPI::unbindMeshTexture(const RenderObjectID &meshid, const RenderObjectID &texid) {
