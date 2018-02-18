@@ -85,7 +85,7 @@ endif()
 set(DEVA_FRAMEWORK_SYSTEM_DEP ${DEVA_FRAMEWORK_SYSTEM_DEP_OGL})
 
 #Provided dependencies
-set(DEVA_FRAMEWORK_PROV_DEP_VULKAN vulkan-1)
+#set(DEVA_FRAMEWORK_PROV_DEP_VULKAN vulkan-1)
 set(DEVA_FRAMEWORK_PROV_DEP_GLBINDING glbinding)
 set(DEVA_FRAMEWORK_PROV_DEP_LUA lua)
 set(DEVA_FRAMEWORK_PROV_DEP_FMT fmt)
@@ -107,6 +107,9 @@ set(
 	${DEVA_FRAMEWORK_PROV_DEP_CROSSGUID}
 )
 
+set(DEVA_PROV_LIBS ${VK_LIB_PATH}/vulkan-1)
+set(DEVA_PROV_LIBS_DEBUG ${VK_LIB_PATH_D}/vulkan-1)
+
 file(GLOB DEVA_PROV_LIBS
   "lib/Release/*.lib"
 )
@@ -122,12 +125,6 @@ foreach(lib IN LISTS DEVA_PROV_LIBS_DEBUG)
 	get_filename_component(name ${lib} NAME_WE)
 	set(DEVA_FRAMEWORK_PROV_DEP_DEBUG ${DEVA_FRAMEWORK_PROV_DEP_DEBUG} ${name})
 endforeach()
-
-# set(DEVA_FRAMEWORK_PROV_DEP_DEBUG "vulkan-1_d.dll")
-# foreach(dep IN LISTS DEVA_FRAMEWORK_PROV_DEP)
-# 	set(dep_d ${dep}${CMAKE_DEBUG_POSTFIX})
-# 	set(DEVA_FRAMEWORK_PROV_DEP_DEBUG ${DEVA_FRAMEWORK_PROV_DEP_DEBUG} ${dep_d})
-# endforeach()
 
 #All dependencies
 set(
