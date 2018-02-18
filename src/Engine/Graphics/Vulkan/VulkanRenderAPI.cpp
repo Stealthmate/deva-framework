@@ -240,8 +240,6 @@ void VulkanRenderAPI::createRenderPass()	 {
 	}
 }
 
-VulkanHandle<VkDescriptorPool> dpool;
-#include <DevaFramework\Graphics\ImageReaders.hpp>
 void VulkanRenderAPI::createPipeline()
 {
 	auto vert = DevaFramework::Vulkan::loadShaderFromFile(this->main_device, "../shaders/vshader.spv");
@@ -262,8 +260,6 @@ void VulkanRenderAPI::createPipeline()
 	vib.addAttribute(DevaFramework::Vulkan::makeVAD(0, 0, VK_FORMAT_R32G32B32A32_SFLOAT, 0));
 	vib.addAttribute(DevaFramework::Vulkan::makeVAD(1, 0, VK_FORMAT_R32G32B32_SFLOAT, 16));
 	plb.addVertexInputBinding(vib);
-
-
 
 	VkDescriptorSetLayoutBinding binding;
 	binding.binding = 0;
