@@ -3,7 +3,7 @@
 using namespace DevaFramework;
 using Vulkan::LOG_VULKAN;
 
-#define ERRCHK if( result != VK_SUCCESS ) throw DevaException("DevaFramework::VulkanInstance failed because of Vulkan. Check logs for more info.");
+#define ERRCHK if( result != VK_SUCCESS ) throw DevaException("DevaFramework::VulkanInstance failed because of Vulkan. Check logs for more info.\nError Code: " + strf(result));
 
 namespace
 {
@@ -15,7 +15,7 @@ namespace
 		VK_MAKE_VERSION(1, 0, 0),
 		"Deva Engine",
 		VK_MAKE_VERSION(1, 0, 0),
-		VK_MAKE_VERSION(1, 0, 13)
+		VK_MAKE_VERSION(1, 0, 65)
 	};
 
 	const VkInstanceCreateInfo DEFAULT_INSTANCE_CREATE_INFO =
