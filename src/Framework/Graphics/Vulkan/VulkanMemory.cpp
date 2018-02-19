@@ -21,7 +21,7 @@ VulkanMemory Vulkan::allocateMemoryForBuffer(const VulkanDevice &dev, const Vulk
 	VkMemoryAllocateInfo allocInfo;
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.pNext = nullptr;
-	allocInfo.allocationSize = buffer.size;
+	allocInfo.allocationSize = buffer.memoryRequirements.size;
 
 	uint32_t typeFilter = buffer.memoryRequirements.memoryTypeBits;
 	auto memProperties = dev.physicalDevice.memoryProperties;
