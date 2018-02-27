@@ -22,6 +22,8 @@ set(
 	${CURDIR}/Graphics/Vulkan/Config.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanBufferMemoryIndex.hpp
+	${CURDIR}/Graphics/Vulkan/VulkanMemoryManager.cpp
+	${CURDIR}/Graphics/Vulkan/VulkanMemoryManager.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipelineBuilder.cpp
 	${CURDIR}/Graphics/Vulkan/VulkanPipelineBuilder.hpp
 	${CURDIR}/Graphics/Vulkan/VulkanPresenter.cpp

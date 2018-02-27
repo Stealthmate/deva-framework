@@ -14,13 +14,13 @@ namespace DevaEngine {
 		typedef DevaFramework::Uuid MemID;
 
 		DEVA_ENGINE_API BufID addBuffer(DevaFramework::VulkanBuffer &&buffer, const DevaFramework::Uuid &memory = DevaFramework::Uuid::NULL_ID);
-		DEVA_ENGINE_API MemID addMemory(DevaFramework::VulkanMemory &&memory);
+		DEVA_ENGINE_API MemID addMemory(DevaFramework::VulkanMemoryAlloc &&memory);
 		DEVA_ENGINE_API void bindBufferMemory(const BufID &bufID, const MemID &memID, const DevaFramework::VulkanDevice &dev, VkDeviceSize offset = 0);
 
 		DEVA_ENGINE_API DevaFramework::VulkanBuffer& getBuffer(const BufID &id);
 		DEVA_ENGINE_API const DevaFramework::VulkanBuffer& getBuffer(const BufID &id) const;
-		DEVA_ENGINE_API DevaFramework::VulkanMemory& getMemory(const MemID &id);
-		DEVA_ENGINE_API const DevaFramework::VulkanMemory& getMemory(const MemID &id) const;
+		DEVA_ENGINE_API DevaFramework::VulkanMemoryAlloc& getMemory(const MemID &id);
+		DEVA_ENGINE_API const DevaFramework::VulkanMemoryAlloc& getMemory(const MemID &id) const;
 
 		DEVA_ENGINE_API MemID getBufferMemory(const BufID &bufID);
 		
@@ -32,14 +32,14 @@ namespace DevaEngine {
 		DEVA_ENGINE_API void removeBuffer(const BufID &id, bool discardMemory);
 		DEVA_ENGINE_API void removeMemory(const MemID &id);
 
-		DEVA_ENGINE_API std::pair<std::vector<DevaFramework::VulkanBuffer>, std::vector<DevaFramework::VulkanMemory>> purge();
-		DEVA_ENGINE_API std::pair<std::vector<DevaFramework::VulkanBuffer>, std::vector<DevaFramework::VulkanMemory>> clear();
+		DEVA_ENGINE_API std::pair<std::vector<DevaFramework::VulkanBuffer>, std::vector<DevaFramework::VulkanMemoryAlloc>> purge();
+		DEVA_ENGINE_API std::pair<std::vector<DevaFramework::VulkanBuffer>, std::vector<DevaFramework::VulkanMemoryAlloc>> clear();
 
 	private:
 
 		class MemoryComparator {
 		public:
-			bool operator()(const DevaFramework::VulkanMemory* lhs, const DevaFramework::VulkanMemory* rhs) const;
+			bool operator()(const DevaFramework::VulkanMemoryAlloc* lhs, const DevaFramework::VulkanMemoryAlloc* rhs) const;
 		};
 
 		bool needsPurge = false;
@@ -47,13 +47,13 @@ namespace DevaEngine {
 		std::unordered_set<BufID> bufferIDs;
 		std::unordered_set<MemID> memoryIDs;
 		std::unordered_map<BufID, DevaFramework::VulkanBuffer> bufferIDMap;
-		std::unordered_map<MemID, DevaFramework::VulkanMemory> memoryIDMap;
-		std::map<DevaFramework::VulkanMemory*, MemID, MemoryComparator> sortedMemoryMap;
+		std::unordered_map<MemID, DevaFramework::VulkanMemoryAlloc> memoryIDMap;
+		std::map<DevaFramework::VulkanMemoryAlloc*, MemID, MemoryComparator> sortedMemoryMap;
 		std::unordered_map<BufID, MemID> bufferToMemoryMap;
 		std::unordered_map<MemID, std::unordered_set<BufID>> memoryToBuffersMap;
 
 		DevaFramework::VulkanBuffer eraseBuffer(const BufID &id);
-		DevaFramework::VulkanMemory eraseMemory(const MemID &id);
+		DevaFramework::VulkanMemoryAlloc eraseMemory(const MemID &id);
 
 	
 	};

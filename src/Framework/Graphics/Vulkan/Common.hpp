@@ -13,7 +13,7 @@ namespace DevaFramework {
 	struct VulkanInstance;
 	struct VulkanDevice;
 	struct VulkanBuffer;
-	struct VulkanMemory;
+	struct VulkanMemoryAlloc;
 	struct VertexBuffer;
 
 	class Window;
@@ -48,7 +48,7 @@ namespace DevaFramework {
 		template <class T>
 		DEVA_FRAMEWORK_API T vulkanCopyHandle(const T &o1, const T &o2);
 
-		DEVA_FRAMEWORK_API bool isBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanMemory &mem);
+		DEVA_FRAMEWORK_API bool isBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanMemoryAlloc &mem);
 
 		DEVA_FRAMEWORK_API VkResult submitBuffers(VkQueue queue);
 

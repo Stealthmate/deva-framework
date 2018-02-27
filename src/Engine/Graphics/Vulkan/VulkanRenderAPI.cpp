@@ -583,7 +583,7 @@ RenderObjectID VulkanRenderAPI::loadTexture(const Image &tex) {
 		throw DevaException("Could not create image");
 	}
 
-	VulkanMemory imgmem = DevaFramework::Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	VulkanMemoryAlloc imgmem = DevaFramework::Vulkan::allocateMemoryForImage(main_device, image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	image.sharingMode = imageInfo.sharingMode;
 	image.size = imgmem.size;
 	image.usage = imageInfo.usage;

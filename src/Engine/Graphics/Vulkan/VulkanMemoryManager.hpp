@@ -3,43 +3,30 @@
 
 #include "Config.hpp"
 #include <DevaFramework\Graphics\Vulkan\VulkanDevice.hpp>
+#include <DevaFramework\Graphics\Vulkan\VulkanMemory.hpp>
 
 namespace DevaFramework {
-	struct VulkanMemory;
+	struct VulkanMemoryRange;
+	struct VulkanMemoryAlloc;
 }
 
 namespace DevaEngine {
 
-	struct VulkanMemoryRange {
-		VkDeviceMemory memory;
-		VkDeviceSize offset;
-		VkDeviceSize size;
-	};
-
-	class IVulkanMemoryManager {
-	public:
-		virtual std::shared_ptr<const VulkanMemoryRange> allocate(
-			const VkMemoryRequirements &reqs,
-			VkMemoryPropertyFlags properties) = 0;
-		virtual void free(VulkanMemoryRange &range) = 0;
-	};
-
-	class BasicVulkanMemoryManager : public IVulkanMemoryManager {
-		typedef DevaFramework::VulkanMemory Allocation;
+	class BasicVulkanMemoryManager : public DevaFramework::IVulkanMemoryManager {
+		typedef DevaFramework::VulkanMemoryAlloc Allocation;
 
 	public:
 
 		DEVA_ENGINE_API BasicVulkanMemoryManager(const DevaFramework::VulkanDevice &dev);
 
-		DEVA_ENGINE_API virtual std::shared_ptr<const VulkanMemoryRange> allocate(
+		DEVA_ENGINE_API virtual std::shared_ptr<const DevaFramework::VulkanMemoryRange> allocate(
 			const VkMemoryRequirements &reqs,
 			VkMemoryPropertyFlags properties) override;
-		DEVA_ENGINE_API virtual void free(VulkanMemoryRange &range) override;
+		DEVA_ENGINE_API virtual void free(DevaFramework::VulkanMemoryRange &range) override;
 
 	private:
 		DevaFramework::VulkanDevice device;
 	};
-
 }
 
 #endif //DEVA_ENGINE_API_GRAPHICS_VULKAN_VULKAN_MEMORY_MANAGER_HPP

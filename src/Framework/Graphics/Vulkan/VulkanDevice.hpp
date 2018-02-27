@@ -5,12 +5,12 @@
 
 #include "VulkanDeviceFunctionSet.hpp"
 #include "VulkanPhysicalDevice.hpp"
+#include "VulkanDeviceQueue.hpp"
 
 namespace DevaFramework
 {
 	struct VulkanInstance;
 	struct VulkanDeviceFunctionSet;
-	struct VulkanQueue;
 
 	struct VulkanDevice {
 

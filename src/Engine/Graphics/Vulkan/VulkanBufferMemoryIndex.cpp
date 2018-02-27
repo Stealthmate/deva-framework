@@ -11,7 +11,7 @@ using namespace DevaEngine;
 typedef VulkanBufferMemoryIndex::BufID BufID;
 typedef VulkanBufferMemoryIndex::MemID MemID;
 
-bool VulkanBufferMemoryIndex::MemoryComparator::operator()(const VulkanMemory* lhs, const VulkanMemory* rhs) const {
+bool VulkanBufferMemoryIndex::MemoryComparator::operator()(const VulkanMemoryAlloc* lhs, const VulkanMemoryAlloc* rhs) const {
 	return lhs->size < rhs->size;
 }
 
@@ -38,7 +38,7 @@ BufID VulkanBufferMemoryIndex::addBuffer(VulkanBuffer &&buffer, const Uuid & mem
 	return id;
 }
 
-MemID VulkanBufferMemoryIndex::addMemory(VulkanMemory &&memory) {
+MemID VulkanBufferMemoryIndex::addMemory(VulkanMemoryAlloc &&memory) {
 	Uuid id;
 	while (memoryIDs.find(id) != memoryIDs.end()) id = Uuid();
 
@@ -97,7 +97,7 @@ const VulkanBuffer & VulkanBufferMemoryIndex::getBuffer(const BufID & id) const 
 	return bufferIDMap.find(id)->second;
 }
 
-VulkanMemory & VulkanBufferMemoryIndex::getMemory(const MemID &id) {
+VulkanMemoryAlloc & VulkanBufferMemoryIndex::getMemory(const MemID &id) {
 	auto i = memoryIDs.find(id);
 	if (i == memoryIDs.end()) {
 		throw MEMORY_NOT_FOUND(id);
@@ -106,7 +106,7 @@ VulkanMemory & VulkanBufferMemoryIndex::getMemory(const MemID &id) {
 	return memoryIDMap.find(id)->second;
 }
 
-const VulkanMemory & VulkanBufferMemoryIndex::getMemory(const MemID & id) const {
+const VulkanMemoryAlloc & VulkanBufferMemoryIndex::getMemory(const MemID & id) const {
 	auto i = memoryIDs.find(id);
 	if (i == memoryIDs.end()) {
 		throw MEMORY_NOT_FOUND(id);
@@ -252,9 +252,9 @@ VulkanBuffer VulkanBufferMemoryIndex::eraseBuffer(const BufID &id) {
 	return buf;
 }
 
-VulkanMemory VulkanBufferMemoryIndex::eraseMemory(const MemID &id) {
+VulkanMemoryAlloc VulkanBufferMemoryIndex::eraseMemory(const MemID &id) {
 	memoryIDs.erase(id);
-	VulkanMemory mem;
+	VulkanMemoryAlloc mem;
 
 	auto i = memoryIDMap.find(id);
 	if (i != memoryIDMap.end()) {
@@ -266,11 +266,11 @@ VulkanMemory VulkanBufferMemoryIndex::eraseMemory(const MemID &id) {
 	return mem;
 }
 
-std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemory>> VulkanBufferMemoryIndex::purge() {
+std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemoryAlloc>> VulkanBufferMemoryIndex::purge() {
 
-	if (!needsPurge) return{};
+	if (!needsPurge) return {};
 
-	std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemory>> purged;
+	std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemoryAlloc>> purged;
 
 	auto i = bufferIDMap.begin();
 	while (i != bufferIDMap.end()) {
@@ -298,8 +298,8 @@ std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemory>> VulkanBufferMemo
 	return purged;
 }
 
-std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemory>> VulkanBufferMemoryIndex::clear() {
-	std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemory>> purged = {};
+std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemoryAlloc>> VulkanBufferMemoryIndex::clear() {
+	std::pair<std::vector<VulkanBuffer>, std::vector<VulkanMemoryAlloc>> purged = {};
 
 	bufferIDs.clear();
 	memoryIDs.clear();

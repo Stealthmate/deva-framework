@@ -17,7 +17,7 @@ uint32_t Vulkan::findMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties &pde
 	return index;
 }
 
-VulkanMemory Vulkan::allocateMemoryForBuffer(const VulkanDevice &dev, const VulkanBuffer &buffer, VkMemoryPropertyFlags properties) {
+VulkanMemoryAlloc Vulkan::allocateMemoryForBuffer(const VulkanDevice &dev, const VulkanBuffer &buffer, VkMemoryPropertyFlags properties) {
 	VkMemoryAllocateInfo allocInfo;
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.pNext = nullptr;
@@ -34,7 +34,7 @@ VulkanMemory Vulkan::allocateMemoryForBuffer(const VulkanDevice &dev, const Vulk
 
 	allocInfo.memoryTypeIndex = findMemoryTypeIndex(dev.physicalDevice.memoryProperties, buffer.memoryRequirements.memoryTypeBits, properties);
 
-	VulkanMemory memory;
+	VulkanMemoryAlloc memory;
 
 	VkResult result = dev.vk.vkAllocateMemory(dev.handle, &allocInfo, nullptr, &memory.handle);
 	if (result != VK_SUCCESS) {
@@ -48,11 +48,11 @@ VulkanMemory Vulkan::allocateMemoryForBuffer(const VulkanDevice &dev, const Vulk
 	return memory;
 }
 
-VulkanMemory Vulkan::allocateMemoryForImage(const VulkanDevice &device, const VulkanImage &image, VkMemoryPropertyFlags properties) {
+VulkanMemoryAlloc Vulkan::allocateMemoryForImage(const VulkanDevice &device, const VulkanImage &image, VkMemoryPropertyFlags properties) {
 	auto dev = device.handle;
 	auto& vk = device.vk;
 
-	VulkanMemory memory;
+	VulkanMemoryAlloc memory;
 
 	VkMemoryRequirements memreq;
 	vk.vkGetImageMemoryRequirements(dev, image.handle, &memreq);
@@ -76,7 +76,7 @@ VulkanMemory Vulkan::allocateMemoryForImage(const VulkanDevice &device, const Vu
 	return memory;
 }
 
-void Vulkan::destroyObject(const VulkanDevice &dev, VulkanMemory &mem) {
+void Vulkan::destroyObject(const VulkanDevice &dev, VulkanMemoryAlloc &mem) {
 	dev.vk.vkFreeMemory(dev.handle, mem.handle, nullptr);
 	mem.handle = VK_NULL_HANDLE;
 }

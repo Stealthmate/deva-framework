@@ -142,7 +142,7 @@ VkSemaphore Vulkan::createSemaphore(const VulkanDevice &dev) {
 	return sem;
 }
 
-bool Vulkan::isBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanMemory &mem) {
+bool Vulkan::isBufferCompatibleWithMemory(const VulkanBuffer &buf, const VulkanMemoryAlloc &mem) {
 	auto req = buf.memoryRequirements;
 	
 	if (req.size > mem.size) return false;

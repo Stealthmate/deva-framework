@@ -1,5 +1,5 @@
 #include "VulkanMemoryManager.hpp"
-
+#include <DevaFramework\Graphics\Vulkan\VulkanDevice.hpp>
 #include <DevaFramework\Graphics\Vulkan\VulkanMemory.hpp>
 
 using namespace DevaFramework;
@@ -42,7 +42,7 @@ std::shared_ptr<const VulkanMemoryRange> BasicVulkanMemoryManager::allocate(
 
 	allocInfo.memoryTypeIndex = findMemoryTypeIndex(pdev.memoryProperties, req.memoryTypeBits, properties);
 
-	VulkanMemory memory;
+	VulkanMemoryAlloc memory;
 
 	VkResult result = vk.vkAllocateMemory(dev, &allocInfo, nullptr, &memory.handle);
 	if (result != VK_SUCCESS) {
